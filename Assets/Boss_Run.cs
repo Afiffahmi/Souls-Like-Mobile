@@ -40,7 +40,7 @@ public class Boss_Run : StateMachineBehaviour
         }
         else if (Vector3.Distance(player.position, rb.position) > chaseRange)
         {
-            animator.SetTrigger("Idle");
+            animator.SetTrigger("BSIdle");
         }
     }
 
