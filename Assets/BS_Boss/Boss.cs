@@ -5,18 +5,36 @@ using UnityEngine;
 public class Boss : MonoBehaviour
 {
     public Transform player;
+    public float speed = 2.0f;
 
-    public void Update()
+    void Start()
     {
-        LookAtPlayer();
+        if (!player)
+        {
+            player = GameObject.FindGameObjectWithTag("Player").transform;
+        }
+    }
+
+    void Update()
+    {
+        if (player)
+        {
+            LookAtPlayer();
+            MoveTowardsPlayer();
+        }
     }
 
     public void LookAtPlayer()
     {
         Vector3 direction = player.position - transform.position;
-        direction.y = 0; // This line prevents the boss from tilting upwards/downwards.
-
+        direction.y = 0;
         Quaternion rotation = Quaternion.LookRotation(direction);
         transform.rotation = rotation;
+    }
+
+    void MoveTowardsPlayer()
+    {
+        Vector3 direction = (player.position - transform.position).normalized;
+        transform.position += direction * speed * Time.deltaTime;
     }
 }

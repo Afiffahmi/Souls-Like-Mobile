@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Boss_Run : StateMachineBehaviour
 {
-    public float speed = 2.5f;
+    public float speed = 2.0f;
     Transform player;
     Rigidbody rb;
     Boss boss;
@@ -37,12 +37,14 @@ public class Boss_Run : StateMachineBehaviour
         if (Vector3.Distance(player.position, rb.position) < attackRange)
         {
             animator.SetTrigger("LightAttack");
-        }
-        else if (Vector3.Distance(player.position, rb.position) > chaseRange)
-        {
-            animator.SetTrigger("BSIdle");
+            Debug.Log("LightAttack");
         }
     }
+
+    void OnCollisionEnter(Collision collision)
+{
+    Debug.Log("The boss has collided with " + collision.gameObject.name);
+}
 
     // OnStateExit is called when a transition ends and the state machine finishes evaluating this state
     override public void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
