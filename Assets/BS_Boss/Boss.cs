@@ -5,10 +5,14 @@ using UnityEngine;
 public class Boss : MonoBehaviour
 {
     public Transform player;
-    public float speed = 2.0f;
+    public float speed = 4.0f;
+    float chaseRange = 18f;
+    private BossIdle bossIdle;
+    private Animator animator;
 
     void Start()
     {
+        animator = GetComponent<Animator>();
         if (!player)
         {
             player = GameObject.FindGameObjectWithTag("Player").transform;
@@ -17,10 +21,19 @@ public class Boss : MonoBehaviour
 
     void Update()
     {
-        if (player)
+        bossIdle = animator.GetComponent<BossIdle>();
+        float distanceToPlayer = Vector3.Distance(transform.position, player.position);
+        if (distanceToPlayer <= chaseRange)
         {
+            animator.SetBool("isRunning", true);
+            animator.SetBool("Idle", false);
             LookAtPlayer();
             MoveTowardsPlayer();
+            
+            
+        }else {
+            animator.SetBool("isRunning", false);
+            animator.SetBool("Idle", true);
         }
     }
 
