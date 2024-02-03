@@ -31,9 +31,6 @@ public class Boss : MonoBehaviour
             MoveTowardsPlayer();
             
             
-        }else {
-            animator.SetBool("isRunning", false);
-            animator.SetBool("Idle", true);
         }
     }
 

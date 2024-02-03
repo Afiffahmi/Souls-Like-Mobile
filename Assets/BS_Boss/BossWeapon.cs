@@ -1,4 +1,4 @@
-using System.Collections;
+/*using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,7 +8,7 @@ public class BossWeapon : MonoBehaviour
     public int enragedAttackDamage = 40;
 
     public float attackRange = 1f;
-    public Vector3 attackOffset;;
+    public Vector3 attackOffset;
     public LayerMask attackMask;
 
     public void Attack()
@@ -31,5 +31,5 @@ public class BossWeapon : MonoBehaviour
     {
         
     }
-}
+*/
  
