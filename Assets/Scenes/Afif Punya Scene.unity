@@ -938,7 +938,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2088523552}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: Fight, Assembly-CSharp
         m_MethodName: LightAttack
         m_Mode: 1
@@ -1323,19 +1323,19 @@ PrefabInstance:
     - target: {fileID: 3782573351797891440, guid: db664a6bc6657494384a9700aefc8402, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: 13548f34ed8b5d84e9fc14844962785c, type: 2}
+      objectReference: {fileID: 2100000, guid: 79199a7710405bd4aa02e38a33d1d7fd, type: 2}
     - target: {fileID: 3782573351797891440, guid: db664a6bc6657494384a9700aefc8402, type: 3}
       propertyPath: m_Materials.Array.data[3]
       value: 
-      objectReference: {fileID: 2100000, guid: 13548f34ed8b5d84e9fc14844962785c, type: 2}
+      objectReference: {fileID: 2100000, guid: 79199a7710405bd4aa02e38a33d1d7fd, type: 2}
     - target: {fileID: 3782573351797891440, guid: db664a6bc6657494384a9700aefc8402, type: 3}
       propertyPath: m_Materials.Array.data[4]
       value: 
-      objectReference: {fileID: 2100000, guid: 13548f34ed8b5d84e9fc14844962785c, type: 2}
+      objectReference: {fileID: 2100000, guid: 79199a7710405bd4aa02e38a33d1d7fd, type: 2}
     - target: {fileID: 3782573351797891440, guid: db664a6bc6657494384a9700aefc8402, type: 3}
       propertyPath: m_Materials.Array.data[5]
       value: 
-      objectReference: {fileID: 2100000, guid: 13548f34ed8b5d84e9fc14844962785c, type: 2}
+      objectReference: {fileID: 2100000, guid: 79199a7710405bd4aa02e38a33d1d7fd, type: 2}
     - target: {fileID: 4654857974508664667, guid: db664a6bc6657494384a9700aefc8402, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
       value: 35.661755
@@ -1579,7 +1579,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7b3e26562cb92124bb027b6dc9229a51, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  player: {fileID: 2088523551}
+  player: {fileID: 0}
   speed: 3
 --- !u!65 &1997130915
 BoxCollider:
@@ -1822,7 +1822,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f1a4297ae0beecc469fe75a3288fe3c4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _animator: {fileID: 346500278}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
