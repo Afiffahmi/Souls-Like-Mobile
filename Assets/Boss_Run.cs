@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class BossRun : StateMachineBehaviour
 {
-    public float speed = 4.0f;
+    public float speed = 10.0f;
     public float attackRange = 3f;
     public float chaseRange = 10f;
     public float idleRange = 5f; // New parameter for idle range

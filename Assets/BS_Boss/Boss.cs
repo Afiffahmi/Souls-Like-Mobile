@@ -5,7 +5,7 @@ using UnityEngine;
 public class Boss : MonoBehaviour
 {
     public Transform player;
-    public float speed = 4.0f;
+    public float speed = 10.0f;
     float chaseRange = 18f;
     private BossIdle bossIdle;
     private Animator animator;
