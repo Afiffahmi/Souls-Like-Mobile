@@ -1,4 +1,4 @@
-using UnityEngine;
+/*using UnityEngine;
 
 public class BossRun : StateMachineBehaviour
 {
@@ -83,3 +83,4 @@ public class BossRun : StateMachineBehaviour
         }
     }
 }
+*/
