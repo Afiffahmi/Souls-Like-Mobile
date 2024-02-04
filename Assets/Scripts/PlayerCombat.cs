@@ -37,19 +37,20 @@ public class PlayerCombat : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
         if (Time.time - lastComboEnd > 0.2f && comboCounter < combo.Count)
         {
             CancelInvoke("EndCombo");
+
             if (Time.time - lastClickedTime >= 1.15f)
             {
                 anim.runtimeAnimatorController = combo[comboCounter].animatorOV;
                 anim.Play("Attack", 0, 0);
                 comboCounter++;
                 lastClickedTime = Time.time;
+                Debug.Log("1");
 
                 if (comboCounter >= combo.Count)
                 {
                     comboCounter = 0;
+                    StartCoroutine(WaitAndEndCombo(1.19f));
                 }
-
-                // Disable movement during attack
                 if (playerController != null)
                 {
                     playerController.SetCanMove(false);
@@ -58,11 +59,13 @@ public class PlayerCombat : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
         }
     }
 
+
     void ExitAttack()
     {
         if(anim.GetCurrentAnimatorStateInfo(0).normalizedTime > 0.9f && anim.GetCurrentAnimatorStateInfo(0).IsTag("Attack"))
         {
             Invoke("EndCombo", 1);
+            Debug.Log("3");
         }
 
     }
@@ -70,6 +73,7 @@ public class PlayerCombat : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
     {
         comboCounter = 0;
         lastComboEnd = Time.time;
+        Debug.Log("4");
 
         if (playerController != null)
         {
@@ -90,5 +94,10 @@ public class PlayerCombat : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
     public void OnPointerUp(PointerEventData eventData)
     {
         isPressed = false;
+    }
+    IEnumerator WaitAndEndCombo(float waitTime)
+    {
+        yield return new WaitForSeconds(waitTime);
+        EndCombo();
     }
 }
