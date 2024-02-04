@@ -1,18 +1,19 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class Boss : MonoBehaviour
 {
     public Transform player;
-    public float speed = 10.0f;
-    float chaseRange = 18f;
-    private BossIdle bossIdle;
+    public float chaseRange = 18f;
+
+    private NavMeshAgent navMeshAgent;
     private Animator animator;
 
     void Start()
     {
         animator = GetComponent<Animator>();
+        navMeshAgent = GetComponent<NavMeshAgent>();
+
         if (!player)
         {
             player = GameObject.FindGameObjectWithTag("Player").transform;
@@ -21,7 +22,6 @@ public class Boss : MonoBehaviour
 
     void Update()
     {
-        bossIdle = animator.GetComponent<BossIdle>();
         float distanceToPlayer = Vector3.Distance(transform.position, player.position);
         if (distanceToPlayer <= chaseRange)
         {
@@ -29,8 +29,6 @@ public class Boss : MonoBehaviour
             animator.SetBool("Idle", false);
             LookAtPlayer();
             MoveTowardsPlayer();
-            
-            
         }
     }
 
@@ -44,7 +42,7 @@ public class Boss : MonoBehaviour
 
     void MoveTowardsPlayer()
     {
-        Vector3 direction = (player.position - transform.position).normalized;
-        transform.position += direction * speed * Time.deltaTime;
+        // Set the destination for NavMeshAgent
+        navMeshAgent.SetDestination(player.position);
     }
 }
