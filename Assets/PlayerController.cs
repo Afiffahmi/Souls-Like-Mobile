@@ -10,7 +10,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float _movespeed, rotationSpeed;
     [SerializeField] private Animator _animator;
 
-    private bool canMove = true; // Flag to control movement
+    public bool canMove = true;
 
     private void FixedUpdate()
     {
