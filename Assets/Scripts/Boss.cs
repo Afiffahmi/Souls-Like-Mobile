@@ -1,3 +1,5 @@
+// Boss.cs
+
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -9,9 +11,10 @@ public class Boss : MonoBehaviour
     public NavMeshAgent navMeshAgent;
     public Animator animator;
 
+    private bool isMoving =false;
+
     void Start()
     {
-
         if (!player)
         {
             player = GameObject.FindGameObjectWithTag("Player").transform;
@@ -20,18 +23,32 @@ public class Boss : MonoBehaviour
 
     void Update()
     {
+        AnimatorStateInfo currentState = animator.GetCurrentAnimatorStateInfo(0);
+        bool isAttacking = currentState.IsTag("Attack");
+        bool isBlocking = currentState.IsTag("Block");
+
         float distanceToPlayer = Vector3.Distance(transform.position, player.position);
-        if (distanceToPlayer <= chaseRange)
+        if (!isAttacking && !isBlocking && distanceToPlayer <= chaseRange)
         {
-            animator.SetBool("Idle", false);
-            animator.SetBool("isRunning", true);
+            SetAnimatorFlags(false, true);
             LookAtPlayer();
             MoveTowardsPlayer();
-        }else{
-            animator.SetBool("Idle", true);
-            animator.SetBool("isRunning", false);
+            
+        }else if(isBlocking){
+            LookAtPlayer();
+        }
+        else
+        {
+            SetAnimatorFlags(true, false);
         }
     }
+
+    void SetAnimatorFlags(bool idle, bool isRunning)
+    {
+        animator.SetBool("Idle", idle);
+        animator.SetBool("isRunning", isRunning);
+    }
+
 
     public void LookAtPlayer()
     {
@@ -39,11 +56,18 @@ public class Boss : MonoBehaviour
         direction.y = 0;
         Quaternion rotation = Quaternion.LookRotation(direction);
         transform.rotation = rotation;
+    Quaternion targetRotation = Quaternion.LookRotation(direction);
+
+        float rotationSpeed = 5f; // Adjust this value as needed for desired rotation speed
+    transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
     }
 
     void MoveTowardsPlayer()
     {
-        // Set the destination for NavMeshAgent
-        navMeshAgent.SetDestination(player.position);
+        if (navMeshAgent.enabled) // Check if not currently attacking
+        {
+            Vector3 targetPosition = player.position;
+            navMeshAgent.SetDestination(targetPosition);
+        }
     }
 }
