@@ -15,6 +15,7 @@ public class BossRun : StateMachineBehaviour
     public float lightAttackCooldown = 1.5f;
     public float heavyAttackCooldown = 3.0f;
     public float rangeAttackCooldown = 2.0f;
+    public float SwingCooldown = 4.0f;
 
     private Transform player;
     private Rigidbody rb;
@@ -25,6 +26,7 @@ public class BossRun : StateMachineBehaviour
     private float lightAttackTimer = 0f;
     private float heavyAttackTimer = 0f;
     private float rangeAttackTimer = 0f;
+    private float SwingTimer = 0f;
 
     private bool isBlocking = false;
     private float blockingStartTime = 1f;
@@ -91,19 +93,21 @@ public class BossRun : StateMachineBehaviour
     {
         lightAttackTimer = lightAttackCooldown;
         animator.SetTrigger("LightAttack");
-        Debug.Log("LightAttack");
+
     }
     else if (heavyAttackTimer <= 0f)
     {
         heavyAttackTimer = heavyAttackCooldown;
         animator.SetTrigger("HeavyAttack");
-        Debug.Log("HeavyAttack");
     }
     else if (rangeAttackTimer <= 0f)
     {
         rangeAttackTimer = rangeAttackCooldown;
         animator.SetTrigger("RangeAttack");
         RangeAttack(animator);
+    }else if (SwingTimer <= 0f ){
+        SwingTimer = SwingCooldown;
+        animator.SetTrigger("Swing");
     }
     // Add more conditions for additional attack types with their respective cooldowns
 }
