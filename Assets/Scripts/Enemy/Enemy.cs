@@ -4,20 +4,17 @@ using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
-    public float turnSpeed;
-    public float aggressionRange;
-
-    [Header("Attack data")]
-    public float attackRange;
-    public float attackMoveSpeed;
 
     [Header("Idle Info")]
     public float idleTime;
+    public float aggressionRange;
 
     [Header("Move data")]
     public float moveSpeed;
     public float chaseSpeed;
     private bool manualMovement;
+    public float turnSpeed;
+    private bool manualRotation;
 
     [SerializeField] private Transform[] patrolPoints;
     private int currentPatrolIndex;
@@ -46,24 +43,25 @@ public class Enemy : MonoBehaviour
     
     }
 
-    private void OnDrawGizmosSelected() {
+    protected virtual void OnDrawGizmosSelected() {
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, aggressionRange);
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(transform.position, attackRange);
+        
     }
 
     public void ActiveManualMovement(bool manualMovement) => this.manualMovement = manualMovement;
     public bool ManualMovementActive() => manualMovement;
+
+    public void ActiveManualRotation(bool manualRotation) => this.manualRotation = manualRotation;
+
+    public bool manualRotationActive() => manualRotation;
     public void AnimationTrigger() => stateMachine.CurrentState.AnimationTrigger();
 
     public bool PlayerInAggressionRange(){
         return Vector3.Distance(transform.position, player.position) < aggressionRange;
     }
 
-    public bool PlayerInAttackRange(){
-        return Vector3.Distance(transform.position, player.position) < attackRange;
-    }
+    
 
     public Vector3 GetPatrolDestination(){
         Vector3 destination = patrolPoints[currentPatrolIndex].transform.position;
