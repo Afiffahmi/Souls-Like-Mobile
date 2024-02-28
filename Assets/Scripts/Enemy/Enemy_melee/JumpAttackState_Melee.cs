@@ -21,7 +21,10 @@ public class JumpAttackState_Melee : EnemyState
         lastPlayerPos = enemy.player.position;
         enemy.agent.isStopped = true;
         enemy.agent.velocity = Vector3.zero;
+        
+        
         float distanceToPlayer = Vector3.Distance(lastPlayerPos, enemy.transform.position);
+        
 
         jumpAttackMovementSpeed = distanceToPlayer / enemy.travelTimetoTarget;
 
@@ -40,6 +43,7 @@ public class JumpAttackState_Melee : EnemyState
 
        if(enemy.ManualMovementActive()){
             enemy.transform.position = Vector3.MoveTowards(myPos, lastPlayerPos, jumpAttackMovementSpeed * Time.deltaTime);
+            enemy.VisualBoss.PlaceLandingEffect(enemy.transform.position);
         }
 
         if(triggerCalled){

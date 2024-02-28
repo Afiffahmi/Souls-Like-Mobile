@@ -41,6 +41,8 @@ public class Enemy_Melee : Enemy
     public DeadState_Melee deadState { get; private set; } 
     public JumpAttackState_Melee jumpAttackState { get; private set; } 
 
+    public BossVisual_Melee VisualBoss { get; private set; }
+
 
 
     [Header("Attack data")]
@@ -50,6 +52,9 @@ public class Enemy_Melee : Enemy
     protected override void Awake()
     {
         base.Awake();
+        VisualBoss = GetComponent<BossVisual_Melee>();
+
+
         IdleState = new IdleState_Melee(this, stateMachine, "Idle");
         moveState = new MoveState_Melee(this, stateMachine, "Move");
         recoveryState = new RecoveryState_Melee(this, stateMachine, "Recovery");
