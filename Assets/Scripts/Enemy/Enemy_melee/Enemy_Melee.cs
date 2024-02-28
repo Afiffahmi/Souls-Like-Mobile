@@ -20,6 +20,13 @@ public enum AttackType{
 
 public class Enemy_Melee : Enemy
 {   
+    [Header("Junp attack")]
+    public float travelTimetoTarget = 1;
+    public float jumpAttackCooldown = 10;
+    public float lastTimeJumped;
+    public float minJumpDistance;
+    
+
 
     
     public IdleState_Melee IdleState { get; private set; }
@@ -31,6 +38,9 @@ public class Enemy_Melee : Enemy
     public ChaseState_Melee chaseState { get; private set; }
 
     public AttackState_Melee attackState { get; private set; }
+    public DeadState_Melee deadState { get; private set; } 
+    public JumpAttackState_Melee jumpAttackState { get; private set; } 
+
 
 
     [Header("Attack data")]
@@ -45,6 +55,8 @@ public class Enemy_Melee : Enemy
         recoveryState = new RecoveryState_Melee(this, stateMachine, "Recovery");
         chaseState= new ChaseState_Melee(this, stateMachine, "Chase");
         attackState = new AttackState_Melee(this, stateMachine, "Attack");
+        deadState = new DeadState_Melee(this, stateMachine, "Idle"); 
+        jumpAttackState = new JumpAttackState_Melee(this, stateMachine, "JumpAttack");   
     }
     
 
@@ -58,6 +70,29 @@ public class Enemy_Melee : Enemy
     {
         base.Update();
         stateMachine.CurrentState.Update();
+    }
+
+    public override void GetHit(){
+        base.GetHit();
+
+        if(healthPoints <= 0){
+            stateMachine.ChangeState(deadState);
+        }
+    }
+
+    public bool CanDoJumpAttack(){
+
+        float distanceToPlayer = Vector3.Distance(transform.position, player.position);
+        
+        if(distanceToPlayer < minJumpDistance){
+            return false;
+        }
+
+        if(Time.time > lastTimeJumped + jumpAttackCooldown){
+            lastTimeJumped = Time.time;
+            return true;
+        }
+        return false;
     }
 
     protected override void OnDrawGizmosSelected() {

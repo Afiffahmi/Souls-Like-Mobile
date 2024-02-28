@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
+    [SerializeField] protected int healthPoints = 20;
 
     [Header("Idle Info")]
     public float idleTime;
@@ -59,6 +60,10 @@ public class Enemy : MonoBehaviour
 
     public bool PlayerInAggressionRange(){
         return Vector3.Distance(transform.position, player.position) < aggressionRange;
+    }
+
+    public virtual void GetHit(){
+        healthPoints--;
     }
 
     
