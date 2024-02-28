@@ -5,71 +5,56 @@ using UnityEngine;
 public class AttackDamageBS : MonoBehaviour
 {
     BoxCollider boxCollider;
+    public ParticleSystem hitParticle1,hitParticle2;
     GameObject player;
+    public Player playerHP;
     public Animator anim;
-    // Start is called before the first frame update
+    public BoxCollider LeftArm, RightArm;
+
     void Start()
     {
-        player = GameObject.FindWithTag("Player"); 
-        boxCollider = GetComponentInChildren<BoxCollider>();
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        player = GameObject.FindWithTag("Player");
+        LeftArm.enabled = false;
+        RightArm.enabled = false;
     }
 
     void EnableSwingAttack()
     {
-        boxCollider.enabled = true;
-
-        // Find the player and apply damage
-        GameObject playerObject = GameObject.FindWithTag("Player");
-        if (playerObject != null)
-        {
-            Player player = playerObject.GetComponent<Player>();
-            if (player != null)
-            {
-                Debug.Log("kena swing");
-                anim.ResetTrigger("Idle");
-                anim.ResetTrigger("Running");
-                anim.SetTrigger("Hit");
-                CancelInvoke("EndCombo");
-                player.TakeDamage(4);
-            }
-
-        }
+        LeftArm.enabled = true;
+        RightArm.enabled = true;
     }
 
     void EnableLightAttack()
     {
-        boxCollider.enabled = true;
-
-        // Find the player and apply damage
-        GameObject playerObject = GameObject.FindWithTag("Player");
-        if (playerObject != null)
-        {
-            Player player = playerObject.GetComponent<Player>();
-            if (player != null)
-            {
-                Debug.Log("kena Light");
-                anim.ResetTrigger("Idle");
-                anim.ResetTrigger("Running");
-                anim.SetTrigger("Hit");
-                CancelInvoke("EndCombo");
-                player.TakeDamage(4);
-            }
-
-        }
+        LeftArm.enabled = true;
+        RightArm.enabled = true;
     }
 
     void DisableSwingAttack()
     {
-        boxCollider.enabled = false;
+        LeftArm.enabled = false;
+        RightArm.enabled = false;
     }
+
     void DisableLightAttack()
     {
-        boxCollider.enabled = false;
+        LeftArm.enabled = false;
+        RightArm.enabled = false;
     }
+
+    public void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.CompareTag("Player"))
+        {
+            anim.ResetTrigger("Idle");
+            anim.ResetTrigger("Running");
+            anim.SetTrigger("Hit");
+            playerHP.TakeDamage(4);
+            hitParticle1.Play();
+            hitParticle2.Play();
+        }
+    }
+
+
+
 }

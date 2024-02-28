@@ -45,6 +45,9 @@ public class PlayerCombat : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
                 comboCounter++;
                 lastClickedTime = Time.time;
                 Debug.Log("1");
+                anim.ResetTrigger("Hit");
+                anim.SetTrigger("Idle");
+                
 
                 if (comboCounter >= combo.Count)
                 {
@@ -54,6 +57,8 @@ public class PlayerCombat : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
                 if (playerController != null)
                 {
                     playerController.SetCanMove(false);
+                    anim.ResetTrigger("Hit");
+                    anim.SetTrigger("Idle");
                 }
             }
         }
@@ -66,6 +71,8 @@ public class PlayerCombat : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
         {
             Invoke("EndCombo", 1);
             Debug.Log("3");
+            anim.ResetTrigger("Hit");
+            anim.SetTrigger("Idle");
         }
 
     }
@@ -78,6 +85,8 @@ public class PlayerCombat : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
         if (playerController != null)
         {
             playerController.SetCanMove(true);
+            anim.ResetTrigger("Hit");
+            anim.SetTrigger("Idle");
         }
     }
 
