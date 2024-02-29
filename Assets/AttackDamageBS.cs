@@ -21,16 +21,42 @@ public class AttackDamageBS : MonoBehaviour
     void EnableSwingAttack()
     {
         LeftArm.enabled = true;
+        Debug.Log("Swing");
         RightArm.enabled = true;
     }
+
+    void EnableHeavyAttack()
+    {
+        LeftArm.enabled = true;
+        Debug.Log("Heavy");
+        RightArm.enabled = true;
+    }
+    
 
     void EnableLightAttack()
     {
         LeftArm.enabled = true;
+        Debug.Log("Light");
+        RightArm.enabled = true;
+    }
+    void EnableJumpAttack()
+    {
+        LeftArm.enabled = true;
+        Debug.Log("Light");
         RightArm.enabled = true;
     }
 
     void DisableSwingAttack()
+    {
+        LeftArm.enabled = false;
+        RightArm.enabled = false;
+    }
+    void DisableJumpAttack()
+    {
+        LeftArm.enabled = false;
+        RightArm.enabled = false;
+    }
+    void DisableHeavyAttack()
     {
         LeftArm.enabled = false;
         RightArm.enabled = false;
