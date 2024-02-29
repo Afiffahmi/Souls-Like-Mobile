@@ -383,6 +383,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8e6d8f0549c5f41be88f6003fc3c5a84, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  healthPoints: 20
   idleTime: 2
   aggressionRange: 5
   moveSpeed: 1.5
@@ -392,6 +393,10 @@ MonoBehaviour:
   - {fileID: 43021633}
   - {fileID: 1654819056}
   - {fileID: 960387325}
+  travelTimetoTarget: 1
+  jumpAttackCooldown: 10
+  lastTimeJumped: 0
+  minJumpDistance: 0
   attackData:
     attackName: 
     attackRange: 3
