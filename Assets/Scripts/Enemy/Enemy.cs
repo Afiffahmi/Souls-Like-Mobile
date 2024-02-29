@@ -18,6 +18,7 @@ public class Enemy : MonoBehaviour
     private bool manualRotation;
 
     [SerializeField] private Transform[] patrolPoints;
+ 
     private int currentPatrolIndex;
 
     public Transform player {get; private set;}
@@ -65,8 +66,6 @@ public class Enemy : MonoBehaviour
     public virtual void GetHit(){
         healthPoints--;
     }
-
-    
 
     public Vector3 GetPatrolDestination(){
         Vector3 destination = patrolPoints[currentPatrolIndex].transform.position;

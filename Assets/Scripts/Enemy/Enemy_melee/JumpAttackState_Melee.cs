@@ -43,7 +43,7 @@ public class JumpAttackState_Melee : EnemyState
 
        if(enemy.ManualMovementActive()){
             enemy.transform.position = Vector3.MoveTowards(myPos, lastPlayerPos, jumpAttackMovementSpeed * Time.deltaTime);
-            enemy.VisualBoss.PlaceLandingEffect(enemy.transform.position);
+            
         }
 
         if(triggerCalled){
