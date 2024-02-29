@@ -13,6 +13,8 @@ public class AttackDamageBS : MonoBehaviour
 
     void Start()
     {
+        hitParticle1.Stop();
+        hitParticle2.Stop();
         player = GameObject.FindWithTag("Player");
         LeftArm.enabled = false;
         RightArm.enabled = false;
