@@ -35,14 +35,13 @@ public class BossVisual_Melee : MonoBehaviour
 
             spawnStone[i].transform.position = spawnPosition;
             distanceInFront += 1.5f;
-            StartCoroutine(DestroyStone(spawnStone[i]));
         }
     }
 
     private IEnumerator DestroyStone(Transform stone)
     {
         yield return new WaitForSeconds(2f);
-        spawnStone.Remove(stone);
-        Destroy(stone.gameObject);
+
+
     }
 }
