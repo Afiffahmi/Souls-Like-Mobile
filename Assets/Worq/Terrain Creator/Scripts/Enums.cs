@@ -1,0 +1,1 @@
+﻿public enum ToolType{None, Bump, Noise, Smooth, PaintBrush}

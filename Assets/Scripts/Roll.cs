@@ -24,7 +24,7 @@ public class Roll : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         if (isPressed && canMove && canRoll)
         {
             _animator.ResetTrigger("Idle");
-            _animator.ResetTrigger("Runnih");
+            _animator.ResetTrigger("Running");
             StartCoroutine(StartRoll());
         }
     }
@@ -58,6 +58,7 @@ public class Roll : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
         _animator.ResetTrigger("Running");
         yield return new WaitForSeconds(0.8f);
         _animator.ResetTrigger("Rolling");
+        _animator.SetTrigger("Idle");
         StartCoroutine(WaitRoll());
         
         _rigidbody.velocity = Vector3.zero;
@@ -69,7 +70,7 @@ public class Roll : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     private IEnumerator WaitRoll()
     {
         
-        yield return new WaitForSeconds(1.3f);
+        yield return new WaitForSeconds(0.3f);
         playerController.SetCanMove(true);
         canRoll = true;
     }

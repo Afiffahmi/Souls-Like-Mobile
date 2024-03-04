@@ -38,6 +38,8 @@ public class PlayerController : MonoBehaviour
 
                 _animator.SetTrigger("Running");
                 _animator.ResetTrigger("Idle");
+                _animator.ResetTrigger("Hit");
+
 
                 EmitFootprint();
             }
