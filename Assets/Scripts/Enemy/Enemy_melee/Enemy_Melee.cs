@@ -25,6 +25,10 @@ public class Enemy_Melee : Enemy
     public float jumpAttackCooldown = 10;
     public float lastTimeJumped;
     public float minJumpDistance;
+    [Space]
+    public float impactRadius = 2.5f;
+    public float impactPower = 5;
+    [SerializeField] private float upforceMultiplier = 10;
     
 
 
@@ -82,6 +86,17 @@ public class Enemy_Melee : Enemy
 
         if(healthPoints <= 0){
             stateMachine.ChangeState(deadState);
+        }
+    }
+
+    public void JumpImpact(){
+        Collider[] hitColliders = Physics.OverlapSphere(transform.position, impactRadius);
+        foreach (var hitCollider in hitColliders)
+        {
+            Rigidbody rb = hitCollider.GetComponent<Rigidbody>();
+            if(rb != null){
+                rb.AddExplosionForce(impactPower, transform.position, impactRadius, upforceMultiplier, ForceMode.Impulse);
+            }
         }
     }
 

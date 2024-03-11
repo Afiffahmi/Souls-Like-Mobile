@@ -5,6 +5,7 @@ using UnityEngine;
 public class EnemyAnimationEvent : MonoBehaviour
 {
     private Enemy enemy;
+    private Enemy_Melee enemyMelee;
 
     private void Awake()
     {
@@ -30,6 +31,14 @@ public class EnemyAnimationEvent : MonoBehaviour
 
     public void EndManualRotation(){
         enemy.ActiveManualRotation(false);
+    }
+
+    public void BossJumpImpact(){
+        if(enemyMelee == null){
+            enemyMelee = GetComponentInParent<Enemy_Melee>();
+        }
+
+        enemyMelee.JumpImpact();
     }
     
 
