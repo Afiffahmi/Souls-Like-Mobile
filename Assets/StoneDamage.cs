@@ -7,7 +7,7 @@ public class StoneDamage : MonoBehaviour
     BoxCollider boxCollider;
     GameObject player;
     public Animator anim;
-    public Player playerHP;
+    public PlayerOverall playerHP;
     void Start()
     {
         

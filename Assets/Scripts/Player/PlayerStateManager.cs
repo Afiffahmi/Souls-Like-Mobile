@@ -1,0 +1,82 @@
+using UnityEngine;
+
+
+public partial class PlayerStateManager : MonoBehaviour
+{
+
+    private void Awake()
+    {
+        Controller = GetComponent<CharacterController>();
+        playerInput = new Player();
+        PlayerSpeed = 10f;
+        PlayerRotateSpeed = 100;
+
+        _gravityVector = new Vector3(0, -9.81f, 0);
+    }
+
+    void Start()
+    {
+        lastEmit = transform.position;
+        isJumped = false;
+        jumpTimer = 0.8f;
+        CurrentState = IdlingState;
+        CurrentState.EnterState(this);
+    }
+
+    void Update()
+    {
+        if (CurrentState != FallingState && CurrentState != JumpingState && !groundedPlayer){
+            SwitchState(FallingState);
+        }
+        CurrentState.UpdateState(this);
+        ApplyGravity();
+    }
+    private void FixedUpdate()
+    {
+        groundedPlayer = Physics.Raycast(transform.position, Vector3.down, groundRayDistance);
+    }
+    
+    public void SwitchState(PlayerBaseState state){
+        CurrentState.ExitState(this);
+        CurrentState = state;
+        state.EnterState(this);
+    }
+
+    #region Movement
+    public void ApplyGravity(){
+        Controller.Move(_gravityVector * Time.deltaTime);
+    }
+    public void Jump(){
+        playerVelocity.y += Mathf.Sqrt(jumpHeight * -3.0f * gravityValue);
+    }
+
+    public void EmitFootprint()
+    {
+        if (Vector3.Distance(lastEmit, transform.position) > delta)
+        {
+            var pos = transform.position + (transform.right * gap * dir);
+            dir *= -1;
+            ParticleSystem.EmitParams ep = new ParticleSystem.EmitParams();
+            ep.position = pos;
+            ep.rotation = transform.rotation.eulerAngles.y;
+            footstepParticleSystem.Emit(ep, 1);
+            lastEmit = transform.position;
+        }
+    }
+    public void Move()
+    {
+            Vector3 move = (cameraMain.forward * MoveVector.z + cameraMain.right * MoveVector.x);
+            move.y = 0f;
+            Controller.Move(PlayerSpeed * move * Time.deltaTime);
+            if (move != Vector3.zero)
+            {
+                gameObject.transform.forward = move;
+               EmitFootprint();
+            }
+    }
+    
+
+    #endregion
+
+
+}

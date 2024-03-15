@@ -7,7 +7,7 @@ public class AttackDamageBS : MonoBehaviour
     BoxCollider boxCollider;
     public ParticleSystem hitParticle1,hitParticle2;
     GameObject player;
-    public Player playerHP;
+    public PlayerOverall playerHP;
     public Animator anim;
     public BoxCollider LeftArm, RightArm;
 

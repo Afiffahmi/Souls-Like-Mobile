@@ -1,28 +1,34 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using Cinemachine;
 
+[RequireComponent(typeof(CinemachineFreeLook))]
 public class CameraLook : MonoBehaviour
 {
-    private float XMove;
-    private float YMove;
-    private float XRotation;
-    [SerializeField] private Transform PlayerBody;
-    private Vector2 LockAxis;
-    void Start()
+    [SerializeField] private float lookSpeed = 1;
+    private CinemachineFreeLook cinemachine;
+    private Player playerInput;
+
+
+    private void Awake()
     {
-        
+        playerInput = new Player();
+        cinemachine = GetComponent<CinemachineFreeLook>();
     }
+    private void OnEnable()
+    {
+        playerInput.Enable();
+    }
+
+    private void OnDisable()
+    {
+        playerInput.Disable();
+    }
+
 
     // Update is called once per frame
     void Update()
     {
-        XMove = LockAxis.x;
-        YMove = LockAxis.y;
-        XRotation -= YMove;
-        XRotation = Mathf.Clamp(XRotation, -90f, 90f);
-
-        transform.localRotation = Quaternion.Euler(XRotation,0,0);
-        PlayerBody.Rotate(Vector3.up * XMove);
+        Vector2 delta = playerInput.PlayerMain.Look.ReadValue<Vector2>();
+        cinemachine.m_XAxis.Value += delta.x * 200 *  lookSpeed * Time.deltaTime;
     }
 }
