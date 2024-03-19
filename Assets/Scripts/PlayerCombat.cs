@@ -38,41 +38,39 @@ public class PlayerCombat : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
         {
             CancelInvoke("EndCombo");
 
-            if (Time.time - lastClickedTime >= 1.15f)
+            if (Time.time - lastClickedTime >= 0.7f)
             {
                 anim.runtimeAnimatorController = combo[comboCounter].animatorOV;
                 anim.Play("Attack", 0, 0);
                 comboCounter++;
+                anim.ResetTrigger("Hit");
                 lastClickedTime = Time.time;
                 Debug.Log("1");
-                anim.ResetTrigger("Hit");
-                anim.SetTrigger("Idle");
                 
 
                 if (comboCounter >= combo.Count)
                 {
                     comboCounter = 0;
-                    StartCoroutine(WaitAndEndCombo(1.19f));
+                    StartCoroutine(WaitAndEndCombo(0.1f));
                 }
                 if (playerController != null)
                 {
                     playerController.SetCanMove(false);
                     anim.ResetTrigger("Hit");
-                    anim.SetTrigger("Idle");
                 }
             }
+            anim.ResetTrigger("Hit");
         }
     }
 
 
     void ExitAttack()
     {
-        if(anim.GetCurrentAnimatorStateInfo(0).normalizedTime > 0.9f && anim.GetCurrentAnimatorStateInfo(0).IsTag("Attack"))
+        if(anim.GetCurrentAnimatorStateInfo(0).normalizedTime > 0.4f && anim.GetCurrentAnimatorStateInfo(0).IsTag("Attack"))
         {
             Invoke("EndCombo", 1);
             Debug.Log("3");
             anim.ResetTrigger("Hit");
-            anim.SetTrigger("Idle");
         }
 
     }
@@ -86,7 +84,7 @@ public class PlayerCombat : MonoBehaviour, IPointerDownHandler, IPointerUpHandle
         {
             playerController.SetCanMove(true);
             anim.ResetTrigger("Hit");
-            anim.SetTrigger("Idle");
+
         }
     }
 
