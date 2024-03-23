@@ -25,15 +25,22 @@ public partial class PlayerStateManager : MonoBehaviour
 
     void Update()
     {
-        if (CurrentState != FallingState && CurrentState != JumpingState && !groundedPlayer){
+        timeSinceAttack += Time.deltaTime;
+        if (CurrentState != FallingState && CurrentState != JumpingState && !groundedPlayer && CurrentState != WalkingState && CurrentState != IdlingState && CurrentState != RunningState&& CurrentState != IdlingAttackState ){
             SwitchState(FallingState);
         }
+        
+
         CurrentState.UpdateState(this);
         ApplyGravity();
     }
     private void FixedUpdate()
     {
         groundedPlayer = Physics.Raycast(transform.position, Vector3.down, groundRayDistance);
+        if(timeSinceAttack > 2)
+        {
+            currentAttack = 0;
+        }
     }
     
     public void SwitchState(PlayerBaseState state){
@@ -65,16 +72,22 @@ public partial class PlayerStateManager : MonoBehaviour
     }
     public void Move()
     {
-            Vector3 move = (cameraMain.forward * MoveVector.z + cameraMain.right * MoveVector.x);
-            move.y = 0f;
-            Controller.Move(PlayerSpeed * move * Time.deltaTime);
-            if (move != Vector3.zero)
-            {
-                gameObject.transform.forward = move;
-               EmitFootprint();
-            }
+        Vector3 move = (cameraMain.forward * MoveVector.z + cameraMain.right * MoveVector.x);
+        move.y = 0f;
+
+        Controller.Move(PlayerSpeed * move * Time.deltaTime);
+
+        if (move != Vector3.zero)
+        {
+            velocity += Time.deltaTime * acceleration;
+            velocity = Mathf.Min(velocity, maxVelocity);
+            gameObject.transform.forward = move;
+            EmitFootprint();
+        }
+        anim.SetFloat("Blend", velocity);
     }
     
+
 
     #endregion
 

@@ -7,8 +7,15 @@ public partial class PlayerStateManager
 {
     public CharacterController Controller;
     private Player playerInput;
+    public int currentAttack = 0;
+    public float timeSinceAttack;
+    public bool isAttackState = false;
+    public bool isAtackking = true;
+    public float maxVelocity = 0.5f;
     public Animator anim;
-    
+    public float velocity = 0.0f;
+    public float acceleration = 2f;
+    public float deceleration = 2f;
     public Transform cameraMain;
     public float jumpTimer;
     public int jumpForce = 15;
@@ -36,6 +43,15 @@ public partial class PlayerStateManager
     public PlayerIdleState IdlingState = new PlayerIdleState();
     public PlayerFallState FallingState = new PlayerFallState();
     public PlayerJumpState JumpingState = new PlayerJumpState();
+    public PlayerRunState RunningState = new PlayerRunState();
+    public PlayerIdlingAttackState IdlingAttackState = new PlayerIdlingAttackState();
+    public PlayeLightAttack1State LightAttacking1 = new PlayeLightAttack1State();
+    public PlayeLightAttack2State LightAttacking2 = new PlayeLightAttack2State();
+    public PlayeLightAttack3State LightAttacking3 = new PlayeLightAttack3State();
+    public PlayerArmingAttackState ArmingAttackState = new PlayerArmingAttackState();
+    public PlayerDisarmingAttackState DisarmingAttackState = new PlayerDisarmingAttackState();
+    public PlayerWalkAttackState WalkingAttackState = new PlayerWalkAttackState();
+    
     #endregion
 
 
