@@ -14,6 +14,7 @@ public partial class PlayerStateManager
     {
        if (CurrentState != JumpingState && CurrentState != FallingState && !isAttackState && CurrentState != IdlingAttackState)
         {
+            anim.SetTrigger("Jump");
             SwitchState(JumpingState);
         }
     }
@@ -35,6 +36,7 @@ public partial class PlayerStateManager
     {
        if (CurrentState != JumpingState && CurrentState != FallingState && CurrentState != WalkingState && CurrentState == IdlingState && CurrentState != RunningState)
         {
+
             isAttackState = true;
             SwitchState(ArmingAttackState);
         }

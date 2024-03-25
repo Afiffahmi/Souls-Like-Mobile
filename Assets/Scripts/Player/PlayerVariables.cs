@@ -10,11 +10,11 @@ public partial class PlayerStateManager
     public int currentAttack = 0;
     public float timeSinceAttack;
     public bool isAttackState = false;
-    public bool isAtackking = true;
+    public bool isAtackking = false;
     public float maxVelocity = 0.5f;
     public Animator anim;
     public float velocity = 0.0f;
-    public float acceleration = 2f;
+    public float acceleration = 1;
     public float deceleration = 2f;
     public Transform cameraMain;
     public float jumpTimer;

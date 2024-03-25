@@ -18,7 +18,6 @@ public class PlayerWalkAttackState : PlayerBaseState
         if (move != Vector3.zero && !player.isAtackking)
         {
             player.gameObject.transform.forward = move;
-            player.EmitFootprint();
         }
         else if (player.MoveVector.magnitude == 0){
             player.SwitchState(player.IdlingAttackState);

@@ -6,12 +6,12 @@ public class PlayerJumpState : PlayerBaseState
 
     public override void EnterState(PlayerStateManager player)
     {
-        player.anim.SetBool("isJump",true);
+        
     }
 
     public override void ExitState(PlayerStateManager player)
     {
-        player.anim.SetBool("isJump",false);
+        
     }
 
     public override void UpdateState(PlayerStateManager player)

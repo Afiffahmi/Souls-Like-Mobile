@@ -57,19 +57,6 @@ public partial class PlayerStateManager : MonoBehaviour
         playerVelocity.y += Mathf.Sqrt(jumpHeight * -3.0f * gravityValue);
     }
 
-    public void EmitFootprint()
-    {
-        if (Vector3.Distance(lastEmit, transform.position) > delta)
-        {
-            var pos = transform.position + (transform.right * gap * dir);
-            dir *= -1;
-            ParticleSystem.EmitParams ep = new ParticleSystem.EmitParams();
-            ep.position = pos;
-            ep.rotation = transform.rotation.eulerAngles.y;
-            footstepParticleSystem.Emit(ep, 1);
-            lastEmit = transform.position;
-        }
-    }
     public void Move()
     {
         Vector3 move = (cameraMain.forward * MoveVector.z + cameraMain.right * MoveVector.x);
@@ -82,7 +69,7 @@ public partial class PlayerStateManager : MonoBehaviour
             velocity += Time.deltaTime * acceleration;
             velocity = Mathf.Min(velocity, maxVelocity);
             gameObject.transform.forward = move;
-            EmitFootprint();
+
         }
         anim.SetFloat("Blend", velocity);
     }
