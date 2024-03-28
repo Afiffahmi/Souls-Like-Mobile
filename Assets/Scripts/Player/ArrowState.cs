@@ -1,10 +1,10 @@
 using UnityEngine;
 using System.Collections;
 
-public class PlayerArmingAttackState : PlayerBaseState
+public class ArrowState : PlayerBaseState
 {
     public override void EnterState(PlayerStateManager player){
-        player.anim.SetTrigger("Draw");
+        player.anim.SetBool("Arrow",true);
     }
     public override void ExitState(PlayerStateManager player){
     }
@@ -15,7 +15,6 @@ public class PlayerArmingAttackState : PlayerBaseState
     {
         yield return new WaitForSeconds(0.7f);
 
-        player.SwitchState(player.IdlingState);
+        player.SwitchState(player.EquipBowState);
     }
 }
- 

@@ -44,6 +44,8 @@ public partial class PlayerStateManager
     public PlayerFallState FallingState = new PlayerFallState();
     public PlayerJumpState JumpingState = new PlayerJumpState();
     public PlayerRunState RunningState = new PlayerRunState();
+    public EquipBowState EquipBowState = new EquipBowState();
+    public DisarmBowState DisarmBowState = new DisarmBowState();
     public PlayerIdlingAttackState IdlingAttackState = new PlayerIdlingAttackState();
     public PlayeLightAttack1State LightAttacking1 = new PlayeLightAttack1State();
     public PlayeLightAttack2State LightAttacking2 = new PlayeLightAttack2State();

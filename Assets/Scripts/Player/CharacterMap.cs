@@ -44,10 +44,22 @@ public partial class PlayerStateManager
         {  
             timeSinceAttack = 0;
             SwitchState(LightAttacking1);
-        }
-        
+        }  
+    }
 
-        
+    private void OnEquip(InputValue value)
+    {
+        if (CurrentState != JumpingState && CurrentState != FallingState &&  anim.GetBool("isEquip") == false && CurrentState != IdlingAttackState && CurrentState != WalkingAttackState )
+        {
+            anim.SetBool("isEquip",true);
+            SwitchState(EquipBowState);
+        }
+        else if (CurrentState != JumpingState && CurrentState != FallingState && anim.GetBool("isEquip") == true && CurrentState != IdlingAttackState && CurrentState != WalkingAttackState)
+        {
+            anim.SetBool("isEquip",false);
+            SwitchState(DisarmBowState);
+        }
+
     }
 
 }

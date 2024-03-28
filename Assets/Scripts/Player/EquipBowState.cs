@@ -1,10 +1,11 @@
 using UnityEngine;
 using System.Collections;
 
-public class PlayerArmingAttackState : PlayerBaseState
+
+public class EquipBowState : PlayerBaseState
 {
     public override void EnterState(PlayerStateManager player){
-        player.anim.SetTrigger("Draw");
+        player.anim.SetBool("isEquip",true);
     }
     public override void ExitState(PlayerStateManager player){
     }
@@ -13,9 +14,8 @@ public class PlayerArmingAttackState : PlayerBaseState
     }
     IEnumerator WaitAndSwitch(PlayerStateManager player)
     {
-        yield return new WaitForSeconds(0.7f);
+        yield return new WaitForSeconds(0.0f);
 
-        player.SwitchState(player.IdlingState);
+        player.SwitchState(player.WalkingState);
     }
 }
- 
