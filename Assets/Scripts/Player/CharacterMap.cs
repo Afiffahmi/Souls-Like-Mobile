@@ -3,51 +3,16 @@ using UnityEngine.InputSystem;
 
 public partial class PlayerStateManager
 {
-    private void OnMove(InputValue value)
+    // PlayerInput Send Messages callbacks. Polling in Update also handles sprint
+    // release correctly with the project's existing Press interaction.
+    private void OnMove(InputValue value) => SetMoveInput(value.Get<Vector2>());
+    private void OnSprint(InputValue value) => SetSprintInput(value.isPressed);
+
+    public void SetMoveInput(Vector2 input)
     {
-        InputVector = value.Get<Vector2>();
-        MoveVector.x = InputVector.x;
-        MoveVector.z = InputVector.y;
+        InputVector = Vector2.ClampMagnitude(input, 1f);
+        MoveVector = new Vector3(InputVector.x, 0f, InputVector.y);
     }
 
-    private void OnJump(InputValue value)
-    {
-       if (CurrentState != JumpingState && CurrentState != FallingState && !isAttackState && CurrentState != IdlingAttackState)
-        {
-            anim.SetTrigger("Jump");
-            SwitchState(JumpingState);
-        }
-    }
-
-    private void OnSprint(InputValue value)
-    {
-        
-        if (CurrentState != JumpingState && CurrentState != FallingState && !isAttackState && CurrentState != IdlingAttackState)
-        {
-            SwitchState(RunningState);
-        }
-        else if (CurrentState == IdlingAttackState && CurrentState != WalkingState && CurrentState != FallingState  && CurrentState != RunningState && CurrentState != WalkingAttackState ){
-            isAttackState = false;
-            SwitchState(DisarmingAttackState);
-        }
-    }
-
-    private void OnAttack(InputValue value)
-    {
-       if (CurrentState != JumpingState && CurrentState != FallingState && CurrentState != WalkingState && CurrentState == IdlingState && CurrentState != RunningState)
-        {
-
-            isAttackState = true;
-            SwitchState(ArmingAttackState);
-        }
-        if(CurrentState == IdlingAttackState && isAttackState)
-        {  
-            timeSinceAttack = 0;
-            SwitchState(LightAttacking1);
-        }
-        
-
-        
-    }
-
+    public void SetSprintInput(bool pressed) => SprintHeld = pressed;
 }

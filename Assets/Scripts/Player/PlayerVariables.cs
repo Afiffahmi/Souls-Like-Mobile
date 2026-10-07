@@ -1,58 +1,53 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 public partial class PlayerStateManager
 {
+    [Header("References")]
     public CharacterController Controller;
-    private Player playerInput;
-    public int currentAttack = 0;
-    public float timeSinceAttack;
-    public bool isAttackState = false;
-    public bool isAtackking = false;
-    public float maxVelocity = 0.5f;
     public Animator anim;
-    public float velocity = 0.0f;
-    public float acceleration = 1;
-    public float deceleration = 2f;
+    [Tooltip("Movement uses this camera's horizontal forward/right axes. Falls back to Camera.main.")]
     public Transform cameraMain;
-    public float jumpTimer;
-    public int jumpForce = 15;
-    private CharacterController controller;
-    public Vector3 MoveVector;
-    private Vector3 lastEmit;
-    public float delta = 1;
-    public bool isJumped = false;
-    public float gap = 0.5f;
-    public ParticleSystem footstepParticleSystem;
-    private int dir = 1;
-    public Vector2 InputVector;
-    public PlayerBaseState CurrentState;
-    public float PlayerSpeed;
-    public float gravityValue = -9.81f;
-    [SerializeField] private float groundRayDistance = 0.2f;
-    [SerializeField] public bool groundedPlayer;
-    [SerializeField] public float jumpHeight = 1.0f;
-    public float PlayerRotateSpeed;
-    public Vector3 playerVelocity;
-    private Vector3 _gravityVector;
 
-    #region ConcreteStates
+    [Header("Locomotion")]
+    [Min(0.1f)] public float walkSpeed = 6f;
+    [Min(0.1f)] public float runSpeed = 9f;
+    [Tooltip("Horizontal acceleration in metres per second squared.")]
+    [Min(0.1f)] public float acceleration = 14f;
+    [Min(0.1f)] public float deceleration = 20f;
+    [Range(0f, 0.95f)] public float inputDeadzone = 0.1f;
+    [Tooltip("CameraForward gives strafing/backpedalling. MovementDirection turns toward travel. External leaves facing to a future controller.")]
+    public PlayerFacingMode facingMode = PlayerFacingMode.CameraForward;
+    [Tooltip("Turning speed in degrees per second.")]
+    [Min(1f)] public float PlayerRotateSpeed = 720f;
+    public float gravityValue = -20f;
+    [Min(0f)] public float animationDamping = 0.08f;
+
+    [HideInInspector] public Vector2 InputVector;
+    [HideInInspector] public Vector3 MoveVector;
+    [HideInInspector] public Vector3 playerVelocity;
+    [HideInInspector] public bool groundedPlayer;
+    public PlayerBaseState CurrentState;
+
     public PlayerWalkState WalkingState = new PlayerWalkState();
     public PlayerIdleState IdlingState = new PlayerIdleState();
-    public PlayerFallState FallingState = new PlayerFallState();
-    public PlayerJumpState JumpingState = new PlayerJumpState();
     public PlayerRunState RunningState = new PlayerRunState();
-    public PlayerIdlingAttackState IdlingAttackState = new PlayerIdlingAttackState();
-    public PlayeLightAttack1State LightAttacking1 = new PlayeLightAttack1State();
-    public PlayeLightAttack2State LightAttacking2 = new PlayeLightAttack2State();
-    public PlayeLightAttack3State LightAttacking3 = new PlayeLightAttack3State();
-    public PlayerArmingAttackState ArmingAttackState = new PlayerArmingAttackState();
-    public PlayerDisarmingAttackState DisarmingAttackState = new PlayerDisarmingAttackState();
-    public PlayerWalkAttackState WalkingAttackState = new PlayerWalkAttackState();
-    
-    #endregion
 
-
+    // Kept to preserve serialization and references from older prototype states.
+    // The locomotion controller does not select those states or handle their input.
+    [HideInInspector] public PlayerFallState FallingState = new PlayerFallState();
+    [HideInInspector] public PlayerJumpState JumpingState = new PlayerJumpState();
+    [HideInInspector] public int currentAttack;
+    [HideInInspector] public float timeSinceAttack;
+    [HideInInspector] public bool isAttackState;
+    [HideInInspector] public bool isAtackking;
+    [HideInInspector] public float maxVelocity = 1f;
+    [HideInInspector] public float velocity;
+    [HideInInspector] public float jumpTimer = 0.8f;
+    [HideInInspector] public int jumpForce = 15;
+    [HideInInspector] public float delta = 1f;
+    [HideInInspector] public bool isJumped;
+    [HideInInspector] public float gap = 0.5f;
+    [HideInInspector] public ParticleSystem footstepParticleSystem;
+    [HideInInspector] public float PlayerSpeed;
+    [HideInInspector] public float jumpHeight = 1f;
 }

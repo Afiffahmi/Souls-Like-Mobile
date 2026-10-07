@@ -1,82 +1,100 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
-
+[DisallowMultipleComponent]
+[RequireComponent(typeof(CharacterController))]
 public partial class PlayerStateManager : MonoBehaviour
 {
+    private PlayerInput movementInput;
+    private InputAction moveAction;
+    private InputAction sprintAction;
+
+    public bool SprintHeld { get; private set; }
+    public bool HasMoveInput => new Vector2(MoveVector.x, MoveVector.z).sqrMagnitude > inputDeadzone * inputDeadzone;
+    public float CurrentSpeed => planarVelocity.magnitude;
 
     private void Awake()
     {
         Controller = GetComponent<CharacterController>();
-        playerInput = new Player();
-        PlayerSpeed = 10f;
-        PlayerRotateSpeed = 100;
+        movementInput = GetComponent<PlayerInput>();
+        if (anim == null) anim = GetComponentInChildren<Animator>();
+        if (cameraMain == null && Camera.main != null) cameraMain = Camera.main.transform;
 
-        _gravityVector = new Vector3(0, -9.81f, 0);
-    }
+        foreach (Animator childAnimator in GetComponentsInChildren<Animator>(true))
+            childAnimator.applyRootMotion = false;
 
-    void Start()
-    {
-        lastEmit = transform.position;
-        isJumped = false;
-        jumpTimer = 0.8f;
+        // The CharacterController owns movement; a dynamic Rigidbody would fight it.
+        if (TryGetComponent(out Rigidbody body))
+        {
+            body.isKinematic = true;
+            body.useGravity = false;
+        }
+
+        CacheAnimatorParameters();
         CurrentState = IdlingState;
         CurrentState.EnterState(this);
     }
 
-    void Update()
+    private void Start()
     {
-        timeSinceAttack += Time.deltaTime;
-        if (CurrentState != FallingState && CurrentState != JumpingState && !groundedPlayer && CurrentState != WalkingState && CurrentState != IdlingState && CurrentState != RunningState&& CurrentState != IdlingAttackState ){
-            SwitchState(FallingState);
+        // PlayerInput creates its own action copy during OnEnable, before Start.
+        if (movementInput != null && movementInput.actions != null)
+        {
+            moveAction = movementInput.actions.FindAction("Move", false);
+            sprintAction = movementInput.actions.FindAction("Sprint", false);
         }
-        
+    }
 
+    private void Update()
+    {
+        if (movementInput != null)
+        {
+            bool inputActive = movementInput.isActiveAndEnabled && movementInput.inputIsActive;
+            SetMoveInput(inputActive && moveAction != null && moveAction.enabled
+                ? moveAction.ReadValue<Vector2>() : Vector2.zero);
+            SetSprintInput(inputActive && sprintAction != null && sprintAction.enabled && sprintAction.IsPressed());
+        }
+
+        SwitchState(!HasMoveInput ? IdlingState : CanRun ? (PlayerBaseState)RunningState : WalkingState);
         CurrentState.UpdateState(this);
-        ApplyGravity();
     }
-    private void FixedUpdate()
+
+    private void OnDisable()
     {
-        groundedPlayer = Physics.Raycast(transform.position, Vector3.down, groundRayDistance);
-        if(timeSinceAttack > 2)
-        {
-            currentAttack = 0;
-        }
+        SetMoveInput(Vector2.zero);
+        SetSprintInput(false);
+        planarVelocity = Vector3.zero;
+        playerVelocity = Vector3.zero;
+        velocity = 0f;
+        ResetLocomotionAnimation();
     }
-    
-    public void SwitchState(PlayerBaseState state){
-        CurrentState.ExitState(this);
+
+    public void SwitchState(PlayerBaseState state)
+    {
+        if (state == null || state == CurrentState) return;
+        CurrentState?.ExitState(this);
         CurrentState = state;
-        state.EnterState(this);
+        CurrentState.EnterState(this);
     }
 
-    #region Movement
-    public void ApplyGravity(){
-        Controller.Move(_gravityVector * Time.deltaTime);
-    }
-    public void Jump(){
-        playerVelocity.y += Mathf.Sqrt(jumpHeight * -3.0f * gravityValue);
-    }
-
-    public void Move()
+    // Existing non-locomotion states can still compile, but this controller only
+    // selects Idle, Walk and Run. No jump, combat or targeting input is handled.
+    public void ApplyGravity()
     {
-        Vector3 move = (cameraMain.forward * MoveVector.z + cameraMain.right * MoveVector.x);
-        move.y = 0f;
-
-        Controller.Move(PlayerSpeed * move * Time.deltaTime);
-
-        if (move != Vector3.zero)
-        {
-            velocity += Time.deltaTime * acceleration;
-            velocity = Mathf.Min(velocity, maxVelocity);
-            gameObject.transform.forward = move;
-
-        }
-        anim.SetFloat("Blend", velocity);
+        if (Controller != null && Controller.enabled)
+            Controller.Move(Vector3.up * gravityValue * Time.deltaTime);
     }
-    
 
+    public void Jump() => playerVelocity.y = Mathf.Sqrt(jumpHeight * -2f * gravityValue);
 
-    #endregion
-
-
+    private void OnValidate()
+    {
+        walkSpeed = Mathf.Max(0.1f, walkSpeed);
+        runSpeed = Mathf.Max(walkSpeed + 0.1f, runSpeed);
+        acceleration = Mathf.Max(0.1f, acceleration);
+        deceleration = Mathf.Max(0.1f, deceleration);
+        PlayerRotateSpeed = Mathf.Max(1f, PlayerRotateSpeed);
+        inputDeadzone = Mathf.Clamp(inputDeadzone, 0f, 0.95f);
+        gravityValue = Mathf.Min(-0.01f, gravityValue);
+    }
 }

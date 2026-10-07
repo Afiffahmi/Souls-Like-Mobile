@@ -1,18 +1,18 @@
 using UnityEngine;
-using Cinemachine;
 
-[RequireComponent(typeof(CinemachineFreeLook))]
+
+[RequireComponent(typeof(Unity.Cinemachine.CinemachineFreeLook))]
 public class CameraLook : MonoBehaviour
 {
     [SerializeField] private float lookSpeed = 1;
-    private CinemachineFreeLook cinemachine;
+    private Unity.Cinemachine.CinemachineFreeLook cinemachine;
     private Player playerInput;
 
 
     private void Awake()
     {
         playerInput = new Player();
-        cinemachine = GetComponent<CinemachineFreeLook>();
+        cinemachine = GetComponent<Unity.Cinemachine.CinemachineFreeLook>();
     }
     private void OnEnable()
     {
