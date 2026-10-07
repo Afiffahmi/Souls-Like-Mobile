@@ -31,12 +31,14 @@ public partial class PlayerStateManager : MonoBehaviour
         }
 
         CacheAnimatorParameters();
+        InitializeCombat();
         CurrentState = IdlingState;
         CurrentState.EnterState(this);
     }
 
     private void Start()
     {
+        BindCombatInput();
         // PlayerInput creates its own action copy during OnEnable, before Start.
         if (movementInput != null && movementInput.actions != null)
         {
@@ -55,12 +57,14 @@ public partial class PlayerStateManager : MonoBehaviour
             SetSprintInput(inputActive && sprintAction != null && sprintAction.enabled && sprintAction.IsPressed());
         }
 
+        UpdateCombat();
         SwitchState(!HasMoveInput ? IdlingState : CanRun ? (PlayerBaseState)RunningState : WalkingState);
         CurrentState.UpdateState(this);
     }
 
     private void OnDisable()
     {
+        DisableCombat();
         SetMoveInput(Vector2.zero);
         SetSprintInput(false);
         planarVelocity = Vector3.zero;
@@ -78,7 +82,7 @@ public partial class PlayerStateManager : MonoBehaviour
     }
 
     // Existing non-locomotion states can still compile, but this controller only
-    // selects Idle, Walk and Run. No jump, combat or targeting input is handled.
+    // selects Idle, Walk and Run. Combat gates sprint separately; no jump or targeting input is handled here.
     public void ApplyGravity()
     {
         if (Controller != null && Controller.enabled)

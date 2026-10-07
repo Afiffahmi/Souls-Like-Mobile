@@ -14,6 +14,16 @@ public partial class PlayerStateManager
     private static readonly int SpeedHash = Animator.StringToHash("Speed");
     private Vector3 planarVelocity;
     private bool hasLocomotionParameters;
+    private PlayerLockOn locomotionLockOn;
+
+    private bool RequiresWalking
+    {
+        get
+        {
+            if (locomotionLockOn == null) TryGetComponent(out locomotionLockOn);
+            return IsCombatActive || (locomotionLockOn != null && locomotionLockOn.IsLockedOn);
+        }
+    }
 
     /// <summary>
     /// Optional movement frame supplied by another system. Null uses the camera.
@@ -39,7 +49,7 @@ public partial class PlayerStateManager
         get
         {
             Vector2 input = new Vector2(MoveVector.x, MoveVector.z);
-            if (!SprintHeld || !HasMoveInput) return false;
+            if (RequiresWalking || !SprintHeld || !HasMoveInput) return false;
             if (AllowOmnidirectionalRun || UsesForwardLocomotion) return true;
             if (!IsForwardRunDirection(input)) return false;
             Transform reference = MovementReferenceOverride != null ? MovementReferenceOverride : cameraMain;
@@ -55,6 +65,7 @@ public partial class PlayerStateManager
     {
         if (Controller == null || !Controller.enabled) return;
 
+        if (RequiresWalking) targetSpeed = Mathf.Min(targetSpeed, walkSpeed);
         float dt = Time.deltaTime;
         if (cameraMain == null && Camera.main != null) cameraMain = Camera.main.transform;
         Transform reference = MovementReferenceOverride != null ? MovementReferenceOverride : cameraMain;
@@ -130,8 +141,8 @@ public partial class PlayerStateManager
             : ToAnimatorDirection(transform.InverseTransformDirection(planarVelocity));
         float blendSpeed = speed <= walkSpeed ? speed / walkSpeed
             : 1f + (speed - walkSpeed) / Mathf.Max(0.1f, runSpeed - walkSpeed);
-        // Never let damping retain a Run weight while strafing/backpedalling.
-        if (!AllowOmnidirectionalRun && !IsForwardRunDirection(direction))
+        // Never retain a Run weight during lock-on, combat or restricted strafing.
+        if (RequiresWalking || (!AllowOmnidirectionalRun && !IsForwardRunDirection(direction)))
         {
             blendSpeed = Mathf.Min(blendSpeed, 1f);
             anim.SetFloat(SpeedHash, Mathf.Min(anim.GetFloat(SpeedHash), 1f));
