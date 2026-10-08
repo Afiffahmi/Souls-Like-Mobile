@@ -1,0 +1,53 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 56a6e866cf4d94349940521a47e5d1a2, type: 3}
+  m_Name: SwordAttackConfiguration
+  m_EditorClassIdentifier: Assembly-CSharp::CombatAttackConfiguration
+  weapon: 1
+  animatorController: {fileID: 9100000, guid: a263341e90543a14c888fa88ab00d725, type: 2}
+  combatStateMachinePath: Base Layer.Attack
+  lightAttackChain:
+  - animation: {fileID: 7400000, guid: b0b29feea3fe4a842a34360005b8de20, type: 2}
+    playbackSpeed: 1
+    comboWindowStart: 0.25
+    comboWindowEnd: 0.65
+    chainTransitionTime: 0.85
+  - animation: {fileID: 7400000, guid: bbd4ba65b7ee95d46bfb8a38443918bb, type: 2}
+    playbackSpeed: 1
+    comboWindowStart: 0.25
+    comboWindowEnd: 0.65
+    chainTransitionTime: 0.85
+  - animation: {fileID: 7400000, guid: 42357e114621a7d429fcb81bf2d6a999, type: 2}
+    playbackSpeed: 1
+    comboWindowStart: 0.25
+    comboWindowEnd: 0.65
+    chainTransitionTime: 0.85
+  heavyAttackChain:
+  - animation: {fileID: 7400000, guid: 800ff7cea362bc84eb9c6d3ac85fffee, type: 2}
+    playbackSpeed: 1
+    comboWindowStart: 0.25
+    comboWindowEnd: 0.65
+    chainTransitionTime: 0.85
+  - animation: {fileID: 7400000, guid: be6bdb52db3489a4fb0e4742bb22908c, type: 2}
+    playbackSpeed: 1
+    comboWindowStart: 0.25
+    comboWindowEnd: 0.65
+    chainTransitionTime: 0.85
+  - animation: {fileID: 7400000, guid: 276b9e4abe386c54cbea22e15e73ea4e, type: 2}
+    playbackSpeed: 1
+    comboWindowStart: 0.25
+    comboWindowEnd: 0.65
+    chainTransitionTime: 0.85
+  specialAttack:
+    animation: {fileID: 7400000, guid: 9f6c108161960984ea749105a2aead55, type: 2}
+    playbackSpeed: 1
+    cooldown: 5

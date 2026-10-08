@@ -1,0 +1,84 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30e195cad73ff684dae8069d2afdbd9d, type: 3}
+  m_Name: RollConfiguration
+  m_EditorClassIdentifier: Assembly-CSharp::RollConfiguration
+  animatorController: {fileID: 9100000, guid: a263341e90543a14c888fa88ab00d725, type: 2}
+  rolls:
+  - mode: 0
+    animation: {fileID: 0}
+    directionalAnimations:
+      forward: {fileID: 7400000, guid: 47cadb18313965f438f8cf0138191b16, type: 2}
+      forwardRight: {fileID: 7400000, guid: c7717127fe5c9054387fa5c0d03feae1, type: 2}
+      right: {fileID: 7400000, guid: 81472494d37a5da43ac29ba5e22d9021, type: 2}
+      backwardRight: {fileID: 7400000, guid: 21c31b0a9ef690b478197efec0e72a53, type: 2}
+      backward: {fileID: 7400000, guid: d5aaead54197e674ab154a9b95f189fa, type: 2}
+      backwardLeft: {fileID: 7400000, guid: b388260bde65df44bb5e495417194dfa, type: 2}
+      left: {fileID: 7400000, guid: 13f28a33d5cd6414db94be0ffee6efb0, type: 2}
+      forwardLeft: {fileID: 7400000, guid: d47e4ba9e56534c45bcde11ddd396d04, type: 2}
+    distance: 3
+    duration: 0.65
+    animationFrames: 53
+    movementEndFrame: 32
+    recovery: 0.2
+    requireGrounded: 1
+  - mode: 1
+    animation: {fileID: 0}
+    directionalAnimations:
+      forward: {fileID: 7400000, guid: d746966b58c6b4f4e87b7471d58cd282, type: 2}
+      forwardRight: {fileID: 7400000, guid: a7118aeb1c9169a4b94aa8436799c051, type: 2}
+      right: {fileID: 7400000, guid: f9524dab22aecd548919afc1b464d6e2, type: 2}
+      backwardRight: {fileID: 7400000, guid: 9a49aecbb1f9e7e46abadfc601bc55d7, type: 2}
+      backward: {fileID: 7400000, guid: 7acf5f5354bdaa34eb75dfba153ace21, type: 2}
+      backwardLeft: {fileID: 7400000, guid: cf1e685a530ab5a489c22e6f38d608c6, type: 2}
+      left: {fileID: 7400000, guid: b58fad467a0509a478a9c50ac28c8207, type: 2}
+      forwardLeft: {fileID: 7400000, guid: c716a0b38b099f747bf5e215f5f00826, type: 2}
+    distance: 3
+    duration: 0.65
+    animationFrames: 53
+    movementEndFrame: 32
+    recovery: 0.2
+    requireGrounded: 1
+  - mode: 2
+    animation: {fileID: 0}
+    directionalAnimations:
+      forward: {fileID: 7400000, guid: 830ff694257077a489339281a24bfc7c, type: 2}
+      forwardRight: {fileID: 7400000, guid: 75403249d5382f146b8b55ee854ebf43, type: 2}
+      right: {fileID: 7400000, guid: 45bb5660f056ea64098d2a87ab80d4df, type: 2}
+      backwardRight: {fileID: 7400000, guid: 0df9ea3175a97c840832330ff339d0ee, type: 2}
+      backward: {fileID: 7400000, guid: 4d36ffdcda8cb4a47a4428d62045f942, type: 2}
+      backwardLeft: {fileID: 7400000, guid: 17241ccefb0bc9b468f900cdb671bf52, type: 2}
+      left: {fileID: 7400000, guid: 482e1a2c300471241a7dc13502dcd67c, type: 2}
+      forwardLeft: {fileID: 7400000, guid: c4dd6fe5ca95bb14695c145c43a86785, type: 2}
+    distance: 3
+    duration: 0.65
+    animationFrames: 53
+    movementEndFrame: 32
+    recovery: 0.2
+    requireGrounded: 1
+  - mode: 3
+    animation: {fileID: 0}
+    directionalAnimations:
+      forward: {fileID: 7400000, guid: 1e01da72be772cd4daa422f41b9a63c1, type: 2}
+      forwardRight: {fileID: 7400000, guid: d9ec251dc013f7640a9997fee20c5ef1, type: 2}
+      right: {fileID: 7400000, guid: 0437f8652c53d904788f8493ea784e73, type: 2}
+      backwardRight: {fileID: 7400000, guid: 10343b778baa98e428fc8c04ceee6333, type: 2}
+      backward: {fileID: 7400000, guid: 79c151e375e703a448c1cc2968089d9a, type: 2}
+      backwardLeft: {fileID: 7400000, guid: 4a7a0d1ab82f652458150befc5e48be0, type: 2}
+      left: {fileID: 7400000, guid: 4ea6f06902adc754aa31d13c53b37481, type: 2}
+      forwardLeft: {fileID: 7400000, guid: 88276df01aa9c0b4d90455a1beb58579, type: 2}
+    distance: 3
+    duration: 0.65
+    animationFrames: 53
+    movementEndFrame: 32
+    recovery: 0.2
+    requireGrounded: 1

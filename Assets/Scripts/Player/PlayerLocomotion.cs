@@ -49,7 +49,7 @@ public partial class PlayerStateManager
         get
         {
             Vector2 input = new Vector2(MoveVector.x, MoveVector.z);
-            if (RequiresWalking || !SprintHeld || !HasMoveInput) return false;
+            if (IsRolling || RequiresWalking || !SprintHeld || !HasMoveInput) return false;
             if (AllowOmnidirectionalRun || UsesForwardLocomotion) return true;
             if (!IsForwardRunDirection(input)) return false;
             Transform reference = MovementReferenceOverride != null ? MovementReferenceOverride : cameraMain;
@@ -64,8 +64,14 @@ public partial class PlayerStateManager
     public void Move(float targetSpeed)
     {
         if (Controller == null || !Controller.enabled) return;
+        if (IsRolling)
+        {
+            MoveRoll(Time.deltaTime);
+            return;
+        }
 
         if (RequiresWalking) targetSpeed = Mathf.Min(targetSpeed, walkSpeed);
+        if (IsAttackMovementLocked) targetSpeed = 0f;
         float dt = Time.deltaTime;
         if (cameraMain == null && Camera.main != null) cameraMain = Camera.main.transform;
         Transform reference = MovementReferenceOverride != null ? MovementReferenceOverride : cameraMain;
@@ -73,7 +79,8 @@ public partial class PlayerStateManager
 
         // Clamp length only for translation: diagonals must not move faster.
         Vector2 input = Vector2.ClampMagnitude(new Vector2(MoveVector.x, MoveVector.z), 1f);
-        if (input.sqrMagnitude <= inputDeadzone * inputDeadzone) input = Vector2.zero;
+        // Keep gravity/collision active, but ignore travel and input-facing during Light attacks.
+        if (IsAttackMovementLocked || input.sqrMagnitude <= inputDeadzone * inputDeadzone) input = Vector2.zero;
         Vector3 desiredDirection = forward * input.y + right * input.x;
         // Match this frame's input immediately, including reversals and release.
         // Smoothing velocity here retains momentum in the previous direction.

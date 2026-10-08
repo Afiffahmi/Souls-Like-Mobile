@@ -30,6 +30,7 @@ public partial class PlayerStateManager
 
     public void NotifyEquipmentStarted(PlayerCombatMode weapon, bool equipping, PlayerCombatMode destination)
     {
+        BeginEquipmentLegLocomotion();
         BeginEquipmentRequest(destination);
         EquipmentPhase = equipping ? PlayerEquipmentPhase.Equip : PlayerEquipmentPhase.Unequip;
         ActionState = PlayerActionState.Attack;
@@ -48,6 +49,9 @@ public partial class PlayerStateManager
         // An intermediate Normal Idle/Locomotion callback must not cancel a
         // pending equip. Clear only when the requested final state is entered.
         if (equipmentChangeRequested && mode == equipmentDestination)
+        {
             equipmentChangeRequested = false;
+            EndEquipmentLegLocomotion();
+        }
     }
 }

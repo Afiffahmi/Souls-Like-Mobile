@@ -19,12 +19,12 @@ public partial class PlayerStateManager
         ? (PlayerCombatMode)anim.GetInteger(CombatModeHash) : PlayerCombatMode.Normal;
     public bool IsParrying => parryRequested || AnimatorIsInParry;
     public bool IsCombatActive => hasCombatParameters && anim != null &&
-        (CombatMode != PlayerCombatMode.Normal || IsParrying || IsChangingEquipment ||
+        (CombatMode != PlayerCombatMode.Normal || IsParrying || IsChangingEquipment || IsAttacking ||
          (anim.isInitialized && anim.GetCurrentAnimatorStateInfo(0).IsTag("CombatLocomotion")));
-    public float ParryNormalizedTime => AnimatorIsInParry
-        ? Mathf.Clamp01(anim.GetCurrentAnimatorStateInfo(0).normalizedTime) : 0f;
+    public float ParryNormalizedTime => parryEntered && parryClip != null
+        ? Mathf.Clamp01(parryPlaybackTime / parryClip.length) : 0f;
 
-    // Hooks for future timing/window consumers; these perform no gameplay effects.
+    // Started/completed describe the animation lifecycle, not a successful deflection.
     public event System.Action ParryStarted;
     public event System.Action ParryCompleted;
 
@@ -43,6 +43,9 @@ public partial class PlayerStateManager
             returnMode |= p.nameHash == ParryReturnModeHash && p.type == AnimatorControllerParameterType.Int;
         }
         hasCombatParameters = mode && trigger && returnMode;
+        InitializeParry();
+        InitializeAttacks();
+        InitializeRolls();
     }
 
     private void BindCombatInput()
@@ -53,11 +56,32 @@ public partial class PlayerStateManager
         magicModeAction = movementInput.actions.FindAction("SelectMagic", false);
         bowModeAction = movementInput.actions.FindAction("SelectBow", false);
         parryAction = movementInput.actions.FindAction("Parry", false);
+        BindAttackInput();
+        BindRollInput();
     }
 
     private void UpdateCombat()
     {
+        UpdateCombatState();
+        // Poll even when combat is busy so rejected button presses are diagnosed.
+        // Existing equipment/parry/attack input keeps priority over rolling.
+        PollRollInput();
+    }
+
+    private void UpdateCombatState()
+    {
         if (!hasCombatParameters || anim == null || !anim.isActiveAndEnabled) return;
+        if (IsRolling)
+        {
+            MaintainRollLock();
+            return;
+        }
+        if (IsAttacking)
+        {
+            MaintainAttackLock();
+            PollAttackInput();
+            return;
+        }
         if (IsChangingEquipment)
         {
             MaintainEquipmentRequest();
@@ -68,6 +92,7 @@ public partial class PlayerStateManager
             // Lock the remembered mode even if another caller edits the parameter.
             anim.SetInteger(CombatModeHash, (int)parryReturnMode);
             if (AnimatorIsInParry) anim.ResetTrigger(ParryHash);
+            UpdateParry();
             return;
         }
         int mode = anim.GetInteger(CombatModeHash);
@@ -78,7 +103,8 @@ public partial class PlayerStateManager
             else if (Pressed(swordModeAction)) TrySetCombatMode(PlayerCombatMode.Sword);
             else if (Pressed(magicModeAction)) TrySetCombatMode(PlayerCombatMode.Magic);
             else if (Pressed(bowModeAction)) TrySetCombatMode(PlayerCombatMode.Bow);
-            if (Pressed(parryAction)) TryParry();
+            if (Pressed(parryAction) && TryParry()) parryUsesInput = true;
+            PollAttackInput();
         }
         if (IsCombatActive)
             anim.SetFloat(SpeedHash, Mathf.Min(anim.GetFloat(SpeedHash), 1f));
@@ -100,7 +126,7 @@ public partial class PlayerStateManager
     public bool TrySetCombatMode(PlayerCombatMode mode)
     {
         if (!hasCombatParameters || anim == null || !isActiveAndEnabled ||
-            !anim.isActiveAndEnabled || (int)mode < 0 || (int)mode > 3 || IsParrying || IsChangingEquipment) return false;
+            !anim.isActiveAndEnabled || (int)mode < 0 || (int)mode > 3 || IsParrying || IsChangingEquipment || IsAttacking || IsRolling) return false;
         if (mode == CombatMode) return true;
         BeginEquipmentRequest(mode);
         anim.SetInteger(CombatModeHash, (int)mode);
@@ -125,11 +151,17 @@ public partial class PlayerStateManager
     public bool TryParry()
     {
         if (!hasCombatParameters || anim == null || !isActiveAndEnabled || !anim.isActiveAndEnabled ||
-            !anim.isInitialized || IsParrying || IsChangingEquipment || CombatMode == PlayerCombatMode.Normal || anim.IsInTransition(0) ||
+            !anim.isInitialized || IsParrying || IsChangingEquipment || IsAttacking || IsRolling || CombatMode == PlayerCombatMode.Normal || anim.IsInTransition(0) ||
             !anim.GetCurrentAnimatorStateInfo(0).IsTag("CombatLocomotion")) return false;
+        if (!hasParryControl)
+        {
+            Debug.LogWarning("[Parry] Assign the parry animation on CombatAnimatorState and configure ParryTime/ParryFinished in the Animator.", this);
+            return false;
+        }
         // Latch the actual current Animator mode, not a newly requested next mode.
         parryReturnMode = (PlayerCombatMode)anim.GetInteger(ParryReturnModeHash);
         if (parryReturnMode != CombatMode) return false;
+        PrepareParry();
         parryRequested = true;
         anim.ResetTrigger(ParryHash);
         anim.SetTrigger(ParryHash);
@@ -139,19 +171,28 @@ public partial class PlayerStateManager
     public void NotifyParryStarted(PlayerCombatMode mode)
     {
         parryReturnMode = mode;
-        parryRequested = true;
+        parryEntered = true;
+        // Direct Animator triggers do not create a fresh timing window.
+        if (!parryRequested || !isActiveAndEnabled)
+        {
+            if (hasParryControl) FinishParry();
+            return;
+        }
         ParryStarted?.Invoke();
     }
 
     public void NotifyParryCompleted()
     {
-        parryRequested = false;
+        ResetParry();
         ParryCompleted?.Invoke();
     }
 
     private void DisableCombat()
     {
-        parryRequested = false;
+        ResetRoll();
+        EndEquipmentLegLocomotion();
+        ResetAttackSequence();
+        ResetParry();
         if (hasCombatParameters && anim != null) anim.ResetTrigger(ParryHash);
     }
 }

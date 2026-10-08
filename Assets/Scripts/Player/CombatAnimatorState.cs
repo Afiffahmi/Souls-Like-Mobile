@@ -1,11 +1,13 @@
 using UnityEngine;
 
 // Each locomotion state remembers its mode. One shared parry state locks that
-// remembered value until exit time 1 and returns through its matching transition.
+// remembered value until ParryFinished and returns through its matching transition.
 public sealed class CombatAnimatorState : StateMachineBehaviour
 {
     public PlayerCombatMode mode;
     public bool isParry;
+    [Tooltip("Clip used by the parry state, for frame-accurate hold timing.")]
+    public AnimationClip parryAnimation;
     private int returnMode;
     private static readonly int ModeHash = Animator.StringToHash("CombatMode");
     private static readonly int ReturnHash = Animator.StringToHash("ParryReturnMode");

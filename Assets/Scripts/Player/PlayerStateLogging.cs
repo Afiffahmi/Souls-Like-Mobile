@@ -19,6 +19,8 @@ public partial class PlayerStateManager
     {
         EquipmentPhase = PlayerEquipmentPhase.None;
         if (!parry) NotifyEquipmentSettled(mode);
+        if (!parry) NotifyAttackLocomotionEntered(mode);
+        if (!parry) NotifyRollLocomotionEntered();
         ActionState = mode == PlayerCombatMode.Normal && !parry
             ? PlayerActionState.Normal : PlayerActionState.Attack;
         AttackSubstate = parry ? PlayerAttackSubstate.Parry : mode switch
