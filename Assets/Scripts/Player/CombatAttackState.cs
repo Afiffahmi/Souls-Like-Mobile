@@ -11,10 +11,22 @@ public sealed class CombatAttackState : StateMachineBehaviour
         var player = animator.GetComponentInParent<PlayerStateManager>();
         if (player != null && !player.NotifyAttackEntered(configuration, input, stepIndex) && configuration != null)
             animator.Play(configuration.LocomotionStatePath, layerIndex, 0f);
+        if (player != null && configuration != null && configuration.weapon == PlayerCombatMode.Sword && player.IsAttacking)
+            player.GetComponent<ElementalGems.GemSwordCombat>()?.Begin(stateInfo.fullPathHash, input);
         LockWeapon(animator);
     }
 
-    public override void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) => LockWeapon(animator);
+    public override void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
+    {
+        LockWeapon(animator);
+        if (configuration != null && configuration.weapon == PlayerCombatMode.Sword)
+            animator.GetComponentInParent<ElementalGems.GemSwordCombat>()?.Tick(stateInfo.fullPathHash, stateInfo.normalizedTime);
+    }
+    public override void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
+    {
+        if (configuration != null && configuration.weapon == PlayerCombatMode.Sword)
+            animator.GetComponentInParent<ElementalGems.GemSwordCombat>()?.End(stateInfo.fullPathHash);
+    }
 
     private void LockWeapon(Animator animator)
     {

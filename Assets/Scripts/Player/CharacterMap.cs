@@ -16,3 +16,4 @@ public partial class PlayerStateManager
 
     public void SetSprintInput(bool pressed) => SprintHeld = pressed;
 }
+

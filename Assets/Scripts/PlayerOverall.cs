@@ -14,7 +14,7 @@ public class PlayerOverall : MonoBehaviour
     void Start()
     {
 		currentHealth = maxHealth;
-		healthBar.SetMaxHealth(maxHealth);
+		if (healthBar != null) healthBar.SetMaxHealth(maxHealth);
     }
 
     // Update is called once per frame
@@ -23,10 +23,19 @@ public class PlayerOverall : MonoBehaviour
 		
     }
 
-	public void TakeDamage(int damage)
-	{
-		currentHealth -= damage;
+	public void Heal(int amount)
+    {
+        if (currentHealth <= 0) return;
+        currentHealth = Mathf.Min(maxHealth, currentHealth + Mathf.Max(0, amount));
+        if (healthBar != null) healthBar.SetHealth(currentHealth);
+    }
 
-		healthBar.SetHealth(currentHealth);
+    public void TakeDamage(int damage)
+	{
+		var gems = GetComponent<ElementalGems.GemManager>();
+        damage = gems != null ? gems.ReduceIncomingDamage(damage) : Mathf.Max(0, damage);
+        currentHealth = Mathf.Clamp(currentHealth - damage, 0, maxHealth);
+
+		if (healthBar != null) healthBar.SetHealth(currentHealth);
 	}
 }

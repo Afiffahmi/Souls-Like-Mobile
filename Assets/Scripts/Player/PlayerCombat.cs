@@ -45,6 +45,8 @@ public partial class PlayerStateManager
         hasCombatParameters = mode && trigger && returnMode;
         InitializeParry();
         InitializeAttacks();
+        InitializeBowAttack();
+        InitializeBowHeavyAttack();
         InitializeRolls();
     }
 
@@ -62,6 +64,7 @@ public partial class PlayerStateManager
 
     private void UpdateCombat()
     {
+        PollBowHeavyRelease();
         UpdateCombatState();
         // Poll even when combat is busy so rejected button presses are diagnosed.
         // Existing equipment/parry/attack input keeps priority over rolling.
@@ -112,7 +115,23 @@ public partial class PlayerStateManager
             anim.ResetTrigger(ParryHash); // Do not queue a normal-mode parry for later.
     }
 
-    private static bool Pressed(InputAction action) => action != null && action.enabled && action.WasPressedThisFrame();
+    private static readonly System.Collections.Generic.List<UnityEngine.EventSystems.RaycastResult> pointerHits =
+        new System.Collections.Generic.List<UnityEngine.EventSystems.RaycastResult>();
+
+    private static bool Pressed(InputAction action)
+    {
+        if (action == null || !action.enabled || !action.WasPressedThisFrame()) return false;
+        // Clicking a touch control in the Editor must not also perform the mouse-bound attack.
+        var mouse = action.activeControl?.device as Mouse;
+        var events = UnityEngine.EventSystems.EventSystem.current;
+        if (mouse == null || events == null) return true;
+        var pointer = new UnityEngine.EventSystems.PointerEventData(events) { position = mouse.position.ReadValue() };
+        pointerHits.Clear();
+        events.RaycastAll(pointer, pointerHits);
+        foreach (var hit in pointerHits)
+            if (hit.module is UnityEngine.UI.GraphicRaycaster) return false;
+        return true;
+    }
 
     // PlayerInput uses SendMessages. Polling above is the single dispatch point,
     // so these receivers deliberately do not also trigger actions.
@@ -191,8 +210,11 @@ public partial class PlayerStateManager
     {
         ResetRoll();
         EndEquipmentLegLocomotion();
+        bowHeavyCycle.Cancel();
+        bowHeavyUsesInput = false;
         ResetAttackSequence();
         ResetParry();
         if (hasCombatParameters && anim != null) anim.ResetTrigger(ParryHash);
     }
 }
+

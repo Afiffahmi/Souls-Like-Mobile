@@ -25,6 +25,7 @@ public sealed class PlayerLockOn : MonoBehaviour
     [Tooltip("Layers that block targeting. Player and target colliders are ignored.")]
     public LayerMask obstructionMask = ~0;
     [Min(0f)] public float obstructionGraceTime = 0.5f;
+    [Min(1f)] public float facingSpeed = 720f;
     [SerializeField] private LockOnTarget currentTarget;
 
     public LockOnTarget CurrentTarget => currentTarget;
@@ -79,15 +80,7 @@ public sealed class PlayerLockOn : MonoBehaviour
             Unlock();
             return;
         }
-        UpdateMovementFrame();
-    }
-
-    private void LateUpdate()
-    {
-        if (!IsLockedOn || !player.isActiveAndEnabled) return;
-        // Recompute after movement and animation so strafing cannot leave the
-        // rendered facing one movement step behind the target.
-        transform.rotation = GetTargetFacing();
+        UpdateMovementFrame(Time.deltaTime);
     }
 
     private void ResolveCamera()
@@ -145,7 +138,7 @@ public sealed class PlayerLockOn : MonoBehaviour
         player.MovementReferenceOverride = movementFrame;
         player.facingMode = PlayerFacingMode.External;
         player.AllowOmnidirectionalRun = true;
-        UpdateMovementFrame();
+        UpdateMovementFrame(0f);
         TargetChanged?.Invoke(currentTarget);
         return true;
     }
@@ -165,17 +158,11 @@ public sealed class PlayerLockOn : MonoBehaviour
         TargetChanged?.Invoke(null);
     }
 
-    private Quaternion GetTargetFacing()
+    private void UpdateMovementFrame(float dt)
     {
         Vector3 forward = Vector3.ProjectOnPlane(currentTarget.AimPosition - transform.position, Vector3.up);
-        // Preserve facing when both actors share the same horizontal position.
-        if (forward.sqrMagnitude < 0.00000001f) return transform.rotation;
-        return Quaternion.LookRotation(forward, Vector3.up);
-    }
-
-    private void UpdateMovementFrame()
-    {
-        Quaternion facingRotation = GetTargetFacing();
+        if (forward.sqrMagnitude < 0.0001f) forward = transform.forward;
+        Quaternion facingRotation = Quaternion.LookRotation(forward, Vector3.up);
         Quaternion movementRotation = facingRotation;
         if (movementSpace == LockOnMovementSpace.CameraRelative)
         {
@@ -184,8 +171,8 @@ public sealed class PlayerLockOn : MonoBehaviour
             movementRotation = Quaternion.LookRotation(cameraForward, Vector3.up);
         }
         movementFrame.SetPositionAndRotation(transform.position, movementRotation);
-        // Establish target-facing before locomotion calculates local animation directions.
-        transform.rotation = facingRotation;
+        // Runs while idle too, so a moving enemy remains in front of the character.
+        transform.rotation = Quaternion.RotateTowards(transform.rotation, facingRotation, facingSpeed * dt);
     }
 
     private bool IsValidTarget(LockOnTarget target, bool retainingLock = false)
@@ -225,5 +212,6 @@ public sealed class PlayerLockOn : MonoBehaviour
     private void OnValidate()
     {
         obstructionGraceTime = Mathf.Max(0f, obstructionGraceTime);
+        facingSpeed = Mathf.Max(1f, facingSpeed);
     }
 }

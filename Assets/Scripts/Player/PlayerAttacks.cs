@@ -18,14 +18,15 @@ public partial class PlayerStateManager
     private bool followUpBuffered;
     private InputAction lightAttackAction, heavyAttackAction, specialAttackAction;
 
-    public bool IsAttacking => attackPendingOrActive || (anim != null && anim.isInitialized &&
+    public bool IsAttacking => bowHeavyActive || bowAttackActive || attackPendingOrActive || (anim != null && anim.isInitialized &&
         (anim.GetCurrentAnimatorStateInfo(0).IsTag("CombatAttack") ||
          (anim.IsInTransition(0) && anim.GetNextAnimatorStateInfo(0).IsTag("CombatAttack"))));
     public bool HasBufferedAttack => followUpBuffered;
     // Includes the accepted request before Animator entry and every chained step.
-    public bool IsAttackMovementLocked => attackPendingOrActive && activeAttackInput == CombatAttackInput.LightAttack;
-    public int CurrentAttackNumber => IsAttacking ? activeAttackIndex + 1 : 0;
-    public CombatAttackInput? CurrentAttackInput => IsAttacking ? activeAttackInput : (CombatAttackInput?)null;
+    public bool IsAttackMovementLocked => bowHeavyActive || bowAttackActive || (attackPendingOrActive && activeAttackInput == CombatAttackInput.LightAttack);
+    public int CurrentAttackNumber => bowHeavyActive ? (bowHeavyCharged ? 2 : 1) : bowAttackActive ? 1 : IsAttacking ? activeAttackIndex + 1 : 0;
+    public CombatAttackInput? CurrentAttackInput => bowHeavyActive ? CombatAttackInput.HeavyAttack : bowAttackActive ? CombatAttackInput.LightAttack :
+        IsAttacking ? activeAttackInput : (CombatAttackInput?)null;
     public float SpecialAttackCooldownRemaining => GetSpecialAttackCooldownRemaining(CombatMode);
 
     // Configurations are referenced by their generated Animator states, avoiding
@@ -51,8 +52,14 @@ public partial class PlayerStateManager
     {
         if (movementInput == null || !movementInput.isActiveAndEnabled || !movementInput.inputIsActive) return;
         // One request per frame; Light, Heavy, Special is the simultaneous-press priority.
-        if (Pressed(lightAttackAction)) TryAttack(CombatAttackInput.LightAttack);
-        else if (Pressed(heavyAttackAction)) TryAttack(CombatAttackInput.HeavyAttack);
+        if (Pressed(lightAttackAction))
+        {
+            if (TryAttack(CombatAttackInput.LightAttack) && bowAttackActive) bowUsesInput = true;
+        }
+        else if (Pressed(heavyAttackAction))
+        {
+            if (TryAttack(CombatAttackInput.HeavyAttack) && bowHeavyActive) bowHeavyUsesInput = true;
+        }
         else if (Pressed(specialAttackAction)) TryAttack(CombatAttackInput.SpecialAttack);
     }
 
@@ -60,7 +67,7 @@ public partial class PlayerStateManager
     private void OnHeavyAttack(InputValue value) { }
     private void OnSpecialAttack(InputValue value) { }
     public void LightAttack() => TryAttack(CombatAttackInput.LightAttack);
-    public void HeavyAttack() => TryAttack(CombatAttackInput.HeavyAttack);
+    public void HeavyAttack() => RequestHeavyAttackClick();
     public void SpecialAttack() => TryAttack(CombatAttackInput.SpecialAttack);
 
     public float GetSpecialAttackCooldownRemaining(PlayerCombatMode weapon) =>
@@ -71,10 +78,14 @@ public partial class PlayerStateManager
     {
         if (!isActiveAndEnabled || !hasCombatParameters || anim == null || !anim.isActiveAndEnabled || !anim.isInitialized ||
             IsChangingEquipment || IsParrying || IsRolling || !System.Enum.IsDefined(typeof(CombatAttackInput), input)) return false;
-        if (IsAttacking) return TryBufferAttack(input);
+        if (IsAttacking) return !bowHeavyActive && !bowAttackActive && TryBufferAttack(input);
         if (anim.IsInTransition(0) || !anim.GetCurrentAnimatorStateInfo(0).IsTag("CombatLocomotion") ||
-            anim.GetInteger(ParryReturnModeHash) != (int)CombatMode ||
-            !attackConfigurations.TryGetValue(CombatMode, out var config) || !config.Validate(out _)) return false;
+            anim.GetInteger(ParryReturnModeHash) != (int)CombatMode) return false;
+        if (CombatMode == PlayerCombatMode.Bow && input == CombatAttackInput.HeavyAttack)
+            return TryBeginBowHeavyAttack();
+        if (CombatMode == PlayerCombatMode.Bow && input == CombatAttackInput.LightAttack)
+            return TryBeginBowAttack();
+        if (!attackConfigurations.TryGetValue(CombatMode, out var config) || !config.Validate(out _)) return false;
         var chain = config.Chain(input);
         if (input != CombatAttackInput.SpecialAttack && (chain == null || chain.Count == 0)) return false;
         if (!anim.HasState(0, Animator.StringToHash(config.StatePath(input, 0)))) return false;
@@ -111,6 +122,16 @@ public partial class PlayerStateManager
 
     private void MaintainAttackLock()
     {
+        if (bowHeavyActive)
+        {
+            UpdateBowHeavyAttack();
+            return;
+        }
+        if (bowAttackActive)
+        {
+            UpdateBowAttack();
+            return;
+        }
         if (activeAttackConfiguration == null) return;
         anim.SetInteger(CombatModeHash, (int)activeAttackConfiguration.weapon);
         anim.ResetTrigger(ParryHash);
@@ -143,6 +164,8 @@ public partial class PlayerStateManager
 
     private void NotifyAttackLocomotionEntered(PlayerCombatMode mode)
     {
+        if (bowHeavyActive && bowHeavyEntered) ResetBowHeavyAttack();
+        if (bowAttackActive && bowStateEntered) ResetBowAttack();
         // Do not cancel an accepted trigger before its first attack state enters.
         if (attackPendingOrActive && !attackStateEntered) return;
         if (activeAttackConfiguration != null) ResetAttackSequence();
@@ -150,6 +173,8 @@ public partial class PlayerStateManager
 
     private void ResetAttackSequence()
     {
+        ResetBowHeavyAttack();
+        ResetBowAttack();
         attackPendingOrActive = false;
         attackStateEntered = false;
         followUpBuffered = false;

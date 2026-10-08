@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f285ce9783054bf9b6c314579ee17a50, type: 3}
+  m_Name: BowHeavyAttackConfiguration
+  m_EditorClassIdentifier: Assembly-CSharp::BowHeavyAttackConfiguration
+  holdDuration: 3
+  singleAnimation: {fileID: 7400000, guid: 7e1bf6d9f2722824d93894d17c322f33, type: 2}
+  chargedAnimation: {fileID: 7400000, guid: 6f78abf5d3c6d2a4283b396c5d9b6af1, type: 2}
+  playbackSpeed: 1
+  singleReleaseFrame: 22
+  chargedReleaseFrames: 190000001e00000023000000

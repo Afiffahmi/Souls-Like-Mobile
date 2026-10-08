@@ -94,7 +94,9 @@ public partial class PlayerStateManager
         groundedPlayer = Controller.isGrounded;
         if (groundedPlayer && playerVelocity.y < 0f) playerVelocity.y = -2f;
         playerVelocity.y = Mathf.Max(playerVelocity.y + gravityValue * dt, -50f);
-        Controller.Move((planarVelocity + Vector3.up * playerVelocity.y) * dt);
+        // Elemental mobility scales translation only; input, gravity, attack locks and animation timing remain owned by this motor.
+        var gems = GetComponent<ElementalGems.GemManager>();
+        Controller.Move((planarVelocity * (gems != null ? gems.MovementScale : 1f) + Vector3.up * playerVelocity.y) * dt);
         groundedPlayer = Controller.isGrounded;
 
         // Retained for compatibility with the project's older state scripts.

@@ -89,7 +89,7 @@ public partial class PlayerStateManager : MonoBehaviour
             Controller.Move(Vector3.up * gravityValue * Time.deltaTime);
     }
 
-    public void Jump() => playerVelocity.y = Mathf.Sqrt(jumpHeight * -2f * gravityValue);
+
 
     private void OnValidate()
     {

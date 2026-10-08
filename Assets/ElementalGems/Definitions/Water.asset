@@ -1,0 +1,48 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 89da5dae77543854a949aa9b13c1dc45, type: 3}
+  m_Name: Water
+  m_EditorClassIdentifier: Assembly-CSharp::ElementalGems.GemDefinition
+  element: 2
+  displayName: Water
+  description: Crashing tides slow enemies and push them back. Strong against Fire; resisted by Lightning.
+  icon: {fileID: 21300000, guid: 81a07fe995110b248b4824baea482e55, type: 3}
+  color: {r: 0.12, g: 0.65, b: 1, a: 1}
+  damageScale: 1
+  matchups:
+  - defender: 1
+    multiplier: 2
+  - defender: 5
+    multiplier: 0.5
+  statuses:
+  - kind: 1
+    chance: 1
+    duration: 3
+    magnitude: 0.45
+  knockback: 5
+  armorReduction: 0
+  movementScale: 1
+  projectileSpeedScale: 1
+  healingOnHit: 0
+  lifeSteal: 0
+  comboDamagePerHit: 0
+  maxComboStacks: 5
+  comboTimeout: 2
+  executeHealthThreshold: 0
+  executeDamageScale: 1
+  swordAura: {fileID: 4265759737644398628, guid: 26b799338b4bf604db385ea58476b33c, type: 3}
+  bowAura: {fileID: 6227649286761564335, guid: 5c8a6519f76bd954e96c5201b19f1675, type: 3}
+  impact: {fileID: 7500724466377453577, guid: 72fe8d72519fa074289ef5d8ad9efe00, type: 3}
+  trailMaterial: {fileID: 2100000, guid: 255b68b68027ecb45be2a5c21ed9665d, type: 2}
+  swordTrailWidth: 0.25
+  arrowTrailWidth: 0.07
+  trailLifetime: 0.25
