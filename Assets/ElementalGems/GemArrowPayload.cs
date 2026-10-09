@@ -12,9 +12,10 @@ namespace ElementalGems
         private float baseDamage, radius;
         private bool impacted;
         private TrailRenderer trail;
-        public void Initialize(GemAttack attack, GemManager owner, float damage, float groundRadius)
+        private GroundFieldSnapshot groundField;
+        public void Initialize(GemAttack attack, GemManager owner, float damage, float groundRadius, GroundFieldSnapshot field = null)
         {
-            Attack = attack; source = owner; baseDamage = damage; radius = groundRadius; impacted = false;
+            Attack = attack; source = owner; baseDamage = damage; radius = field != null ? field.radius : groundRadius; groundField = field; impacted = false;
             if (trail != null) Destroy(trail.gameObject);
             if (attack.element != ElementType.Normal && attack.trailMaterial != null)
             {
@@ -49,6 +50,7 @@ namespace ElementalGems
             else if (collider != null)
                 ElementalDamage.Hit(Attack, baseDamage, source, collider.GetComponentInParent<Enemy>(), point, transform.forward);
             ElementalDamage.Impact(Attack, point, normal);
+            if (ground) GemGroundField.Spawn(groundField, Attack, source, point, normal, gameObject.scene);
         }
     }
 }

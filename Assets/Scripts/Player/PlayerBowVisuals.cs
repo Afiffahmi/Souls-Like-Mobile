@@ -1,6 +1,6 @@
 using UnityEngine;
 
-/// <summary>Animated bow with live placement offsets relative to the active socket.</summary>
+/// <summary>Animation-only bow placeholder; sockets and offsets remain replaceable.</summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(PlayerStateManager))]
 public sealed class PlayerBowVisuals : MonoBehaviour
@@ -12,8 +12,6 @@ public sealed class PlayerBowVisuals : MonoBehaviour
     [Header("Optional sockets (created on the humanoid rig when empty)")]
     public Transform handSocket;
     public Transform backSocket;
-    [Header("Live bow offsets (relative to each socket)")]
-    [Tooltip("Adjust these fields during Play Mode. Use Keep Bow Adjustments After Play Mode in this component menu to retain them.")]
     public Vector3 handPosition = new Vector3(0f, 0.08f, 0f);
     public Vector3 handRotation = new Vector3(0f, 0f, 90f);
     public Vector3 backPosition = new Vector3(0f, 0.15f, -0.2f);
@@ -27,12 +25,9 @@ public sealed class PlayerBowVisuals : MonoBehaviour
     private static readonly int UnequipState = Animator.StringToHash("Base Layer.Attack.Bow_Unequip");
     private PlayerStateManager player;
     private GameObject model;
-    public Transform BowModel => model != null ? model.transform : null;
 
+    public Transform BowModel => model != null ? model.transform : null;
     private bool drawn;
-    private Vector3 prefabScale;
-    private Transform generatedHandSocket;
-    private Transform generatedBackSocket;
     private AnimationClip sampledClip;
     private float sampledTime = -1f;
 
@@ -46,26 +41,40 @@ public sealed class PlayerBowVisuals : MonoBehaviour
             return;
         }
         if (handSocket == null)
-            handSocket = generatedHandSocket = CreateSocket("Bow Hand Socket", HumanBodyBones.LeftHand);
+            handSocket = CreateSocket("Bow Hand Socket", HumanBodyBones.LeftHand, handPosition, handRotation);
         if (backSocket == null)
-            backSocket = generatedBackSocket = CreateSocket("Bow Back Socket", HumanBodyBones.Chest);
+            backSocket = CreateSocket("Bow Back Socket", HumanBodyBones.Chest, backPosition, backRotation);
         model = Instantiate(bowPrefab, backSocket, false);
-        model.name = "Bow Visual (Runtime)";
-        prefabScale = model.transform.localScale;
+        model.name = "Bow Placeholder";
+        model.transform.localScale = Vector3.Scale(model.transform.localScale, modelScale);
         // Only the character timeline drives this model, not a second animation clock.
         foreach (var animator in model.GetComponentsInChildren<Animator>(true)) animator.enabled = false;
         foreach (var animation in model.GetComponentsInChildren<Animation>(true)) animation.enabled = false;
         Refresh();
     }
 
-    private Transform CreateSocket(string socketName, HumanBodyBones bone)
+    private Transform CreateSocket(string socketName, HumanBodyBones bone, Vector3 position, Vector3 rotation)
     {
         var socket = new GameObject(socketName).transform;
         socket.SetParent(player.anim.GetBoneTransform(bone) ?? player.anim.transform, false);
+        socket.localPosition = position;
+        socket.localRotation = Quaternion.Euler(rotation);
         return socket;
     }
 
     private void LateUpdate() => Refresh();
+
+    // Used by the existing paused Play Mode bow-placement editor.
+    public void RefreshPlacement()
+    {
+        if (handSocket != null)
+            handSocket.SetLocalPositionAndRotation(handPosition, Quaternion.Euler(handRotation));
+        if (backSocket != null)
+            backSocket.SetLocalPositionAndRotation(backPosition, Quaternion.Euler(backRotation));
+        if (model != null && bowPrefab != null)
+            model.transform.localScale = Vector3.Scale(bowPrefab.transform.localScale, modelScale);
+        Refresh();
+    }
 
     private void Refresh()
     {
@@ -93,7 +102,6 @@ public sealed class PlayerBowVisuals : MonoBehaviour
                 break;
         }
         Sample(clip, progress);
-        RefreshPlacement();
     }
 
     private bool ApplyEquipmentPose(AnimatorStateInfo state)
@@ -110,18 +118,8 @@ public sealed class PlayerBowVisuals : MonoBehaviour
         if (drawn == value && model.transform.parent == socket) return;
         drawn = value;
         model.transform.SetParent(socket, false);
-        RefreshPlacement();
-    }
-
-    /// <summary>Apply the currently selected socket's offsets without restarting or re-equipping.</summary>
-    public void RefreshPlacement()
-    {
-        if (model == null) return;
-        model.transform.SetLocalPositionAndRotation(
-            drawn ? handPosition : backPosition,
-            Quaternion.Euler(drawn ? handRotation : backRotation));
-        // Start from the prefab scale each time so live edits never compound.
-        model.transform.localScale = Vector3.Scale(prefabScale, modelScale);
+        model.transform.localPosition = Vector3.zero;
+        model.transform.localRotation = Quaternion.identity;
     }
 
     private void Sample(AnimationClip clip, float progress)
@@ -153,9 +151,5 @@ public sealed class PlayerBowVisuals : MonoBehaviour
     private void OnDestroy()
     {
         if (model != null) Destroy(model);
-        if (generatedHandSocket != null) Destroy(generatedHandSocket.gameObject);
-        if (generatedBackSocket != null) Destroy(generatedBackSocket.gameObject);
     }
 }
-
-

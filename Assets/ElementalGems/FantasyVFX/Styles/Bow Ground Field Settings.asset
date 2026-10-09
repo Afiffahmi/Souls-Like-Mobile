@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cab115c214547ee4da82fa069a41fcac, type: 3}
+  m_Name: Bow Ground Field Settings
+  m_EditorClassIdentifier: Assembly-CSharp::ElementalGems.GemGroundFieldSettings
+  duration: 2.5
+  damagePerSecond: 12
+  tickInterval: 0.5
+  damageHeight: 2.5
+  enemyLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  requireLineOfSight: 1
+  obstacleLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  maxFieldsPerPlayer: 4
+  mergeDistanceFraction: 0.35
+  elementPrefabs:
+  - {fileID: 7547718678827647476, guid: 195cfd809425504449d6620b9634a36b, type: 3}
+  - {fileID: 7006037529210394824, guid: 43837c9b4014c544d840c6d8a562cde6, type: 3}
+  - {fileID: 4218775309425076293, guid: c0d0a2d42edfe544a813f77fdda52cbf, type: 3}
+  - {fileID: 3187807593327939641, guid: b4e8f2647546d554eab9c858ab4e5bba, type: 3}
+  - {fileID: 2402941947478304377, guid: d77b8725b345ade40a0677ddb118022f, type: 3}
+  - {fileID: 7149148673368273929, guid: a816095404dea244f8eb5dd65c86d456, type: 3}
+  - {fileID: 5167744892844737340, guid: a07854f1afb35af43b7a0de2f0a956cd, type: 3}
+  - {fileID: 1908576076130903127, guid: 10f6442bc6036da47b3763082160d875, type: 3}

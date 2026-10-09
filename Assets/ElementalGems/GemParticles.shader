@@ -24,4 +24,25 @@ Shader "ElementalGems/Particles"
             ENDHLSL
         }
     }
+    SubShader
+    {
+        Tags { "Queue"="Transparent" "RenderType"="Transparent" }
+        Blend SrcAlpha OneMinusSrcAlpha
+        ZWrite Off
+        Cull Off
+        Pass
+        {
+            CGPROGRAM
+            #pragma vertex vert
+            #pragma fragment frag
+            #include "UnityCG.cginc"
+            struct Attributes { float4 vertex:POSITION; float2 uv:TEXCOORD0; fixed4 color:COLOR; };
+            struct Varyings { float4 vertex:SV_POSITION; float2 uv:TEXCOORD0; fixed4 color:COLOR; };
+            sampler2D _MainTex;
+            fixed4 _Tint;
+            Varyings vert(Attributes i) { Varyings o; o.vertex=UnityObjectToClipPos(i.vertex); o.uv=i.uv; o.color=i.color*_Tint; return o; }
+            fixed4 frag(Varyings i):SV_Target { return tex2D(_MainTex,i.uv)*i.color; }
+            ENDCG
+        }
+    }
 }

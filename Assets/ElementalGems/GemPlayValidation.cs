@@ -93,8 +93,9 @@ namespace ElementalGems.Editor
             Check(playerHealth.currentHealth>40&&darkness.GetComponent<ElementalEnemy>().HasStatus(StatusKind.Void),"Darkness life steal and void damage");
             manager.Equip(ElementType.Normal,false);Check(manager.MovementScale==1&&manager.Capture().statuses.Length==0&&manager.ReduceIncomingDamage(40)==40,"Normal removes all gem bonuses");
             var ui=FindFirstObjectByType<GemSelectionUI>();ui.openButton.onClick.Invoke();
-            var fireCard=Array.Find(ui.cards,c=>c.gem.element==ElementType.Fire);fireCard.button.onClick.Invoke();ui.equipButton.onClick.Invoke();
-            Check(ui.panel.activeSelf&&manager.EquippedElement==ElementType.Fire,"Gem UI selection and Equip button work");ui.closeButton.onClick.Invoke();Check(!ui.panel.activeSelf,"Gem UI closes");
+            var fireCard=Array.Find(ui.cards,c=>c.gem.element==ElementType.Fire);fireCard.button.onClick.Invoke();
+            if (!ui.compact) ui.equipButton.onClick.Invoke();
+            Check(manager.EquippedElement==ElementType.Fire,"Gem UI selection equips shared gem");ui.Close();Check(!ui.panel.activeSelf,"Gem UI closes");
             // Test real save/reload, restoring the user's existing preference afterward.
             const string key="ElementalGems.Equipped.v1";bool had=PlayerPrefs.HasKey(key);int saved=PlayerPrefs.GetInt(key);
             try

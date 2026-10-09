@@ -9,6 +9,8 @@ namespace ElementalGems
         public Vector3 swordAuraPosition = new Vector3(0.12f, 0.1f, 0);
         public Vector3 swordTrailPosition = new Vector3(0.48f, 0.1f, 0);
         public Vector3 bowAuraPosition;
+        [Header("Visual-only style overrides")]
+        public GemVfxStyle[] styles;
         private GemManager manager;
         private PlayerBowVisuals bow;
         private PlayerSwordVisuals swordVisuals;
@@ -17,6 +19,7 @@ namespace ElementalGems
         private TrailRenderer slash;
         private GemDefinition gem;
         private Transform bowRoot;
+        private GemVfxStyle style;
         private void Awake()
         {
             manager = GetComponent<GemManager>(); bow = GetComponent<PlayerBowVisuals>();
@@ -34,13 +37,17 @@ namespace ElementalGems
         {
             Clear(); gem = next; bowRoot = null;
             if (gem == null || gem.element == ElementType.Normal) return;
+            style = styles == null ? null : System.Array.Find(styles, s => s != null && s.element == gem.element);
             if (sword != null)
             {
-                swordEffect = Aura(gem.swordAura, sword, swordAuraPosition);
+                swordEffect = Aura(style != null ? style.swordAura : gem.swordAura, sword, swordAuraPosition);
                 var go = new GameObject("Elemental Slash Trail"); go.transform.SetParent(sword, false); go.transform.localPosition = swordTrailPosition;
-                slash = go.AddComponent<TrailRenderer>(); slash.sharedMaterial = gem.trailMaterial;
-                slash.time = gem.trailLifetime; slash.startWidth = gem.swordTrailWidth; slash.endWidth = 0;
-                slash.startColor = gem.color; slash.endColor = new Color(gem.color.r, gem.color.g, gem.color.b, 0);
+                slash = go.AddComponent<TrailRenderer>(); slash.sharedMaterial = style != null ? style.trailMaterial : gem.trailMaterial;
+                slash.time = style != null ? style.trailDuration : gem.trailLifetime;
+                slash.startWidth = style != null ? style.swordTrailWidth : gem.swordTrailWidth; slash.endWidth = 0;
+                var color = style != null ? style.trailColor : gem.color;
+                slash.startColor = color; slash.endColor = new Color(color.r,color.g,color.b,0);
+                slash.numCornerVertices=3;slash.numCapVertices=2;slash.textureMode=LineTextureMode.Stretch;
                 slash.emitting = false; slash.minVertexDistance = 0.02f;
                 slash.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off; slash.receiveShadows = false;
             }
@@ -49,7 +56,11 @@ namespace ElementalGems
         private GameObject Aura(GameObject prefab, Transform parent, Vector3 offset)
         {
             if (prefab == null) return null;
-            var go = Instantiate(prefab, parent, false); go.transform.localPosition = offset; return go;
+            var go = Instantiate(prefab, parent, false); go.transform.localPosition = offset;
+            // Imported bow has a large FBX scale. Keep particle sizes in world metres.
+            var scale=parent.lossyScale;
+            go.transform.localScale=new Vector3(1/Mathf.Max(.001f,Mathf.Abs(scale.x)),1/Mathf.Max(.001f,Mathf.Abs(scale.y)),1/Mathf.Max(.001f,Mathf.Abs(scale.z))) * (style != null ? style.size : 1);
+            return go;
         }
         private void LateUpdate() => RefreshActive();
         private void RefreshActive()
@@ -58,13 +69,31 @@ namespace ElementalGems
             if (bow != null && bow.BowModel != bowRoot)
             {
                 Dispose(ref bowEffect); bowRoot = bow.BowModel;
-                if (bowRoot != null) bowEffect = Aura(gem.bowAura, bowRoot, bowAuraPosition);
+                if (bowRoot != null)
+                {
+                    var renderers=bowRoot.GetComponentsInChildren<Renderer>(true);
+                    Vector3 center=Vector3.zero;
+                    if(renderers.Length>0)
+                    {
+                        var bounds=renderers[0].bounds;
+                        for(int i=1;i<renderers.Length;i++)bounds.Encapsulate(renderers[i].bounds);
+                        center=bowRoot.InverseTransformPoint(bounds.center);
+                    }
+                    bowEffect = Aura(style != null ? style.bowAura : gem.bowAura, bowRoot, center+bowAuraPosition);
+                }
             }
             bool swordOn = swordVisuals != null && swordVisuals.IsSwordDrawn;
             bool bowOn = bowRoot != null && bowRoot.parent == bow.handSocket && bow.isActiveAndEnabled;
-            if (swordEffect != null && swordEffect.activeSelf != swordOn) swordEffect.SetActive(swordOn);
-            if (bowEffect != null && bowEffect.activeSelf != bowOn) bowEffect.SetActive(bowOn);
+            SetAuraActive(swordEffect,swordOn);
+            SetAuraActive(bowEffect,bowOn);
             if (slash != null) { slash.emitting = swordOn && melee != null && melee.TrailActive; if (!swordOn) slash.Clear(); }
+        }
+        private static void SetAuraActive(GameObject effect,bool active)
+        {
+            if(effect==null||effect.activeSelf==active)return;
+            if(!active)foreach(var ps in effect.GetComponentsInChildren<ParticleSystem>())ps.Stop(false,ParticleSystemStopBehavior.StopEmittingAndClear);
+            effect.SetActive(active);
+            if(active)foreach(var ps in effect.GetComponentsInChildren<ParticleSystem>())ps.Play(false);
         }
     }
 }

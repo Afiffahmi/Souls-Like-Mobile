@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6218024919640786030}
   - component: {fileID: 2381342712959626661}
+  - component: {fileID: 8723608089948372503}
   m_Layer: 0
   m_Name: BowArrow
   m_TagString: Untagged
@@ -48,6 +49,26 @@ MonoBehaviour:
   tipOffset: 0.39980468
   hitRadius: 0.015
   impactLifetime: 2
+--- !u!114 &8723608089948372503
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5324511135276170252}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0f84122771202f64f8149758388534c7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ElementalGems.GemArrowVisuals
+  styles:
+  - {fileID: 11400000, guid: 614b87e95a8ef494980352552550881d, type: 2}
+  - {fileID: 11400000, guid: 4a22a2520c3fbbb4b82cc8206a38a8b1, type: 2}
+  - {fileID: 11400000, guid: 227f158e82c29054cab8073b23723dd5, type: 2}
+  - {fileID: 11400000, guid: 5432e86d490b6d64498001fe7cf9eccc, type: 2}
+  - {fileID: 11400000, guid: 0553c72466376b546b1754b6c835be62, type: 2}
+  - {fileID: 11400000, guid: 69448435acce4a44ebec41ff6522507a, type: 2}
+  - {fileID: 11400000, guid: 794b38950062f984c80c0df88735c3c8, type: 2}
 --- !u!1001 &4079890888293779875
 PrefabInstance:
   m_ObjectHideFlags: 0

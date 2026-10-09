@@ -42,7 +42,7 @@ namespace ElementalGems.Editor
             Check(manager!=null&&manager.gems.Length==8,"Scene manager missing");
             Check(UnityEngine.Object.FindObjectsByType<GemManager>(FindObjectsSortMode.None).Length==1,"More than one shared manager");
             var ui=UnityEngine.Object.FindFirstObjectByType<GemSelectionUI>();
-            Check(ui!=null&&ui.manager==manager&&ui.cards.Length==8&&ui.equipButton!=null,"UI bindings incomplete");
+            Check(ui!=null&&ui.manager==manager&&ui.cards.Length==8&&(ui.compact ? ui.previousButton!=null&&ui.nextButton!=null&&ui.equippedIcon!=null : ui.equipButton!=null),"UI bindings incomplete");
             Check(manager.GetComponent<GemSwordCombat>().blade!=null&&manager.GetComponent<GemWeaponEffects>().sword!=null,"Sword bindings missing");
             Check(UnityEngine.Object.FindObjectsByType<UnityEngine.EventSystems.EventSystem>(FindObjectsSortMode.None).Length==1,"Expected one EventSystem");
             return $"PASS: {checks} asset, matchup, snapshot, UI, and scene integration checks.";

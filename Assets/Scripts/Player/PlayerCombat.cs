@@ -170,7 +170,8 @@ public partial class PlayerStateManager
     public bool TryParry()
     {
         if (!hasCombatParameters || anim == null || !isActiveAndEnabled || !anim.isActiveAndEnabled ||
-            !anim.isInitialized || IsParrying || IsChangingEquipment || IsAttacking || IsRolling || CombatMode == PlayerCombatMode.Normal || anim.IsInTransition(0) ||
+            !anim.isInitialized || IsParrying || IsChangingEquipment || IsAttacking || IsRolling ||
+            CombatMode == PlayerCombatMode.Normal || CombatMode == PlayerCombatMode.Bow || anim.IsInTransition(0) ||
             !anim.GetCurrentAnimatorStateInfo(0).IsTag("CombatLocomotion")) return false;
         if (!hasParryControl)
         {

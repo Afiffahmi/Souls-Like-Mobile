@@ -62,6 +62,7 @@ namespace ElementalGems.Editor
             if(events.Length==0) new GameObject("EventSystem",typeof(UnityEngine.EventSystems.EventSystem),typeof(UnityEngine.InputSystem.UI.InputSystemUIInputModule));
             overlay.gameObject.SetActive(false);
             PrefabUtility.SaveAsPrefabAsset(root,GemSystemSetup.Root+"/UI/Gem Selection UI.prefab");
+            GemCompactUIBuilder.Upgrade();
             return ui;
         }
         private static RectTransform Rect(string name,Transform parent,Vector2 min,Vector2 max,Vector2 low,Vector2 high)

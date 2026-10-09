@@ -25,7 +25,11 @@ public sealed class PlayerBowShooter : MonoBehaviour
     [Min(0.1f)] public float groundProbeHeight = 10f;
     [Min(0.1f)] public float groundProbeDepth = 30f;
 
-    [Header("Elemental damage (shared GemManager)")] public float arrowDamage = 18f, heavyArrowDamage = 30f, heavyImpactRadius = 2.2f;
+    [Header("Elemental damage (shared GemManager)")] public float arrowDamage = 18f, heavyArrowDamage = 30f;
+    [Tooltip("Ground blast and lingering field radius in metres. Try 3 to 5.")]
+    [Min(.1f)] public float heavyImpactRadius = 4f;
+    [Tooltip("Duration, damage per second, tick interval, and elemental ground effect prefabs.")]
+    public ElementalGems.GemGroundFieldSettings heavyGroundField;
     private PlayerStateManager player;
     private PlayerBowVisuals visuals;
     private PlayerLockOn lockOn;
@@ -36,6 +40,7 @@ public sealed class PlayerBowShooter : MonoBehaviour
         public bool heavy, foundGround;
         public ElementalGems.GemAttack gem;
         public ElementalGems.GemManager owner;
+        public ElementalGems.GroundFieldSnapshot field;
     }
     private readonly Queue<ReleaseRequest> pendingReleases = new Queue<ReleaseRequest>();
     public event System.Action<BowArrowProjectile> ArrowSpawned;
@@ -60,6 +65,7 @@ public sealed class PlayerBowShooter : MonoBehaviour
         var request = new ReleaseRequest { direction = player.transform.forward.normalized, heavy = player.IsBowHeavyAttacking };
         request.owner = GetComponent<ElementalGems.GemManager>();
         request.gem = request.owner != null ? request.owner.Capture() : new ElementalGems.GemAttack(null);
+        request.field = request.heavy && heavyGroundField != null ? heavyGroundField.Capture(request.gem.element, heavyImpactRadius) : null;
         // Snapshot each release separately; later target movement cannot redirect an arrow in flight.
         if (request.heavy) request.foundGround = TryGetHeavyGroundPoint(out request.groundPoint);
         pendingReleases.Enqueue(request);
@@ -82,7 +88,7 @@ public sealed class PlayerBowShooter : MonoBehaviour
             Quaternion.LookRotation(releaseDirection, Mathf.Abs(releaseDirection.y) > 0.999f ? Vector3.forward : Vector3.up));
         arrow.name = "Arrow (Flying)";
         var payload = arrow.GetComponent<ElementalGems.GemArrowPayload>() ?? arrow.gameObject.AddComponent<ElementalGems.GemArrowPayload>();
-        payload.Initialize(request.gem, request.owner, request.heavy ? heavyArrowDamage : arrowDamage, heavyImpactRadius);
+        payload.Initialize(request.gem, request.owner, request.heavy ? heavyArrowDamage : arrowDamage, heavyImpactRadius, request.field);
         float elementalSpeed = arrowSpeed * request.gem.projectileSpeed;
         if (request.heavy)
             arrow.LaunchAtGround(player.transform, request.groundPoint, request.foundGround, elementalSpeed, arrowLifetime, hitLayers);
