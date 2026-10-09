@@ -39,6 +39,14 @@ namespace ElementalGems
             if (Time.timeAsDouble - lastHit > Equipped.comboTimeout) combo = 0;
             return new GemAttack(Equipped, 1 + combo * Equipped.comboDamagePerHit);
         }
+        /// <summary>Call only for a connected hit, passing its actual knockback/reaction permission.</summary>
+        public GameObject ShowKnockbackImpact(GemAttack attack, Enemy enemy, Vector3 point, Vector3 direction, bool causesKnockback)
+        {
+            // Normal's Impact is the neutral fallback; elemental attacks retain their own impact style.
+            var normal = Array.Find(gems, g => g != null && g.element == ElementType.Normal);
+            return ElementalDamage.KnockbackImpact(attack, enemy, point, direction, causesKnockback,
+                normal != null ? normal.impact : null);
+        }
         public void RegisterHit(GemAttack attack, int actualDamage)
         {
             if (actualDamage <= 0) return;

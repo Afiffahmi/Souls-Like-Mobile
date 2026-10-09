@@ -7,6 +7,10 @@ public partial class PlayerStateManager
     [Min(0)] public int parryHoldFrame = 20;
     [Tooltip("Seconds after pressing during which an incoming hit can be parried. Holding does not extend this window.")]
     [Min(0.01f)] public float parryWindowSeconds = 0.2f;
+    [Tooltip("Playback speed while raising the guard to the held frame. Does not shorten the timing window.")]
+    [Min(.1f)] public float parryRaiseSpeed = 3f;
+    [Tooltip("Playback speed of the full follow-through after a successful parry.")]
+    [Min(.1f)] public float parrySuccessSpeed = 2.5f;
     public bool logParryEvents = false;
 
     private static readonly int ParryTimeHash = Animator.StringToHash("ParryTime");
@@ -22,6 +26,12 @@ public partial class PlayerStateManager
         !parryEnding && !parrySucceeded && Time.timeAsDouble <= parryDeadline;
     public bool IsHoldingParry => parryEntered && !parryEnding && !parrySucceeded &&
         parryPlaybackTime >= ParryHoldTime;
+    // Defense requires the guard pose and a currently held button. Merely
+    // playing a missed/released parry animation does not grant a block.
+    public bool IsDefending => IsHoldingParry && (parryUsesInput
+        ? movementInput != null && movementInput.isActiveAndEnabled && movementInput.inputIsActive &&
+            parryAction != null && parryAction.enabled && parryAction.IsPressed()
+        : parryButtonHeld);
     public event System.Action ParrySucceeded;
 
     private float ParryHoldTime => parryClip == null ? 0f :
@@ -77,7 +87,8 @@ public partial class PlayerStateManager
         }
         if (!parryEntered) return;
         float dt = anim.updateMode == AnimatorUpdateMode.UnscaledTime ? Time.unscaledDeltaTime : Time.deltaTime;
-        parryPlaybackTime = Mathf.Min(parryPlaybackTime + dt * Mathf.Max(0f, anim.speed),
+        float speed = parrySucceeded ? parrySuccessSpeed : parryRaiseSpeed;
+        parryPlaybackTime = Mathf.Min(parryPlaybackTime + dt * Mathf.Max(0f, anim.speed) * Mathf.Max(.1f, speed),
             parrySucceeded ? parryClip.length : ParryHoldTime);
         anim.SetFloat(ParryTimeHash, parryPlaybackTime / parryClip.length);
         if (parrySucceeded && parryPlaybackTime >= parryClip.length) FinishParry();
@@ -103,6 +114,9 @@ public partial class PlayerStateManager
     {
         if (!IsParryWindowOpen) return false;
         parrySucceeded = true;
+        // Show the deflection immediately even when impact occurs during guard startup.
+        parryPlaybackTime = Mathf.Max(parryPlaybackTime, ParryHoldTime);
+        anim.SetFloat(ParryTimeHash, parryPlaybackTime / parryClip.length);
         LogParry("Success: playing the rest of the animation.");
         ParrySucceeded?.Invoke();
         return true;

@@ -22,7 +22,23 @@ This character's damage windows use the zero-based frame numbers on Unity's clip
 | Attack2 | 9 | 14 | 0.300–0.467 s |
 | Attack3 | 9 | 14 | 0.300–0.467 s |
 
-Damage is allowed only between the start and end frame positions, inclusive, and at most once per swing. Entering range during the active window can still be hit. Dodging/parrying a hit consumes that swing's contact attempt. Windup and recovery frames cannot damage the player. If a slow update skips the entire window, no late hit is issued. These values are configured only on this enemy's three attack assets; other profiles retain their own settings.
+The slash is visible from the start frame until the end frame (end excluded). For this enemy, **Damage At Window End** is enabled: the visible window allows a timed parry, and damage resolves once when animation time reaches/crosses the end frame. A successful parry cancels the swing immediately. Holding the guard pose blocks the final damage; releasing it before resolution does not. Otherwise an in-range player receives the configured damage. The player must have been in valid range during the window and still be in range, within the attack arc, and unobstructed at resolution. A completely skipped window cannot produce an invisible hit. Interrupted/dead attackers cannot apply pending damage. Other profiles retain their own timing mode.
+
+## Reusable enemy sword slash
+
+### Windup speed
+
+Each **EnemyAttackDefinition > Windup Speed Multiplier** slows only the animation before **Hit Start Frame** (or normalized **Hit Start** when frame mode is disabled). `1` means normal speed; `0.65` is 65% speed; `0.5` is half speed. It multiplies the attack's base **Playback Speed**. At the start frame, the animation returns to base speed for the slash and recovery.
+
+The current enemy's Attack1/2/3 use `0.65`. For an attack window of frames 8–13, the windup before frame 8 is slower, the slash runs at normal speed from frame 8, and damage still resolves at frame 13. Slowdown changes elapsed time, not the authored frame numbers. Hit, Die, locomotion, and the global stun/pause speed are unaffected.
+
+Changing the multiplier or Hit Start Frame applies without rebuilding. New/custom enemy controllers must be built with **Rebuild Controller from Profile** once to add the attack speed parameter; the current enemy controller is already updated. Shared attack assets share settings, so duplicate the attack asset when an enemy needs its own speed.
+
+The scene enemy and `Enemy1OneHand` prefab have **EnemySlashVisual**. Their attacks share `Assets/EnemyAI/Prefabs/Shared Normal Sword Slash.prefab`, using the same crescent renderer as the player's normal sword. Each enemy caches its own visual instance and reuses it across swings. Parry, Hit interruption, death, disabling, and leaving the attack state clear it immediately.
+
+On each **EnemyAttackDefinition**, **Hit Start Frame / Hit End Frame** are the authoritative variables for both the slash and attack window. Enable **Use Frame Window** and **Damage At Window End**, assign **Slash Prefab**, and enable **Slash**. Offset, rotation, size, sweep direction, and follow settings are per attack; the slash settings' separate start/end fields are ignored for enemies. Attack1 uses 14–19; Attack2 and Attack3 use 9–14. Reuse the component and shared prefab for other AI enemies with their own attack assets and frame values. Changing these window values does not require rebuilding the Animator.
+
+**PlayerEnemyTarget > Parry Enabled** uses the player's existing timed parry input. **Block While Holding Guard** enables defense after the timing window expires, while the guard button and pose remain held. Rolling retains its existing evade behavior. Damage still goes through PlayerOverall and elemental armor.
 
 **Hit timing:** a playable Hit clip always completes before transition. To shorten the visible reaction, edit/trim the clip or adjust the Animator Hit state's playback speed; the AI still waits for the end. **Hit Fallback Milliseconds** now applies only when there is no playable Hit clip. `0` uses Hit Fallback Duration instead. Elemental stun can hold an enemy longer. Assign clips through the profile, then rebuild the controller to keep both in sync.
 
@@ -48,7 +64,7 @@ The animation repair also corrected Idle, which had been assigned the death anim
 2. Assign Idle, Walk, Run, Hit and Die on the profile. Assign Attack1/Attack2 on their attack assets.
 3. Enable looping on locomotion clips. Disable looping on attacks, Hit and Die. Root motion is disabled because NavMeshAgent owns movement.
 4. Select the scene enemy and press **Rebuild Controller from Profile** in the EnemyBrain Inspector. Rebuild after changing a clip, attack state name, or playback speed. This updates only that enemy controller.
-5. On each attack, enable **Use Frame Window** and edit **Hit Start Frame / Hit End Frame** for strict damage frames. This character already uses the values above. **Turn Until** remains normalized animation time. For older profiles with Use Frame Window disabled, **Hit Start / Hit End** retain the original normalized crossing behavior. Range, facing, and obstruction are checked at impact. Animation speed changes are naturally reflected by Animator time; there is no independent damage timer.
+5. On each attack, enable **Use Frame Window** and edit **Hit Start Frame / Hit End Frame**. Enable **Damage At Window End** to offer the slash window for parries and resolve damage at its end. With it disabled, the first eligible contact in the window resolves immediately. **Turn Until** remains normalized animation time. Range, facing, and obstruction are checked at impact. Animation speed changes are naturally reflected by Animator time; there is no independent damage timer.
 
 To add another attack, create an **Enemies > Attack Definition** asset, give it a unique state name, assign its animation and effect, enable Available, add it to the profile's Attacks array, and rebuild. Ranged, Cast and Ability remain disabled future slots. Enable them only after filling the required fields. Run has its own controller slot, but current movement uses Walk until a sprint behavior is added.
 

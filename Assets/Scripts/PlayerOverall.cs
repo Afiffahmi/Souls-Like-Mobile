@@ -10,6 +10,10 @@ public class PlayerOverall : MonoBehaviour
 
 	public HealthBar healthBar;
 
+    [Header("Combat testing")]
+    [Tooltip("Keep health at 1 or more so enemies continue targeting the player. Disable for normal lethal damage.")]
+    public bool keepAliveForCombatTesting = true;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -34,7 +38,8 @@ public class PlayerOverall : MonoBehaviour
 	{
 		var gems = GetComponent<ElementalGems.GemManager>();
         damage = gems != null ? gems.ReduceIncomingDamage(damage) : Mathf.Max(0, damage);
-        currentHealth = Mathf.Clamp(currentHealth - damage, 0, maxHealth);
+        int minimumHealth = keepAliveForCombatTesting ? 1 : 0;
+        currentHealth = Mathf.Clamp(currentHealth - damage, minimumHealth, Mathf.Max(1, maxHealth));
 
 		if (healthBar != null) healthBar.SetHealth(currentHealth);
 	}

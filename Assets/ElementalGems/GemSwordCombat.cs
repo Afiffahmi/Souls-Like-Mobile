@@ -115,9 +115,12 @@ namespace ElementalGems
                 bool light = input == CombatAttackInput.LightAttack;
                 bool react = light ? lightFinisher : !finisherHitReactionOnly || !chainAttack || finisher;
                 Vector3 direction = enemy.transform.position - transform.position;
-                ElementalDamage.Hit(attack, damage, manager, enemy, point, direction, react,
+                int dealt = ElementalDamage.Hit(attack, damage, manager, enemy, point, direction, react,
                     allowControlEffects: !light || lightFinisher);
-                ElementalDamage.Impact(attack, point, transform.forward);
+                var elemental = enemy.GetComponent<ElementalEnemy>();
+                bool pushed = (!light || lightFinisher) && elemental != null && elemental.isActiveAndEnabled &&
+                    attack.knockback > elemental.knockbackResistance;
+                manager.ShowKnockbackImpact(attack, enemy, point, direction, dealt > 0 && (react || pushed));
             }
         }
         private void OnDisable() { tracking = false; sampled = false; lightFinisher = false; comboAttackNumber = 0; hit.Clear(); }

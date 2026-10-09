@@ -8,7 +8,7 @@ namespace SoulsLike.Enemies
         public override void Execute(EnemyAttackContext context)
         {
             if (context.target != null && context.source.CanHit(context.target, context.attack))
-                context.target.ReceiveDamage(context.attack.damage, context.source);
+                context.target.ReceiveDamage(context.attack.damage, context.source, !context.attack.damageAtWindowEnd);
         }
     }
 }

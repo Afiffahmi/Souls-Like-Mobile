@@ -30,8 +30,27 @@ namespace ElementalGems
         private bool restoreInput;
         private CursorLockMode cursorMode;
         private bool cursorVisible;
+        private bool initialized;
         private void Awake()
         {
+            // Prefab assets cannot retain a reference to the scene's player.
+            if (manager == null)
+            {
+                var managers = FindObjectsByType<GemManager>();
+                if (managers.Length == 1) manager = managers[0];
+                else
+                {
+                    Debug.LogError($"[GemSelectionUI] Expected one active GemManager, found {managers.Length}. Assign Manager in the Inspector.", this);
+                    enabled = false;
+                    return;
+                }
+            }
+            if (panel == null || openButton == null)
+            {
+                Debug.LogError("[GemSelectionUI] Assign Panel and Open Button in the Inspector.", this);
+                enabled = false;
+                return;
+            }
             input = manager.GetComponent<PlayerInput>();
             openButton.onClick.AddListener(Toggle);
             if (closeButton != null) closeButton.onClick.AddListener(Close);
@@ -41,6 +60,7 @@ namespace ElementalGems
             foreach (var card in cards) { var captured = card; card.button.onClick.AddListener(() => { Select(captured.gem); if (compact) { EquipSelected(); Close(); } }); }
             manager.GemChanged += OnGemChanged;
             OnGemChanged(manager.Equipped);
+            initialized = true;
         }
         private void Update()
         {
@@ -110,7 +130,7 @@ namespace ElementalGems
             if (equippedIcon != null) { equippedIcon.sprite = gem != null ? gem.icon : null; equippedIcon.color = Color.white; }
             Select(compact ? gem : selected != null ? selected : gem);
         }
-        private void OnDisable() { if (panel != null) Close(); }
+        private void OnDisable() { if (initialized && panel != null) Close(); }
         private void OnDestroy() { if (manager != null) manager.GemChanged -= OnGemChanged; }
     }
 }

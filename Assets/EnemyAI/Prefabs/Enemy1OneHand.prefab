@@ -18,6 +18,7 @@ GameObject:
   - component: {fileID: 8363412304640773842}
   - component: {fileID: 6290836272508563774}
   - component: {fileID: 78858966769893152}
+  - component: {fileID: 7225455177558656621}
   m_Layer: 0
   m_Name: Enemy1OneHand
   m_TagString: Untagged
@@ -190,7 +191,20 @@ MonoBehaviour:
   profile: {fileID: 11400000, guid: 75b64a1a21c1c0f49a43c97985e0f291, type: 2}
   targetOverride: {fileID: 0}
   attackOrigin: {fileID: 1328701319360936749}
+  postAttackStandbySeconds: 2
   state: 0
+--- !u!114 &7225455177558656621
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1162985367512093051}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa336a46916cb6e4c8f1ebdf00a3a00f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SoulsLike.Enemies.EnemySlashVisual
 --- !u!1 &3181411364579265923
 GameObject:
   m_ObjectHideFlags: 0

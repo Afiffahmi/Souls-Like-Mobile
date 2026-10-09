@@ -11,6 +11,16 @@ namespace SoulsLike.Enemies.Editor
         {
             var controller = AssetDatabase.LoadAssetAtPath<AnimatorController>(path);
             if (controller == null) controller = AnimatorController.CreateAnimatorControllerAtPath(path);
+            bool hasPhaseSpeed = false;
+            foreach (var parameter in controller.parameters)
+                if (parameter.name == EnemyAnimationDriver.AttackPhaseSpeedParameter)
+                {
+                    if (parameter.type != AnimatorControllerParameterType.Float)
+                        throw new System.InvalidOperationException("EnemyAttackPhaseSpeed must be a float parameter.");
+                    hasPhaseSpeed = true;
+                }
+            if (!hasPhaseSpeed) controller.AddParameter(new AnimatorControllerParameter {
+                name = EnemyAnimationDriver.AttackPhaseSpeedParameter, type = AnimatorControllerParameterType.Float, defaultFloat = 1f });
             var machine = controller.layers[0].stateMachine;
             var used = new HashSet<string>();
             Set(machine, "Idle", profile.idle, 1, used);
@@ -23,6 +33,9 @@ namespace SoulsLike.Enemies.Editor
                 if (attack == null || string.IsNullOrWhiteSpace(attack.stateName)) continue;
                 if (used.Contains(attack.stateName)) throw new System.InvalidOperationException("Duplicate/reserved state name: " + attack.stateName);
                 Set(machine, attack.stateName, attack.animation, attack.playbackSpeed, used);
+                var state = Find(machine, attack.stateName);
+                state.speedParameter = EnemyAnimationDriver.AttackPhaseSpeedParameter;
+                state.speedParameterActive = true;
             }
             machine.defaultState = Find(machine, "Idle");
             EditorUtility.SetDirty(controller); AssetDatabase.SaveAssets();
@@ -34,6 +47,7 @@ namespace SoulsLike.Enemies.Editor
         {
             var state = Find(machine, name) ?? machine.AddState(name, new Vector3(260 * (used.Count % 3), 90 * (used.Count / 3), 0));
             state.motion = clip; state.speed = speed; state.writeDefaultValues = true; used.Add(name);
+            state.speedParameterActive = false;
         }
         [MenuItem("Tools/Enemy AI/Rebuild Selected Enemy Controller")]
         public static void RebuildSelected()

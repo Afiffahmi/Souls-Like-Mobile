@@ -35,5 +35,17 @@ namespace ElementalGems
             var effect = Object.Instantiate(attack.impact, point, Quaternion.LookRotation(normal.sqrMagnitude > 0.001f ? normal : Vector3.up));
             Object.Destroy(effect, 4);
         }
+        /// <summary>Shared feedback for a confirmed knockback/reaction, including damage-free parries.</summary>
+        public static GameObject KnockbackImpact(GemAttack attack, Enemy enemy, Vector3 point, Vector3 direction,
+            bool causesKnockback, GameObject fallback = null)
+        {
+            if (!causesKnockback || enemy == null || enemy.IsDead || !enemy.isActiveAndEnabled) return null;
+            GameObject prefab = attack != null && attack.impact != null ? attack.impact : fallback;
+            if (prefab == null) return null;
+            var effect = Object.Instantiate(prefab, point,
+                Quaternion.LookRotation(direction.sqrMagnitude > .001f ? direction : Vector3.up));
+            Object.Destroy(effect, 4);
+            return effect;
+        }
     }
 }
