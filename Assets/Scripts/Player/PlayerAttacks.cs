@@ -16,6 +16,14 @@ public partial class PlayerStateManager
     private bool attackPendingOrActive;
     private bool attackStateEntered;
     private bool followUpBuffered;
+    private readonly SwordLightComboProgress swordLightCombo = new SwordLightComboProgress();
+    public bool IsSwordLightComboFinisher => attackStateEntered && activeAttackConfiguration != null &&
+        activeAttackConfiguration.weapon == PlayerCombatMode.Sword && activeAttackInput == CombatAttackInput.LightAttack &&
+        activeAttackIndex == 2 && swordLightCombo.IsFinisher;
+    private double attackRecoveryUntil;
+    private double AttackClock => anim != null && anim.updateMode == AnimatorUpdateMode.UnscaledTime
+        ? Time.unscaledTimeAsDouble : Time.timeAsDouble;
+    public float AttackRecoveryRemaining => (float)System.Math.Max(0, attackRecoveryUntil - AttackClock);
     private InputAction lightAttackAction, heavyAttackAction, specialAttackAction;
 
     public bool IsAttacking => bowHeavyActive || bowAttackActive || attackPendingOrActive || (anim != null && anim.isInitialized &&
@@ -77,7 +85,8 @@ public partial class PlayerStateManager
     public bool TryAttack(CombatAttackInput input)
     {
         if (!isActiveAndEnabled || !hasCombatParameters || anim == null || !anim.isActiveAndEnabled || !anim.isInitialized ||
-            IsChangingEquipment || IsParrying || IsRolling || !System.Enum.IsDefined(typeof(CombatAttackInput), input)) return false;
+            IsChangingEquipment || IsParrying || IsRolling || AttackRecoveryRemaining > 0 ||
+            !System.Enum.IsDefined(typeof(CombatAttackInput), input)) return false;
         if (IsAttacking) return !bowHeavyActive && !bowAttackActive && TryBufferAttack(input);
         if (anim.IsInTransition(0) || !anim.GetCurrentAnimatorStateInfo(0).IsTag("CombatLocomotion") ||
             anim.GetInteger(ParryReturnModeHash) != (int)CombatMode) return false;
@@ -93,6 +102,7 @@ public partial class PlayerStateManager
         activeAttackConfiguration = config;
         activeAttackInput = input;
         activeAttackIndex = 0;
+        swordLightCombo.Reset();
         attackPendingOrActive = true;
         attackStateEntered = false;
         followUpBuffered = false;
@@ -114,9 +124,14 @@ public partial class PlayerStateManager
         var step = chain[activeAttackIndex];
         if (info.normalizedTime < step.comboWindowStart || info.normalizedTime > step.comboWindowEnd) return false;
         followUpBuffered = true;
-        // The transition also requires its authored exit time. This does not
-        // change animation until the step's configured chain transition point.
-        anim.SetBool(AttackBufferedHash, true);
+        if (step.useChainTransitionFrame && info.normalizedTime >= step.ChainTransitionNormalized)
+        {
+            // Animator exit-time conditions are one-shot. A late press must not
+            // wait for a threshold that this non-looping clip already passed.
+            anim.SetBool(AttackBufferedHash, false);
+            anim.CrossFadeInFixedTime(activeAttackConfiguration.StatePath(input, activeAttackIndex + 1), 0f, 0, 0f);
+        }
+        else anim.SetBool(AttackBufferedHash, true);
         return true;
     }
 
@@ -141,10 +156,14 @@ public partial class PlayerStateManager
 
     public bool NotifyAttackEntered(CombatAttackConfiguration config, CombatAttackInput input, int index)
     {
-        if (config == null || !isActiveAndEnabled) return false;
+        if (config == null || !isActiveAndEnabled || AttackRecoveryRemaining > 0) return false;
         bool acceptedSpecialRequest = attackPendingOrActive && !attackStateEntered && activeAttackConfiguration == config && activeAttackInput == input;
         // Direct Animator triggers must respect Special's cooldown too.
         if (input == CombatAttackInput.SpecialAttack && !acceptedSpecialRequest && !specialCooldowns.TryStart(config, Time.timeAsDouble)) return false;
+        bool continuingLightCombo = attackStateEntered && activeAttackConfiguration == config && activeAttackInput == CombatAttackInput.LightAttack;
+        if (config.weapon == PlayerCombatMode.Sword && input == CombatAttackInput.LightAttack)
+            swordLightCombo.Enter(index, continuingLightCombo);
+        else swordLightCombo.Reset();
         activeAttackConfiguration = config;
         activeAttackInput = input;
         activeAttackIndex = index;
@@ -162,6 +181,15 @@ public partial class PlayerStateManager
         return true;
     }
 
+    public void NotifyAttackExited(CombatAttackConfiguration config, CombatAttackInput input, int index, float normalizedTime)
+    {
+        var chain = config != null ? config.Chain(input) : null;
+        if (chain == null || index < 0 || index >= chain.Count || normalizedTime < 1f) return;
+        // Starts on actual animation completion, so playback-speed changes and
+        // pauses cannot shorten the animation portion of the lockout.
+        attackRecoveryUntil = System.Math.Max(attackRecoveryUntil, AttackClock + chain[index].postAttackRecovery);
+    }
+
     private void NotifyAttackLocomotionEntered(PlayerCombatMode mode)
     {
         if (bowHeavyActive && bowHeavyEntered) ResetBowHeavyAttack();
@@ -173,6 +201,7 @@ public partial class PlayerStateManager
 
     private void ResetAttackSequence()
     {
+        swordLightCombo.Reset();
         ResetBowHeavyAttack();
         ResetBowAttack();
         attackPendingOrActive = false;

@@ -8,6 +8,7 @@ Shader "ElementalGems/Broad Crescent Slash"
         _FlowSpeed("Energy flow", Range(0,10))=3
         _Turbulence("Inner-edge turbulence", Range(0,1))=.45
         _Direction("Sweep direction", Float)=1
+        _SweepProgress("Animation sweep (negative uses lifetime)", Float)=-1
         _WidthScale("Crescent band width", Range(.4,1.8))=1
     }
     SubShader
@@ -22,7 +23,7 @@ Shader "ElementalGems/Broad Crescent Slash"
             #pragma fragment frag
             #include "UnityCG.cginc"
             float4 _Tint;
-            float _Intensity, _Age, _FlowSpeed, _Turbulence, _Direction, _WidthScale;
+            float _Intensity, _Age, _FlowSpeed, _Turbulence, _Direction, _WidthScale, _SweepProgress;
             struct A { float4 vertex:POSITION; float2 uv:TEXCOORD0; float2 layer:TEXCOORD1; float4 color:COLOR; };
             struct V { float4 vertex:SV_POSITION; float2 uv:TEXCOORD0; float2 layer:TEXCOORD1; float4 color:COLOR; };
             V vert(A v) { V o; float r=length(v.vertex.xz); v.vertex.xz*= (v.layer.y+(r-v.layer.y)*_WidthScale)/max(.001,r); o.vertex=UnityObjectToClipPos(v.vertex);o.uv=v.uv;o.layer=v.layer;o.color=v.color;return o; }
@@ -33,8 +34,8 @@ Shader "ElementalGems/Broad Crescent Slash"
                 float phase=u*27-_Age*_FlowSpeed*3+i.layer.y;
                 float wave=sin(phase)*sin(phase*.43+v*7);
                 float endFade=pow(saturate(sin(u*3.14159265)),.38);
-                float reveal=smoothstep(-.09,.05, _Age*6-(_Direction>0?u:1-u));
-                float fade=1-smoothstep(.25,1,_Age);
+                float reveal=smoothstep(-.09,.05, (_SweepProgress>=0?_SweepProgress:_Age*6)-(_Direction>0?u:1-u));
+                float fade=1-smoothstep(_SweepProgress>=0?.8:.25,1,_Age);
                 float edge=smoothstep(0,.12,v)*(1-smoothstep(.85,1,v));
                 float flowV=v+wave*_Turbulence*.10*(1-v);
                 float body=ridge(flowV,.61,.30)*(.67+.12*sin(phase*.61+v*9));

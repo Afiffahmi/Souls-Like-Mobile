@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace ElementalGems
 {
-    /// <summary>A short-lived, world-space visual. Never performs hit detection or damage.</summary>
+    /// <summary>A world-space slash that drives melee timing, position, size and facing.</summary>
     public sealed class GemCrescentSlash : MonoBehaviour
     {
         public ElementType element;
@@ -24,10 +24,99 @@ namespace ElementalGems
         Quaternion rotation;
         float age;
         int direction = 1;
+        GemSlashSettings drivenSettings;
+        float drivenProgress;
+        int emittedParticles;
         static readonly int Age = Shader.PropertyToID("_Age");
         static readonly int Tint = Shader.PropertyToID("_Tint");
         static readonly int Intensity = Shader.PropertyToID("_Intensity");
-        public float NormalizedAge => age / Mathf.Max(.05f, lifetime);
+        public float NormalizedAge => drivenSettings != null ? drivenProgress : age / Mathf.Max(.05f, lifetime);
+
+        // Matches the primary Band in GemCrescentBuilder and _WidthScale in CrescentSlash.shader.
+        public const float BodyRadius = 2.12f, BodyWidth = 1.52f, BodyArc = 172f;
+        public float RevealedSweep => drivenSettings != null ? drivenSettings.Evaluate(drivenProgress) : 0;
+        public bool ReverseSweep => direction < 0;
+        public bool HasDrivenGeometry => drivenSettings != null && gameObject.activeInHierarchy;
+        public Quaternion HitFacing { get; private set; } = Quaternion.identity;
+
+        public void GetLocalHitSpan(float sweep, out Vector3 inner, out Vector3 outer)
+        {
+            float u = direction < 0 ? 1 - sweep : sweep;
+            float angle = (u - .5f) * BodyArc * Mathf.Deg2Rad;
+            float taper = Mathf.Pow(Mathf.Max(.001f, Mathf.Sin(u * Mathf.PI)), .7f) * (.7f + .6f * u);
+            float halfWidth = .5f * BodyWidth * taper * bandWidth;
+            var radial = new Vector3(Mathf.Sin(angle), 0, Mathf.Cos(angle));
+            inner = radial * (BodyRadius - halfWidth);
+            outer = radial * (BodyRadius + halfWidth);
+        }
+
+        public void MakeNeutral()
+        {
+            element = ElementType.Normal;
+            color = new Color(.85f, .92f, 1f);
+            if (accents != null)
+                foreach (var ps in accents)
+                    if (ps != null) ps.gameObject.SetActive(false);
+            accents = System.Array.Empty<ParticleSystem>();
+        }
+
+        public void InitializeDriven(GemSlashSettings settings)
+        {
+            drivenSettings = settings;
+            direction = settings.reverseSweep ? -1 : 1;
+            drivenProgress = 0; emittedParticles = 0;
+            transform.localScale = Vector3.one * size * settings.size;
+            if (accents == null) return;
+            foreach (var ps in accents)
+            {
+                if (ps == null) continue;
+                ps.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+                ps.Play(false);
+            }
+        }
+
+        public void SetAnimationFrame(float progress, Vector3 position, Quaternion facing)
+        {
+            if (drivenSettings == null) return;
+            drivenProgress = Mathf.Clamp01(progress);
+            // Gameplay facing stays horizontal even when the visual slash plane is tilted.
+            HitFacing = facing;
+            float sweep = drivenSettings.Evaluate(drivenProgress);
+            rotation = facing * Quaternion.Euler(drivenSettings.localEulerAngles);
+            transform.position = position + facing * Vector3.forward * (sweep * drivenSettings.forwardDrift);
+            transform.rotation = rotation * Quaternion.Euler(0,
+                Mathf.LerpUnclamped(drivenSettings.startSweepAngle, drivenSettings.endSweepAngle, sweep), 0);
+            if (surface != null)
+            {
+                properties.SetFloat(Age, drivenProgress);
+                properties.SetFloat("_SweepProgress", sweep);
+                properties.SetColor(Tint, color);
+                properties.SetFloat(Intensity, intensity);
+                properties.SetFloat("_WidthScale", bandWidth);
+                properties.SetFloat("_Direction", direction);
+                surface.SetPropertyBlock(properties);
+                surface.enabled = drivenProgress < 1;
+            }
+            // Accents advance along the same arc instead of appearing across the entire slash at spawn.
+            int targetCount = Mathf.CeilToInt(sweep * particlesPerLayer);
+            for (; emittedParticles < targetCount; emittedParticles++)
+            {
+                float u = (emittedParticles + .5f) / Mathf.Max(1, particlesPerLayer);
+                if (direction < 0) u = 1 - u;
+                float a = (u - .5f) * arcDegrees * Mathf.Deg2Rad;
+                var radial = new Vector3(Mathf.Sin(a), 0, Mathf.Cos(a));
+                if (accents == null) continue;
+                foreach (var ps in accents)
+                {
+                    if (ps == null) continue;
+                    ps.Emit(new ParticleSystem.EmitParams {
+                        position = transform.TransformPoint(radial * particleRadius),
+                        velocity = transform.rotation * radial * .3f,
+                        applyShapeToPosition = false
+                    }, 1);
+                }
+            }
+        }
 
         void Awake()
         {
@@ -38,6 +127,7 @@ namespace ElementalGems
         }
         public void Initialize(int swingDirection)
         {
+            drivenSettings = null;
             direction = swingDirection < 0 ? -1 : 1;
             origin = transform.position;
             rotation = transform.rotation;
@@ -66,6 +156,7 @@ namespace ElementalGems
         }
         void Update()
         {
+            if (drivenSettings != null) return;
             age += Time.deltaTime;
             ApplyFrame(NormalizedAge);
             // Allow the leaf, bubble, spark, and smoke tails to finish naturally.
@@ -77,6 +168,7 @@ namespace ElementalGems
             transform.rotation = rotation * Quaternion.Euler(0, direction * (Mathf.Clamp01(t) - .5f) * sweepRotation, 0);
             if (surface == null) return;
             properties.SetFloat(Age, Mathf.Clamp01(t));
+            properties.SetFloat("_SweepProgress", -1);
             properties.SetColor(Tint, color);
             properties.SetFloat(Intensity, intensity);
             properties.SetFloat("_WidthScale", bandWidth);

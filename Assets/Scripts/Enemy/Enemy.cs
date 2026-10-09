@@ -23,6 +23,8 @@ public class Enemy : MonoBehaviour
     public bool IsDead => currentHealth <= 0;
     public int MaxHealth => maxHealth;
     public int CurrentHealth => currentHealth;
+    /// <summary>Valid during OnDamaged. Damage can reduce health without interrupting an AI animation.</summary>
+    public bool DamageRequestsHitReaction { get; private set; }
 
     private void Awake()
     {
@@ -46,7 +48,10 @@ public class Enemy : MonoBehaviour
         }
     }
 
-    public void TakeDamage(int damage)
+    // Ordinary damage does not stop locomotion. Finishers/knockback opt in explicitly.
+    public void TakeDamage(int damage) => TakeDamage(damage, false);
+
+    public void TakeDamage(int damage, bool requestHitReaction)
     {
         if (IsDead) return;
         if (damage < 0) damage = 0;
@@ -56,7 +61,10 @@ public class Enemy : MonoBehaviour
 
         if (debugLog) Debug.Log($"[Enemy] {name} took {damage} damage. HP: {currentHealth}/{maxHealth}");
 
-        OnDamaged?.Invoke(damage);
+        bool previousReaction = DamageRequestsHitReaction;
+        DamageRequestsHitReaction = requestHitReaction;
+        try { OnDamaged?.Invoke(damage); }
+        finally { DamageRequestsHitReaction = previousReaction; }
 
         if (healthBar != null)
         {

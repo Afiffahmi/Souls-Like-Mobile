@@ -77,6 +77,7 @@ namespace ElementalGems.Editor
             GemWaterGroundFieldPolish.Apply();
             GemDarknessGroundFieldPolish.Apply();
             GemWindGroundFieldPolish.Apply();
+            GemEarthGroundFieldPolish.Apply();
             var shooter=Object.FindAnyObjectByType<PlayerBowShooter>();Undo.RecordObject(shooter,"Configure heavy bow damage fields");shooter.heavyImpactRadius=4;shooter.heavyGroundField=settings;
             EditorUtility.SetDirty(shooter);EditorUtility.SetDirty(settings);AssetDatabase.SaveAssets();
             EditorSceneManager.MarkSceneDirty(shooter.gameObject.scene);EditorSceneManager.SaveScene(shooter.gameObject.scene);

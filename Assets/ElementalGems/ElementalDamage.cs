@@ -9,7 +9,7 @@ namespace ElementalGems
             float execute = attack.executeThreshold > 0 && healthRatio <= attack.executeThreshold ? attack.executeScale : 1;
             return Mathf.Max(0, Mathf.RoundToInt(baseDamage * attack.damageScale * attack.MultiplierAgainst(defender) * Mathf.Max(0, resistance) * execute));
         }
-        public static int Hit(GemAttack attack, float baseDamage, GemManager source, Enemy enemy, Vector3 point, Vector3 direction)
+        public static int Hit(GemAttack attack, float baseDamage, GemManager source, Enemy enemy, Vector3 point, Vector3 direction, bool? requestHitReaction = null, bool allowControlEffects = true)
         {
             if (enemy == null || enemy.IsDead || !enemy.isActiveAndEnabled) return 0;
             var elemental = enemy.GetComponent<ElementalEnemy>();
@@ -17,11 +17,13 @@ namespace ElementalGems
             float resistance = elemental != null ? elemental.Resistance(attack.element) : 1;
             int damage = Calculate(attack, baseDamage, defender, resistance, (float)enemy.CurrentHealth / enemy.MaxHealth);
             int before = enemy.CurrentHealth;
-            enemy.TakeDamage(damage);
+            // Explicit combo permission wins; other impacts interrupt only when they knock back.
+            bool knockback = allowControlEffects && attack.knockback > (elemental != null ? elemental.knockbackResistance : 0);
+            enemy.TakeDamage(damage, requestHitReaction ?? knockback);
             int dealt = before - enemy.CurrentHealth;
             if (dealt > 0)
             {
-                if (elemental != null && !enemy.IsDead) elemental.Apply(attack, direction);
+                if (elemental != null && !enemy.IsDead) elemental.Apply(attack, direction, allowControlEffects);
                 if (source != null) source.RegisterHit(attack, dealt);
                 if (attack.MultiplierAgainst(defender) > 1 && resistance > 0) GemFeedback.Show(point, "SUPER EFFECTIVE", attack.color);
             }

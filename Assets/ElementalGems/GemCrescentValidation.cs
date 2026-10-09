@@ -62,12 +62,12 @@ namespace ElementalGems
                 yield return new WaitForSeconds(2.1f);
             }
             manager.Equip(ElementType.Normal,false);yield return null;
-            player.TryAttack(CombatAttackInput.LightAttack);yield return new WaitForSeconds(.4f);
-            Check(FindObjectsByType<GemCrescentSlash>(FindObjectsSortMode.None).Length==0,"Normal light attack has no elemental crescent");
+            player.TryAttack(CombatAttackInput.LightAttack);
+            yield return CheckAttackSlash(ElementType.Normal, "Plain sword shows a neutral slash for its hit shape");
             yield return new WaitForSeconds(1.8f);
             manager.Equip(ElementType.Water,false);yield return null;
-            player.TryAttack(CombatAttackInput.HeavyAttack);yield return new WaitForSeconds(.4f);
-            Check(FindObjectsByType<GemCrescentSlash>(FindObjectsSortMode.None).Length==0,"Heavy attack does not spawn the light-attack crescent");
+            player.TryAttack(CombatAttackInput.HeavyAttack);
+            yield return CheckAttackSlash(ElementType.Water, "Heavy attack shows the slash used for its hit shape");
             yield return new WaitForSeconds(2);
             player.TryAttack(CombatAttackInput.LightAttack);
             float end=Time.time+3;
@@ -78,6 +78,16 @@ namespace ElementalGems
             manager.Equip(original,false);
             report.Add("COMPLETE");File.WriteAllLines(Folder+"/Report.txt",report);
             Destroy(this);
+        }
+        IEnumerator CheckAttackSlash(ElementType element, string label)
+        {
+            var effects = GetComponent<GemLightSlashEffects>();
+            float timeout = Time.time + 4;
+            while (Time.time < timeout && effects.ActiveSlash == null) yield return null;
+            var slash = effects.ActiveSlash;
+            Check(slash != null && slash.element == element && slash.HasDrivenGeometry, label);
+            if (slash != null && element == ElementType.Normal)
+                Check(slash.accents.Length == 0, "Neutral slash has no elemental accent particles");
         }
         void Capture(string element)
         {

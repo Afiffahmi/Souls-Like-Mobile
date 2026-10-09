@@ -12,9 +12,19 @@ public sealed class CombatAttackConfigurationEditor : Editor
     {
         DrawDefaultInspector();
         var config = (CombatAttackConfiguration)target;
+        EditorGUILayout.HelpBox("Slash settings and Light Combo Windup Speed apply immediately. Sword light attacks 2 onward accelerate only up to their slash Start Frame, then use normal Playback Speed. Frames use the assigned clip's frame rate (Unity frame 0). Start is visible; End is hidden. Local Euler Z: -90 top-to-bottom, 0 left-to-right, +45 bottom-left to top-right. Reverse Sweep swaps direction. Damage follows the slash.", MessageType.Info);
+        foreach (var chain in new[] { config.lightAttackChain, config.heavyAttackChain })
+        {
+            if (chain == null) continue;
+            foreach (var step in chain)
+                if (step?.slash != null && step.slash.enabled && !step.slash.IsValid(step.animation))
+                    EditorGUILayout.HelpBox("Invalid slash window/placement for " + (step.animation != null ? step.animation.name : "unassigned clip") + ": use 0 <= Start < End <= clip frame count and positive size. This slash will be skipped.", MessageType.Warning);
+        }
+        if (config.specialAttack?.slash != null && config.specialAttack.slash.enabled && !config.specialAttack.slash.IsValid(config.specialAttack.animation))
+            EditorGUILayout.HelpBox("Special attack slash settings are invalid; its slash will be skipped.", MessageType.Warning);
         bool valid = config.Validate(out string error);
         EditorGUILayout.HelpBox(valid
-            ? "Edit the chain lists, clips, speeds and normalized timing windows above, then apply to update the generated Animator states. Empty chains disable their input. Special never chains."
+            ? "Edit clips, speeds and timing, then apply to update the Animator. Use Chain Transition Frame enables an exact earliest follow-up frame; later presses chain immediately until Combo Window End. Post Attack Recovery blocks new attacks after that step finishes. Empty chains disable their input. Special never chains."
             : error, valid ? MessageType.Info : MessageType.Error);
         using (new EditorGUI.DisabledScope(!valid || EditorApplication.isPlayingOrWillChangePlaymode))
         {
@@ -75,6 +85,13 @@ public static class CombatAttackAnimatorBuilder
                 state.tag="CombatAttack"; state.writeDefaultValues=false;
                 state.motion=input==CombatAttackInput.SpecialAttack?config.specialAttack.animation:chain[i].animation;
                 state.speed=input==CombatAttackInput.SpecialAttack?config.specialAttack.playbackSpeed:chain[i].playbackSpeed;
+                if (config.weapon == PlayerCombatMode.Sword && input == CombatAttackInput.LightAttack)
+                {
+                    string parameter = CombatAttackState.WindupSpeedParameter(i);
+                    EnsureParameter(controller, parameter, AnimatorControllerParameterType.Float);
+                    state.speedParameter = parameter;
+                    state.speedParameterActive = true;
+                }
                 states.Add(state);
             }
             if(count>0)
@@ -89,7 +106,7 @@ public static class CombatAttackAnimatorBuilder
             {
                 if(i+1<count)
                 {
-                    var next=states[i].AddTransition(states[i+1]); Configure(next,true,chain[i].chainTransitionTime);
+                    var next=states[i].AddTransition(states[i+1]); Configure(next,true,chain[i].ChainTransitionNormalized);
                     next.name="Buffered follow-up";
                     next.AddCondition(AnimatorConditionMode.If,0,"AttackBuffered");
                 }
@@ -120,7 +137,8 @@ public static class CombatAttackAnimatorBuilder
     {
         var existing=controller.parameters.FirstOrDefault(p=>p.name==name);
         if(existing!=null && existing.type!=type) throw new InvalidOperationException("Parameter type mismatch: "+name);
-        if(existing==null) controller.AddParameter(name,type);
+        if(existing==null) controller.AddParameter(new AnimatorControllerParameter { name = name, type = type,
+            defaultFloat = type == AnimatorControllerParameterType.Float ? 1f : 0f });
     }
     static void Configure(AnimatorStateTransition t,bool exit,float time)
     {

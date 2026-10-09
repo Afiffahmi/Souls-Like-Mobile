@@ -15,39 +15,311 @@ MonoBehaviour:
   weapon: 1
   animatorController: {fileID: 9100000, guid: a263341e90543a14c888fa88ab00d725, type: 2}
   combatStateMachinePath: Base Layer.Attack
+  lightComboWindupSpeed: 3
+  lightComboFinisherRecoverySpeed: 2.5
   lightAttackChain:
   - animation: {fileID: 7400000, guid: b0b29feea3fe4a842a34360005b8de20, type: 2}
+    slash:
+      enabled: 1
+      startFrame: 11
+      endFrame: 16
+      localOffset: {x: 0, y: 1, z: 0.05}
+      localEulerAngles: {x: 0, y: 0, z: -90}
+      reverseSweep: 0
+      startSweepAngle: 0
+      endSweepAngle: 0
+      progression:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0
+          inSlope: 0
+          outSlope: 1
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 1
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      size: 1
+      forwardDrift: 0
+      followPlayer: 0
     playbackSpeed: 1
     comboWindowStart: 0.25
-    comboWindowEnd: 0.65
+    comboWindowEnd: 1
     chainTransitionTime: 0.85
+    useChainTransitionFrame: 1
+    chainTransitionFrame: 25
+    postAttackRecovery: 0
   - animation: {fileID: 7400000, guid: bbd4ba65b7ee95d46bfb8a38443918bb, type: 2}
+    slash:
+      enabled: 1
+      startFrame: 23
+      endFrame: 28
+      localOffset: {x: 0, y: 1, z: 0.05}
+      localEulerAngles: {x: 0, y: 0, z: 45}
+      reverseSweep: 0
+      startSweepAngle: 0
+      endSweepAngle: 0
+      progression:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0
+          inSlope: 0
+          outSlope: 1
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 1
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      size: 1
+      forwardDrift: 0
+      followPlayer: 0
     playbackSpeed: 1
     comboWindowStart: 0.25
-    comboWindowEnd: 0.65
+    comboWindowEnd: 1
     chainTransitionTime: 0.85
+    useChainTransitionFrame: 1
+    chainTransitionFrame: 28
+    postAttackRecovery: 0
   - animation: {fileID: 7400000, guid: 42357e114621a7d429fcb81bf2d6a999, type: 2}
+    slash:
+      enabled: 1
+      startFrame: 19
+      endFrame: 24
+      localOffset: {x: 0, y: 1, z: 0.05}
+      localEulerAngles: {x: 0, y: 0, z: -90}
+      reverseSweep: 0
+      startSweepAngle: 0
+      endSweepAngle: 0
+      progression:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0
+          inSlope: 0
+          outSlope: 1
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 1
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      size: 1
+      forwardDrift: 0
+      followPlayer: 0
     playbackSpeed: 1
     comboWindowStart: 0.25
     comboWindowEnd: 0.65
     chainTransitionTime: 0.85
+    useChainTransitionFrame: 0
+    chainTransitionFrame: 1
+    postAttackRecovery: 0.05
   heavyAttackChain:
   - animation: {fileID: 7400000, guid: 800ff7cea362bc84eb9c6d3ac85fffee, type: 2}
+    slash:
+      enabled: 0
+      startFrame: 11
+      endFrame: 16
+      localOffset: {x: 0, y: 1, z: 0.05}
+      localEulerAngles: {x: 0, y: 0, z: -90}
+      reverseSweep: 0
+      startSweepAngle: 0
+      endSweepAngle: 0
+      progression:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0
+          inSlope: 0
+          outSlope: 1
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 1
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      size: 1
+      forwardDrift: 0
+      followPlayer: 0
     playbackSpeed: 1
     comboWindowStart: 0.25
     comboWindowEnd: 0.65
     chainTransitionTime: 0.85
+    useChainTransitionFrame: 0
+    chainTransitionFrame: 1
+    postAttackRecovery: 0
   - animation: {fileID: 7400000, guid: be6bdb52db3489a4fb0e4742bb22908c, type: 2}
+    slash:
+      enabled: 0
+      startFrame: 11
+      endFrame: 16
+      localOffset: {x: 0, y: 1, z: 0.05}
+      localEulerAngles: {x: 0, y: 0, z: -90}
+      reverseSweep: 0
+      startSweepAngle: 0
+      endSweepAngle: 0
+      progression:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0
+          inSlope: 0
+          outSlope: 1
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 1
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      size: 1
+      forwardDrift: 0
+      followPlayer: 0
     playbackSpeed: 1
     comboWindowStart: 0.25
     comboWindowEnd: 0.65
     chainTransitionTime: 0.85
+    useChainTransitionFrame: 0
+    chainTransitionFrame: 1
+    postAttackRecovery: 0
   - animation: {fileID: 7400000, guid: 276b9e4abe386c54cbea22e15e73ea4e, type: 2}
+    slash:
+      enabled: 0
+      startFrame: 11
+      endFrame: 16
+      localOffset: {x: 0, y: 1, z: 0.05}
+      localEulerAngles: {x: 0, y: 0, z: -90}
+      reverseSweep: 0
+      startSweepAngle: 0
+      endSweepAngle: 0
+      progression:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0
+          inSlope: 0
+          outSlope: 1
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 1
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      size: 1
+      forwardDrift: 0
+      followPlayer: 0
     playbackSpeed: 1
     comboWindowStart: 0.25
     comboWindowEnd: 0.65
     chainTransitionTime: 0.85
+    useChainTransitionFrame: 0
+    chainTransitionFrame: 1
+    postAttackRecovery: 0
   specialAttack:
     animation: {fileID: 7400000, guid: 9f6c108161960984ea749105a2aead55, type: 2}
+    slash:
+      enabled: 0
+      startFrame: 11
+      endFrame: 16
+      localOffset: {x: 0, y: 1, z: 0.05}
+      localEulerAngles: {x: 0, y: 0, z: -90}
+      reverseSweep: 0
+      startSweepAngle: 0
+      endSweepAngle: 0
+      progression:
+        serializedVersion: 2
+        m_Curve:
+        - serializedVersion: 3
+          time: 0
+          value: 0
+          inSlope: 0
+          outSlope: 1
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        - serializedVersion: 3
+          time: 1
+          value: 1
+          inSlope: 1
+          outSlope: 0
+          tangentMode: 0
+          weightedMode: 0
+          inWeight: 0
+          outWeight: 0
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      size: 1
+      forwardDrift: 0
+      followPlayer: 0
     playbackSpeed: 1
     cooldown: 5

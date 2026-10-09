@@ -86,9 +86,11 @@ namespace ElementalGems.Editor
         {
             var verts=new List<Vector3>();var uv=new List<Vector2>();var uv2=new List<Vector2>();
             var colors=new List<Color>();var triangles=new List<int>();
-            void Band(float radius,float width,float arc,float offset,float layer,float opacity)
+            void Band(float radius,float width,float depth,float arc,float offset,float layer,float opacity)
             {
-                const int along=80,across=8;
+                // Closed elliptical cross-section: the crescent has a visible side surface
+                // even when its original plane is edge-on to the isometric camera.
+                const int along=80,across=16;
                 int start=verts.Count;
                 for(int i=0;i<=along;i++)
                 {
@@ -97,9 +99,11 @@ namespace ElementalGems.Editor
                     float taper=Mathf.Pow(Mathf.Max(.001f,Mathf.Sin(u*Mathf.PI)),.7f)*(.7f+.6f*u);
                     for(int j=0;j<=across;j++)
                     {
-                        float v=(float)j/across;
+                        float around=(float)j/across*Mathf.PI*2;
+                        float v=.5f+.5f*Mathf.Cos(around);
                         float r=radius+(v-.5f)*width*taper;
-                        verts.Add(new Vector3(Mathf.Sin(a)*r,layer*.004f,Mathf.Cos(a)*r));
+                        float height=Mathf.Sin(around)*depth*.5f*taper;
+                        verts.Add(new Vector3(Mathf.Sin(a)*r,height+layer*.004f,Mathf.Cos(a)*r));
                         uv.Add(new Vector2(u,v));uv2.Add(new Vector2(layer,radius));colors.Add(new Color(1,1,1,opacity));
                         if(i==along||j==across)continue;
                         int k=start+i*(across+1)+j;
@@ -108,15 +112,19 @@ namespace ElementalGems.Editor
                 }
             }
             // Broad energy body, separated inner/outer filaments, and a soft halo.
-            Band(2.12f,1.52f,172,0,0,1);
-            Band(2.65f,.19f,184,-4,1,.8f);
-            Band(1.54f,.24f,158,7,1,.6f);
-            Band(2.20f,2.0f,176,0,2,1);
+            // Front/back surfaces add together, so halve opacity to preserve the original glow.
+            Band(2.12f,1.52f,.65f,172,0,0,.5f);
+            Band(2.65f,.19f,.20f,184,-4,1,.4f);
+            Band(1.54f,.24f,.20f,158,7,1,.3f);
+            Band(2.20f,2.0f,.85f,176,0,2,.5f);
             string path=Root+"/Meshes/Layered Crescent.asset";
             var mesh=AssetDatabase.LoadAssetAtPath<Mesh>(path);
             if(mesh==null){mesh=new Mesh{name="Layered 172 degree crescent"};AssetDatabase.CreateAsset(mesh,path);}
             mesh.Clear();mesh.SetVertices(verts);mesh.SetUVs(0,uv);mesh.SetUVs(1,uv2);mesh.SetColors(colors);mesh.SetTriangles(triangles,0);
-            mesh.RecalculateNormals();mesh.bounds=new Bounds(new Vector3(0,0,1),new Vector3(7,.2f,5));
+            mesh.name="Volumetric 172 degree crescent";
+            mesh.RecalculateNormals();mesh.RecalculateBounds();
+            // The shader can widen the band beyond its authored vertices (_WidthScale up to 1.8).
+            var bounds=mesh.bounds;bounds.Expand(new Vector3(3,.1f,3));mesh.bounds=bounds;
             EditorUtility.SetDirty(mesh);return mesh;
         }
     }

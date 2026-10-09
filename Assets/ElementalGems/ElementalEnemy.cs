@@ -35,18 +35,26 @@ namespace ElementalGems
             return 1;
         }
         public bool HasStatus(StatusKind kind) => active.Exists(s => s.spec.kind == kind);
-        public void Apply(GemAttack attack, Vector3 direction)
+        public void Apply(GemAttack attack, Vector3 direction, bool allowControlEffects = true)
         {
             foreach (var spec in attack.statuses)
             {
+                // Early sword light hits still apply damage/debuffs, but cannot trigger
+                // the AI Hit animation indirectly via stun/stagger or add a backward push.
+                if (!allowControlEffects && (spec.kind == StatusKind.Stun || spec.kind == StatusKind.Stagger)) continue;
                 if (spec.duration <= 0 || Array.IndexOf(immunities, spec.kind) >= 0 || UnityEngine.Random.value >= spec.chance) continue;
                 var status = active.Find(s => s.spec.kind == spec.kind);
                 if (status == null) { status = new ActiveStatus { spec = spec }; active.Add(status); }
                 else { var merged = status.spec; merged.magnitude = Mathf.Max(merged.magnitude, spec.magnitude); status.spec = merged; }
                 status.left = Mathf.Max(status.left, spec.duration);
             }
-            push += Vector3.ProjectOnPlane(direction, Vector3.up).normalized * Mathf.Max(0, attack.knockback - knockbackResistance);
+            if (allowControlEffects) ApplyKnockback(direction, attack.knockback);
             UpdateControls();
+        }
+        public void ApplyKnockback(Vector3 direction, float strength)
+        {
+            if (health == null || health.IsDead || !isActiveAndEnabled) return;
+            push += Vector3.ProjectOnPlane(direction, Vector3.up).normalized * Mathf.Max(0, strength - knockbackResistance);
         }
         private void Update()
         {
@@ -61,7 +69,9 @@ namespace ElementalGems
                 {
                     s.damageRemainder += s.spec.magnitude * dt;
                     int damage = Mathf.FloorToInt(s.damageRemainder + 0.0001f);
-                    if (damage > 0) { health.TakeDamage(damage); s.damageRemainder -= damage; }
+                    // Lingering damage is not another weapon impact. Only the
+                    // originating contact decides whether to play a Hit reaction.
+                    if (damage > 0) { health.TakeDamage(damage, false); s.damageRemainder -= damage; }
                 }
                 if (s.left <= 0) { active.RemoveAt(i); changed = true; }
             }

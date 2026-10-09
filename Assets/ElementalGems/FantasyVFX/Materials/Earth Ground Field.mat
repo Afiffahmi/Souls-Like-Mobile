@@ -8,7 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Earth Ground Field
-  m_Shader: {fileID: 4800000, guid: 168cfe868b5d37f40a7632315ce05d23, type: 3}
+  m_Shader: {fileID: 4800000, guid: cc1af46a765a58744936d7cf71d1288c, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -26,10 +26,15 @@ Material:
     m_Ints: []
     m_Floats:
     - _Fade: 1
+    - _FieldAge: 5
     - _Intensity: 1.35
+    - _ParticleMode: 0
     - _Speed: 1.2
     - _Style: 4
     m_Colors:
+    - _CrystalColor: {r: 0.56, g: 0.38, b: 0.63, a: 1}
+    - _GlowColor: {r: 1, g: 0.58, b: 0.12, a: 1}
+    - _RockColor: {r: 0.43, g: 0.29, b: 0.14, a: 1}
     - _Tint: {r: 0.76449996, g: 0.42450002, b: 0.10775, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

@@ -1,0 +1,47 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fb66e02b62df5634689ec68204e25241, type: 3}
+  m_Name: Enemy1OneHand
+  m_EditorClassIdentifier: Assembly-CSharp::SoulsLike.Enemies.EnemyProfile
+  detectionRadius: 12
+  chaseRadius: 22
+  detectionInterval: 0.25
+  requireLineOfSight: 1
+  obstructionLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  lostSightGrace: 3
+  movementSpeed: 2.8
+  acceleration: 10
+  rotationSpeed: 420
+  repathInterval: 0.25
+  homeTolerance: 0.25
+  unreachableTimeout: 5
+  globalAttackCooldown: 0.65
+  avoidRepeatingAttack: 1
+  attacks:
+  - {fileID: 11400000, guid: 3b7e4fdc2f3f32143aba801c6d2343e4, type: 2}
+  - {fileID: 11400000, guid: c1d94b3452a2d934f85f80656e228a2e, type: 2}
+  - {fileID: 11400000, guid: 1a1cb56148bbe6d41850381b3e50c5fe, type: 2}
+  - {fileID: 11400000, guid: 1a2168ec746fd32438c2d4395f05fb9b, type: 2}
+  - {fileID: 11400000, guid: 485a4047b4bc09748aa35f728806eac3, type: 2}
+  - {fileID: 11400000, guid: d65ff5d9e74b7374eb473049b0c79161, type: 2}
+  selector: {fileID: 0}
+  idle: {fileID: 7400000, guid: 85db619d564135f44b2eb469b68c737d, type: 2}
+  walk: {fileID: 7400000, guid: 861baa11ea78c1e4fac3574e932d288e, type: 2}
+  run: {fileID: 7400000, guid: 77ac929024e6180428e0df28f7d78513, type: 2}
+  hit: {fileID: 7400000, guid: ab000953d71ac61468aa1c989c902f40, type: 2}
+  die: {fileID: 7400000, guid: 3f29610e20b173f43a73e079202105c9, type: 2}
+  transitionDuration: 0.12
+  hitFallbackDuration: 0.5
+  hitReactionMilliseconds: 0
+  corpseLifetime: 0

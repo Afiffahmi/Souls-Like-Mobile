@@ -15,6 +15,7 @@ namespace ElementalGems
         private PlayerBowVisuals bow;
         private PlayerSwordVisuals swordVisuals;
         private GemSwordCombat melee;
+        private GemLightSlashEffects slashTiming;
         private GameObject swordEffect, bowEffect;
         private TrailRenderer slash;
         private GemDefinition gem;
@@ -86,7 +87,13 @@ namespace ElementalGems
             bool bowOn = bowRoot != null && bowRoot.parent == bow.handSocket && bow.isActiveAndEnabled;
             SetAuraActive(swordEffect,swordOn);
             SetAuraActive(bowEffect,bowOn);
-            if (slash != null) { slash.emitting = swordOn && melee != null && melee.TrailActive; if (!swordOn) slash.Clear(); }
+            if (slashTiming == null) slashTiming = GetComponent<GemLightSlashEffects>();
+            if (slash != null)
+            {
+                bool configured = slashTiming != null && slashTiming.isActiveAndEnabled && slashTiming.HasConfiguredSlash;
+                slash.emitting = swordOn && (configured ? slashTiming.TrailActive : melee != null && melee.TrailActive);
+                if (!swordOn || (configured && !slash.emitting)) slash.Clear();
+            }
         }
         private static void SetAuraActive(GameObject effect,bool active)
         {

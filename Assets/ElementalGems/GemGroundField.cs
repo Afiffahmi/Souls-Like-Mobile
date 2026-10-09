@@ -16,6 +16,9 @@ namespace ElementalGems
         public bool preserveAuthoredParticleRatios;
         [Tooltip("Fade every particle layer with the ground and clear particles when the field ends.")]
         public bool synchronizeParticleFade;
+        [Header("Eruption reaction")]
+        [Tooltip("Optional outward push on each enemy's first damaging field hit. Zero preserves the normal reaction.")]
+        [Min(0)] public float firstHitKnockback;
         GroundFieldSnapshot settings;
         GemAttack attack;
         GemManager owner;
@@ -27,6 +30,7 @@ namespace ElementalGems
         MaterialPropertyBlock particleBlock;
         static readonly int FadeProperty = Shader.PropertyToID("_Fade");
         readonly HashSet<Enemy> seen = new HashSet<Enemy>();
+        readonly HashSet<Enemy> pushedByEruption = new HashSet<Enemy>();
         Collider[] candidates = new Collider[32];
         RaycastHit[] obstacles = new RaycastHit[16];
         static readonly List<GemGroundField> active = new List<GemGroundField>();
@@ -116,7 +120,7 @@ namespace ElementalGems
         {
             if (surfaceRenderer != null)
             {
-                block.SetFloat(FadeProperty, fade); surfaceRenderer.SetPropertyBlock(block);
+                block.SetFloat(FadeProperty, fade); block.SetFloat("_FieldAge", age); surfaceRenderer.SetPropertyBlock(block);
             }
             if (!synchronizeParticleFade || particleRenderers == null) return;
             foreach (var renderer in particleRenderers)
@@ -148,7 +152,17 @@ namespace ElementalGems
                 Vector3 target = collider.bounds.center;
                 if (settings.lineOfSight && Blocked(physics, origin + up * .2f, target, enemy)) continue;
                 seen.Add(enemy);
-                ElementalDamage.Hit(attack, baseDamage, owner, enemy, target, target - origin);
+                int dealt = ElementalDamage.Hit(attack, baseDamage, owner, enemy, target, target - origin);
+                if (firstHitKnockback > 0 && dealt > 0 && !enemy.IsDead && pushedByEruption.Add(enemy))
+                {
+                    var elemental = enemy.GetComponent<ElementalEnemy>();
+                    if (elemental != null)
+                    {
+                        var outward = Vector3.ProjectOnPlane(target - origin, Vector3.up);
+                        if (outward.sqrMagnitude < .0001f) outward = Vector3.ProjectOnPlane(transform.forward, Vector3.up);
+                        elemental.ApplyKnockback(outward, firstHitKnockback);
+                    }
+                }
             }
         }
         bool Blocked(PhysicsScene physics, Vector3 start, Vector3 end, Enemy target)
