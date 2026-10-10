@@ -53,9 +53,9 @@ public static class BowSpecialAttackSetup
             behaviour.animation = clip; behaviour.highDamage = i == 1;
             EditorUtility.SetDirty(behaviour); EditorUtility.SetDirty(state);
         }
-        var shader = AssetDatabase.LoadAssetAtPath<Shader>("Assets/ElementalGems/BowSpecialEnergy.shader");
+        var shader = AssetDatabase.LoadAssetAtPath<Shader>("Assets/Shader/ElementalGems/BowSpecialEnergy.shader");
         if (shader == null) throw new InvalidOperationException("Bow special energy shader is missing.");
-        const string materialPath = "Assets/ElementalGems/Resources/BowSpecialEnergy.mat";
+        const string materialPath = "Assets/Materials/ElementalGems/Resources/BowSpecialEnergy.mat";
         var material = AssetDatabase.LoadAssetAtPath<Material>(materialPath);
         if (material == null) { material = new Material(shader) { name = "BowSpecialEnergy" }; AssetDatabase.CreateAsset(material, materialPath); }
         EditorUtility.SetDirty(machine); EditorUtility.SetDirty(controller);
