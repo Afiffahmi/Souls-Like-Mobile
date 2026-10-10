@@ -70,6 +70,13 @@ public partial class PlayerStateManager
             return;
         }
 
+        if (IsSwordSpecialAttacking)
+        {
+            planarVelocity = Vector3.zero;
+            ResetLocomotionAnimation();
+            return; // The special timeline owns jump movement, gravity and collision.
+        }
+
         if (RequiresWalking) targetSpeed = Mathf.Min(targetSpeed, walkSpeed);
         if (IsAttackMovementLocked) targetSpeed = 0f;
         float dt = Time.deltaTime;

@@ -23,7 +23,7 @@ namespace SoulsLike.Enemies
         public override bool ReceiveDamage(int damage, EnemyBrain source) => ReceiveDamage(damage, source, true);
         public override bool ReceiveDamage(int damage, EnemyBrain source, bool allowParry)
         {
-            if (!IsAlive || damage <= 0 || (evadeDuringRoll && player != null && player.IsRolling)) return false;
+            if (!IsAlive || health.IsInvulnerable || damage <= 0 || (evadeDuringRoll && player != null && player.IsRolling)) return false;
             if (allowParry && TryParryAttack(source)) return false;
             if (blockWhileHoldingGuard && player != null && player.IsDefending) return false;
             int before = health.currentHealth;
@@ -32,7 +32,7 @@ namespace SoulsLike.Enemies
         }
         public override bool TryParryAttack(EnemyBrain source)
         {
-            if (!IsAlive || (evadeDuringRoll && player != null && player.IsRolling)) return false;
+            if (!IsAlive || health.IsInvulnerable || (evadeDuringRoll && player != null && player.IsRolling)) return false;
             // Confirm success at actual impact, using the same window as the held pose.
             // This releases the hold frame and lets the player's full follow-through play.
             if (parryEnabled && player != null && player.TryReceiveParryableHit())

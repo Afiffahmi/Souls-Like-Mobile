@@ -23,6 +23,8 @@ namespace ElementalGems
         [Tooltip("Sweep and reveal progression. Keep endpoints at (0,0) and (1,1).")]
         public AnimationCurve progression = AnimationCurve.Linear(0, 0, 1, 1);
         [Min(.01f)] public float size = 1;
+        [Tooltip("Visual stretch in the slash plane. Narrow X with forward drift creates a thrust trail.")]
+        public Vector3 visualScale = Vector3.one;
         [Min(0)] public float forwardDrift;
         [Tooltip("Follow player position/facing during the swing; otherwise stay at the spawn pose.")]
         public bool followPlayer;
@@ -30,6 +32,8 @@ namespace ElementalGems
         public bool IsValid(AnimationClip clip) => clip != null && clip.frameRate > 0 &&
             Finite(startFrame) && Finite(endFrame) && startFrame >= 0 && endFrame > startFrame &&
             endFrame <= clip.length * clip.frameRate + .01f && Finite(size) && size > 0 &&
+            Finite(visualScale.x) && Finite(visualScale.y) && Finite(visualScale.z) &&
+            visualScale.x > 0 && visualScale.y > 0 && visualScale.z > 0 &&
             Finite(startSweepAngle) && Finite(endSweepAngle) && Finite(forwardDrift) && forwardDrift >= 0 &&
             Finite(localOffset.x) && Finite(localOffset.y) && Finite(localOffset.z) &&
             Finite(localEulerAngles.x) && Finite(localEulerAngles.y) && Finite(localEulerAngles.z);

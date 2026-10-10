@@ -113,6 +113,8 @@ namespace ElementalGems
                 var collider = contacts[i];
                 var enemy = collider.GetComponentInParent<Enemy>();
                 if (enemy == null || enemy.transform.IsChildOf(transform) || !enemy.isActiveAndEnabled || enemy.IsDead || hit.Contains(enemy)) continue;
+                // A special hit belongs to its selected enemy; nearby bystanders do not consume extra hits.
+                if (player.IsSwordSpecialAttacking && enemy != player.SwordSpecialTarget) continue;
                 // Reject enemies behind the slash, even if a large collider overlaps the front box.
                 Vector3 toEnemy = Vector3.ProjectOnPlane(enemy.transform.position - origin, Vector3.up);
                 if (!fullCircle && Vector3.Dot(toEnemy, forward) < 0f) continue;

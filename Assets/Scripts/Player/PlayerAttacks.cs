@@ -31,7 +31,7 @@ public partial class PlayerStateManager
          (anim.IsInTransition(0) && anim.GetNextAnimatorStateInfo(0).IsTag("CombatAttack"))));
     public bool HasBufferedAttack => followUpBuffered;
     // Includes the accepted request before Animator entry and every chained step.
-    public bool IsAttackMovementLocked => swordHeavyActive || bowHeavyActive || bowAttackActive || (attackPendingOrActive && activeAttackInput == CombatAttackInput.LightAttack);
+    public bool IsAttackMovementLocked => swordSpecialActive || swordHeavyActive || bowHeavyActive || bowAttackActive || (attackPendingOrActive && activeAttackInput == CombatAttackInput.LightAttack);
     public int CurrentAttackNumber => bowHeavyActive ? (bowHeavyCharged ? 2 : 1) : bowAttackActive ? 1 : IsAttacking ? activeAttackIndex + 1 : 0;
     public CombatAttackInput? CurrentAttackInput => bowHeavyActive ? CombatAttackInput.HeavyAttack : bowAttackActive ? CombatAttackInput.LightAttack :
         IsAttacking ? activeAttackInput : (CombatAttackInput?)null;
@@ -104,6 +104,7 @@ public partial class PlayerStateManager
         var chain = config.Chain(input);
         if (input != CombatAttackInput.SpecialAttack && (chain == null || chain.Count == 0)) return false;
         if (!anim.HasState(0, Animator.StringToHash(config.StatePath(input, 0)))) return false;
+        if (input == CombatAttackInput.SpecialAttack && config.UsesSwordSpecial && !FindSwordSpecialTargets(config)) return false;
         if (input == CombatAttackInput.SpecialAttack && !specialCooldowns.TryStart(config, Time.timeAsDouble, CaptureAttackDefaults(config.weapon,input).cooldownSeconds)) return false;
         activeAttackConfiguration = config;
         activeAttackInput = input;
@@ -113,6 +114,7 @@ public partial class PlayerStateManager
         attackStateEntered = false;
         followUpBuffered = false;
         if (chargedSword) PrepareSwordHeavyAttack(config);
+        if (input == CombatAttackInput.SpecialAttack && config.UsesSwordSpecial) PrepareSwordSpecialAttack(config);
         ClearAttackTriggers();
         anim.SetBool(AttackBufferedHash, false);
         anim.ResetTrigger(ParryHash);
@@ -144,6 +146,11 @@ public partial class PlayerStateManager
 
     private void MaintainAttackLock()
     {
+        if (swordSpecialActive)
+        {
+            UpdateSwordSpecialAttack();
+            return;
+        }
         if (swordHeavyActive)
         {
             UpdateSwordHeavyAttack();
@@ -217,6 +224,7 @@ public partial class PlayerStateManager
 
     private void ResetAttackSequence()
     {
+        ResetSwordSpecialAttack();
         ResetSwordHeavyAttack();
         swordLightCombo.Reset();
         ResetBowHeavyAttack();

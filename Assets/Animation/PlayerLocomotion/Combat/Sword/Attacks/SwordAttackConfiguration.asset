@@ -54,6 +54,7 @@ MonoBehaviour:
         m_PostInfinity: 2
         m_RotationOrder: 4
       size: 1
+      visualScale: {x: 1, y: 1, z: 1}
       forwardDrift: 0
       followPlayer: 0
     playbackSpeed: 1
@@ -99,6 +100,7 @@ MonoBehaviour:
         m_PostInfinity: 2
         m_RotationOrder: 4
       size: 1
+      visualScale: {x: 1, y: 1, z: 1}
       forwardDrift: 0
       followPlayer: 0
     playbackSpeed: 1
@@ -144,6 +146,7 @@ MonoBehaviour:
         m_PostInfinity: 2
         m_RotationOrder: 4
       size: 1
+      visualScale: {x: 1, y: 1, z: 1}
       forwardDrift: 0
       followPlayer: 0
     playbackSpeed: 1
@@ -190,6 +193,7 @@ MonoBehaviour:
         m_PostInfinity: 2
         m_RotationOrder: 4
       size: 1
+      visualScale: {x: 1, y: 1, z: 1}
       forwardDrift: 0
       followPlayer: 0
     playbackSpeed: 1.2
@@ -242,6 +246,7 @@ MonoBehaviour:
           m_PostInfinity: 2
           m_RotationOrder: 4
         size: 1
+        visualScale: {x: 1, y: 1, z: 1}
         forwardDrift: 0
         followPlayer: 0
     highDamageHeavyAttack:
@@ -282,10 +287,11 @@ MonoBehaviour:
           m_PostInfinity: 2
           m_RotationOrder: 4
         size: 1
+        visualScale: {x: 1, y: 1, z: 1}
         forwardDrift: 0
         followPlayer: 0
   specialAttack:
-    animation: {fileID: 7400000, guid: 9f6c108161960984ea749105a2aead55, type: 2}
+    animation: {fileID: 7400000, guid: fc45e68d372f5054cbe61390058fd9ee, type: 2}
     slash:
       enabled: 0
       startFrame: 11
@@ -321,7 +327,400 @@ MonoBehaviour:
         m_PostInfinity: 2
         m_RotationOrder: 4
       size: 1
+      visualScale: {x: 1, y: 1, z: 1}
       forwardDrift: 0
       followPlayer: 0
     playbackSpeed: 1
     cooldown: 5
+  swordSpecial:
+    enabled: 1
+    targetRadius: 12
+    arrivalDistance: 1.5
+    jumpHeight: 1.2
+    baseKnockback: 5
+    steps:
+    - animation: {fileID: 7400000, guid: fc45e68d372f5054cbe61390058fd9ee, type: 2}
+      slash:
+        enabled: 1
+        startFrame: 40
+        endFrame: 47
+        localOffset: {x: 0, y: 1, z: 0.05}
+        localEulerAngles: {x: 0, y: 0, z: 0}
+        reverseSweep: 0
+        fullCircle: 0
+        startSweepAngle: 0
+        endSweepAngle: 0
+        progression:
+          serializedVersion: 2
+          m_Curve:
+          - serializedVersion: 3
+            time: 0
+            value: 0
+            inSlope: 0
+            outSlope: 1
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          - serializedVersion: 3
+            time: 1
+            value: 1
+            inSlope: 1
+            outSlope: 0
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        size: 1
+        visualScale: {x: 0.28, y: 1, z: 1}
+        forwardDrift: 0.7
+        followPlayer: 1
+      followThrough:
+        enabled: 0
+        startFrame: 11
+        endFrame: 16
+        localOffset: {x: 0, y: 1, z: 0.05}
+        localEulerAngles: {x: 0, y: 0, z: -90}
+        reverseSweep: 0
+        fullCircle: 0
+        startSweepAngle: 0
+        endSweepAngle: 0
+        progression:
+          serializedVersion: 2
+          m_Curve:
+          - serializedVersion: 3
+            time: 0
+            value: 0
+            inSlope: 0
+            outSlope: 1
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          - serializedVersion: 3
+            time: 1
+            value: 1
+            inSlope: 1
+            outSlope: 0
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        size: 1
+        visualScale: {x: 1, y: 1, z: 1}
+        forwardDrift: 0
+        followPlayer: 0
+    - animation: {fileID: 7400000, guid: 06e1ed4ab13d5774e9608ff8b8135319, type: 2}
+      slash:
+        enabled: 1
+        startFrame: 34
+        endFrame: 41
+        localOffset: {x: 0, y: 1, z: 0.05}
+        localEulerAngles: {x: 0, y: 0, z: -90}
+        reverseSweep: 0
+        fullCircle: 0
+        startSweepAngle: 0
+        endSweepAngle: 0
+        progression:
+          serializedVersion: 2
+          m_Curve:
+          - serializedVersion: 3
+            time: 0
+            value: 0
+            inSlope: 0
+            outSlope: 1
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          - serializedVersion: 3
+            time: 1
+            value: 1
+            inSlope: 1
+            outSlope: 0
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        size: 1
+        visualScale: {x: 1, y: 1, z: 1}
+        forwardDrift: 0
+        followPlayer: 1
+      followThrough:
+        enabled: 0
+        startFrame: 11
+        endFrame: 16
+        localOffset: {x: 0, y: 1, z: 0.05}
+        localEulerAngles: {x: 0, y: 0, z: -90}
+        reverseSweep: 0
+        fullCircle: 0
+        startSweepAngle: 0
+        endSweepAngle: 0
+        progression:
+          serializedVersion: 2
+          m_Curve:
+          - serializedVersion: 3
+            time: 0
+            value: 0
+            inSlope: 0
+            outSlope: 1
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          - serializedVersion: 3
+            time: 1
+            value: 1
+            inSlope: 1
+            outSlope: 0
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        size: 1
+        visualScale: {x: 1, y: 1, z: 1}
+        forwardDrift: 0
+        followPlayer: 0
+    - animation: {fileID: 7400000, guid: 792cf9cfe1265bf4482110650d6611d4, type: 2}
+      slash:
+        enabled: 1
+        startFrame: 35
+        endFrame: 44
+        localOffset: {x: 0, y: 1, z: 0.05}
+        localEulerAngles: {x: 0, y: 0, z: -90}
+        reverseSweep: 0
+        fullCircle: 0
+        startSweepAngle: 0
+        endSweepAngle: 0
+        progression:
+          serializedVersion: 2
+          m_Curve:
+          - serializedVersion: 3
+            time: 0
+            value: 0
+            inSlope: 0
+            outSlope: 1
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          - serializedVersion: 3
+            time: 1
+            value: 1
+            inSlope: 1
+            outSlope: 0
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        size: 1
+        visualScale: {x: 1, y: 1, z: 1}
+        forwardDrift: 0
+        followPlayer: 1
+      followThrough:
+        enabled: 0
+        startFrame: 11
+        endFrame: 16
+        localOffset: {x: 0, y: 1, z: 0.05}
+        localEulerAngles: {x: 0, y: 0, z: -90}
+        reverseSweep: 0
+        fullCircle: 0
+        startSweepAngle: 0
+        endSweepAngle: 0
+        progression:
+          serializedVersion: 2
+          m_Curve:
+          - serializedVersion: 3
+            time: 0
+            value: 0
+            inSlope: 0
+            outSlope: 1
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          - serializedVersion: 3
+            time: 1
+            value: 1
+            inSlope: 1
+            outSlope: 0
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        size: 1
+        visualScale: {x: 1, y: 1, z: 1}
+        forwardDrift: 0
+        followPlayer: 0
+    - animation: {fileID: 7400000, guid: 1b6b75af2307d6b4c92ff7f9c558ad69, type: 2}
+      slash:
+        enabled: 1
+        startFrame: 23
+        endFrame: 32
+        localOffset: {x: 0, y: 1, z: 0.05}
+        localEulerAngles: {x: 0, y: 0, z: -90}
+        reverseSweep: 0
+        fullCircle: 0
+        startSweepAngle: 0
+        endSweepAngle: 0
+        progression:
+          serializedVersion: 2
+          m_Curve:
+          - serializedVersion: 3
+            time: 0
+            value: 0
+            inSlope: 0
+            outSlope: 1
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          - serializedVersion: 3
+            time: 1
+            value: 1
+            inSlope: 1
+            outSlope: 0
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        size: 1
+        visualScale: {x: 1, y: 1, z: 1}
+        forwardDrift: 0
+        followPlayer: 1
+      followThrough:
+        enabled: 0
+        startFrame: 11
+        endFrame: 16
+        localOffset: {x: 0, y: 1, z: 0.05}
+        localEulerAngles: {x: 0, y: 0, z: -90}
+        reverseSweep: 0
+        fullCircle: 0
+        startSweepAngle: 0
+        endSweepAngle: 0
+        progression:
+          serializedVersion: 2
+          m_Curve:
+          - serializedVersion: 3
+            time: 0
+            value: 0
+            inSlope: 0
+            outSlope: 1
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          - serializedVersion: 3
+            time: 1
+            value: 1
+            inSlope: 1
+            outSlope: 0
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        size: 1
+        visualScale: {x: 1, y: 1, z: 1}
+        forwardDrift: 0
+        followPlayer: 0
+    - animation: {fileID: 7400000, guid: 9f91afc3f3dd4bd42adacae12f5b007d, type: 2}
+      slash:
+        enabled: 1
+        startFrame: 26
+        endFrame: 29.5
+        localOffset: {x: 0, y: 1, z: 0.05}
+        localEulerAngles: {x: 0, y: 0, z: -90}
+        reverseSweep: 0
+        fullCircle: 0
+        startSweepAngle: 0
+        endSweepAngle: 0
+        progression:
+          serializedVersion: 2
+          m_Curve:
+          - serializedVersion: 3
+            time: 0
+            value: 0
+            inSlope: 0
+            outSlope: 1
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          - serializedVersion: 3
+            time: 1
+            value: 1
+            inSlope: 1
+            outSlope: 0
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        size: 1
+        visualScale: {x: 1, y: 1, z: 1}
+        forwardDrift: 0
+        followPlayer: 1
+      followThrough:
+        enabled: 1
+        startFrame: 29.5
+        endFrame: 33
+        localOffset: {x: 0, y: 1, z: 0.05}
+        localEulerAngles: {x: 0, y: 0, z: 0}
+        reverseSweep: 0
+        fullCircle: 0
+        startSweepAngle: 0
+        endSweepAngle: 0
+        progression:
+          serializedVersion: 2
+          m_Curve:
+          - serializedVersion: 3
+            time: 0
+            value: 0
+            inSlope: 0
+            outSlope: 1
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          - serializedVersion: 3
+            time: 1
+            value: 1
+            inSlope: 1
+            outSlope: 0
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        size: 1
+        visualScale: {x: 1, y: 1, z: 1}
+        forwardDrift: 0
+        followPlayer: 1

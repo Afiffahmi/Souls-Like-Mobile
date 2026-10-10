@@ -67,7 +67,7 @@ namespace ElementalGems
             drivenSettings = settings;
             direction = settings.reverseSweep ? -1 : 1;
             drivenProgress = 0; emittedParticles = 0;
-            transform.localScale = Vector3.one * size * settings.size;
+            transform.localScale = settings.visualScale * size * settings.size;
             if (surface != null)
             {
                 // Shader expands the front crescent into a full ring; include its back half in culling.

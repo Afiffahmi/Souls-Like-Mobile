@@ -24,6 +24,8 @@ public sealed class CombatAttackConfigurationEditor : Editor
         }
         if (config.specialAttack?.slash != null && config.specialAttack.slash.enabled && !config.specialAttack.slash.IsValid(config.specialAttack.animation))
             EditorGUILayout.HelpBox("Special attack slash settings are invalid; its slash will be skipped.", MessageType.Warning);
+        if (config.UsesSwordSpecial)
+            EditorGUILayout.HelpBox("Sword special: five automatic hits, each with a one-second base duration. Nearby enemies are visited once before random repeats. Each hit dashes along the ground to its target and knocks it back. Only the gem aura is visible between slash windows. Player level, weapon upgrades and accessories scale the base damage, speed and knockback duration. The player is invulnerable for the active cycle. The final follow-through shares its hit, so it cannot double damage.", MessageType.Info);
         bool valid = config.Validate(out string error);
         EditorGUILayout.HelpBox(valid
             ? "Edit clips, speeds and timing, then apply to update the Animator. Use Chain Transition Frame enables an exact earliest follow-up frame; later presses chain immediately until Combo Window End. Post Attack Recovery blocks new attacks after that step finishes. Empty chains disable their input. Special never chains."
@@ -74,7 +76,8 @@ public static class CombatAttackAnimatorBuilder
         foreach (var input in (CombatAttackInput[])Enum.GetValues(typeof(CombatAttackInput)))
         {
             var chain = config.Chain(input);
-            int count = input==CombatAttackInput.SpecialAttack ? 1 : chain.Count;
+            bool swordSpecial = config.UsesSwordSpecial && input == CombatAttackInput.SpecialAttack;
+            int count = input==CombatAttackInput.SpecialAttack ? (swordSpecial ? 5 : 1) : chain.Count;
             var states = new List<AnimatorState>();
             for(int i=0;i<count;i++)
             {
@@ -104,6 +107,15 @@ public static class CombatAttackAnimatorBuilder
                     state.timeParameter = PlayerStateManager.SwordHeavyTimeParameter;
                     state.timeParameterActive = true;
                 }
+                if (swordSpecial)
+                {
+                    EnsureParameter(controller, PlayerStateManager.SwordSpecialTimeParameter, AnimatorControllerParameterType.Float);
+                    state.motion = config.swordSpecial.steps[i].animation;
+                    state.speed = 0;
+                    state.speedParameterActive = false;
+                    state.timeParameter = PlayerStateManager.SwordSpecialTimeParameter;
+                    state.timeParameterActive = true;
+                }
                 states.Add(state);
             }
             if(count>0)
@@ -116,6 +128,8 @@ public static class CombatAttackAnimatorBuilder
             }
             for(int i=0;i<count;i++)
             {
+                // Special state changes and completion are driven by one shared clock.
+                if (swordSpecial) continue;
                 if(i+1<count)
                 {
                     var next=states[i].AddTransition(states[i+1]); Configure(next,true,chain[i].ChainTransitionNormalized);

@@ -34,8 +34,20 @@ public class PlayerOverall : MonoBehaviour
         if (healthBar != null) healthBar.SetHealth(currentHealth);
     }
 
+    private PlayerStateManager combatPlayer;
+    public bool IsInvulnerable
+    {
+        get
+        {
+            if (combatPlayer == null) combatPlayer = GetComponent<PlayerStateManager>();
+            return combatPlayer != null && combatPlayer.isActiveAndEnabled && combatPlayer.IsSwordSpecialAttacking;
+        }
+    }
+
     public void TakeDamage(int damage)
 	{
+        // Central gate covers melee, projectiles, hazards and periodic damage using this health API.
+        if (IsInvulnerable) return;
 		var gems = GetComponent<ElementalGems.GemManager>();
         damage = gems != null ? gems.ReduceIncomingDamage(damage) : Mathf.Max(0, damage);
         int minimumHealth = keepAliveForCombatTesting ? 1 : 0;

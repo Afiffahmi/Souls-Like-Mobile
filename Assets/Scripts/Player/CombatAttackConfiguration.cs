@@ -75,11 +75,13 @@ public sealed class CombatAttackConfiguration : ScriptableObject
     public SwordHeavyChargeSettings swordHeavyCharge = new SwordHeavyChargeSettings();
     public bool UsesSwordHeavyCharge => weapon == PlayerCombatMode.Sword && swordHeavyCharge != null && swordHeavyCharge.enabled && heavyAttackChain != null && heavyAttackChain.Count > 0;
     public CombatSpecialAttack specialAttack = new CombatSpecialAttack();
+    public SwordSpecialAttackSettings swordSpecial = new SwordSpecialAttackSettings();
+    public bool UsesSwordSpecial => weapon == PlayerCombatMode.Sword && swordSpecial != null && swordSpecial.enabled;
 
     public string AttackMachineName => weapon + "_Attacks";
     public string LocomotionStatePath => combatStateMachinePath + "." + weapon;
     public string StateName(CombatAttackInput input, int index) => weapon + "_" + input +
-        (input == CombatAttackInput.SpecialAttack ? "" : "_" + (index + 1));
+        (input == CombatAttackInput.SpecialAttack && (!UsesSwordSpecial || index == 0) ? "" : "_" + (index + 1));
     public string StatePath(CombatAttackInput input, int index) => combatStateMachinePath + "." + AttackMachineName + "." + StateName(input, index);
     public List<CombatAttackStep> Chain(CombatAttackInput input) => input == CombatAttackInput.LightAttack
         ? lightAttackChain : input == CombatAttackInput.HeavyAttack ? heavyAttackChain : null;
@@ -89,6 +91,8 @@ public sealed class CombatAttackConfiguration : ScriptableObject
         error = null;
         if (weapon == PlayerCombatMode.Normal || animatorController == null || string.IsNullOrWhiteSpace(combatStateMachinePath))
             error = "Assign a combat weapon, Animator Controller, and combat parent path.";
+        else if (UsesSwordSpecial && !swordSpecial.IsValid)
+            error = "Sword special needs exactly five non-looping clips with valid slash windows and positive target radius, arrival distance and knockback.";
         else if (lightAttackChain == null || heavyAttackChain == null)
             error = "Attack chains must be lists (an empty list disables that attack input).";
         else if (UsesSwordHeavyCharge && (heavyAttackChain.Count != 1 || !swordHeavyCharge.IsValid(heavyAttackChain[0])))

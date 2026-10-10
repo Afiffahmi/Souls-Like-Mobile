@@ -216,7 +216,8 @@ public sealed class PlayerLockOn : MonoBehaviour
         }
         movementFrame.SetPositionAndRotation(transform.position, movementRotation);
         // Runs while idle too, so a moving enemy remains in front of the character.
-        transform.rotation = Quaternion.RotateTowards(transform.rotation, facingRotation, facingSpeed * dt);
+        if (!player.IsSwordSpecialAttacking)
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, facingRotation, facingSpeed * dt);
     }
 
     private bool IsValidTarget(LockOnTarget target, bool retainingLock = false)

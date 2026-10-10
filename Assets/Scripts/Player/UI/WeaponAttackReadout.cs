@@ -45,8 +45,22 @@ public sealed class WeaponAttackReadout
             if (melee == null || config == null) return result;
             if (input == CombatAttackInput.SpecialAttack)
             {
+                if (config.UsesSwordSpecial)
+                {
+                    float total = 0;
+                    for (int i = 0; i < 5; i++)
+                        total += player.ApplyPlayerLevelStats(loadout.Evaluate(input, i + 1)).Duration(SwordSpecialAttackSettings.SecondsPerHit / defaults.speed);
+                    for (int i = 0; i < 5; i++)
+                    {
+                        var stats = player.ApplyPlayerLevelStats(loadout.Evaluate(input, i + 1));
+                        result.Add(stats, defaults.damage, 0, gem.WithKnockbackMultiplier(1, config.swordSpecial.baseKnockback),
+                            true, defaultKnockbackScale: defaults.knockbackDurationScale);
+                        result.seconds[result.seconds.Count - 1] = total + defaults.recoverySeconds / player.ApplyPlayerLevelStats(loadout.Evaluate(input, 5)).AgilityMultiplier;
+                    }
+                    return result;
+                }
                 var special = config.specialAttack;
-                if (special?.animation != null) result.Add(loadout.Evaluate(input), defaults.damage,
+                if (special?.animation != null) result.Add(player.ApplyPlayerLevelStats(loadout.Evaluate(input)), defaults.damage,
                     special.animation.length / defaults.speed + defaults.recoverySeconds, gem, true, defaultKnockbackScale:defaults.knockbackDurationScale);
                 return result;
             }
@@ -56,7 +70,7 @@ public sealed class WeaponAttackReadout
             {
                 var step = chain[i];
                 if (step?.animation == null) continue;
-                var stats = loadout.Evaluate(input, i + 1);
+                var stats = player.ApplyPlayerLevelStats(loadout.Evaluate(input, i + 1));
                 float length = step.animation.length, speed = defaults.speed;
                 if (input == CombatAttackInput.HeavyAttack && config.UsesSwordHeavyCharge)
                 {
@@ -91,7 +105,7 @@ public sealed class WeaponAttackReadout
         {
             var shooter = equipment.GetComponent<PlayerBowShooter>();
             if (shooter == null) return result;
-            var stats = loadout.Evaluate(input);
+            var stats = player.ApplyPlayerLevelStats(loadout.Evaluate(input));
             if (input == CombatAttackInput.LightAttack)
             {
                 var clip = animator.GetBehaviours<CombatBowAttackState>().Select(s => s.characterAnimation).FirstOrDefault(c => c != null);

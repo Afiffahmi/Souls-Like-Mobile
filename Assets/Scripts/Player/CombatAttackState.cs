@@ -19,6 +19,25 @@ public sealed class CombatAttackState : StateMachineBehaviour
     public override void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
         var player = animator.GetComponentInParent<PlayerStateManager>();
+        if (IsSwordSpecial)
+        {
+            if (player == null || !player.IsSwordSpecialAttacking)
+            {
+                animator.Play(configuration.LocomotionStatePath, layerIndex, 0);
+                return;
+            }
+            if (stepIndex == 0)
+            {
+                if (!player.NotifyAttackEntered(configuration, input, stepIndex))
+                {
+                    animator.Play(configuration.LocomotionStatePath, layerIndex, 0);
+                    return;
+                }
+                player.EnterSwordSpecialAttack(stepIndex);
+            }
+            LockWeapon(animator);
+            return;
+        }
         if (IsChargedSwordHeavy && (player == null || !player.IsSwordHeavyAttacking))
         {
             animator.Play(configuration.LocomotionStatePath, layerIndex, 0f);
@@ -75,7 +94,7 @@ public sealed class CombatAttackState : StateMachineBehaviour
     public override void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
         LockWeapon(animator);
-        if (IsChargedSwordHeavy) return;
+        if (IsChargedSwordHeavy || IsSwordSpecial) return;
         UpdateWindup(animator, stateInfo);
         if (configuration != null && configuration.weapon == PlayerCombatMode.Sword)
         {
@@ -84,6 +103,12 @@ public sealed class CombatAttackState : StateMachineBehaviour
     }
     public override void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
+        // The shared five-second timeline owns window cleanup between special states.
+        if (IsSwordSpecial)
+        {
+            animator.GetComponentInParent<PlayerStateManager>()?.ExitSwordSpecialAttack(stepIndex);
+            return;
+        }
         if (IsChargedSwordHeavy)
         {
             animator.GetComponentInParent<PlayerStateManager>()?.ExitSwordHeavyAttack();
@@ -101,6 +126,7 @@ public sealed class CombatAttackState : StateMachineBehaviour
         }
     }
 
+    private bool IsSwordSpecial => configuration != null && configuration.UsesSwordSpecial && input == CombatAttackInput.SpecialAttack;
     private bool IsChargedSwordHeavy => configuration != null && configuration.UsesSwordHeavyCharge && input == CombatAttackInput.HeavyAttack && stepIndex == 0;
 
     private void UpdateWindup(Animator animator, AnimatorStateInfo stateInfo)

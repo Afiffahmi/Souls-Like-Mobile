@@ -73,6 +73,16 @@ namespace ElementalGems
             if (hash != stateHash) return;
             tracking = false; Clear();
         }
+        public void TickSpecial(int hash, float normalizedTime)
+        {
+            if (!tracking || hash != stateHash || clip == null || settings == null) return;
+            float requested = normalizedTime * clip.length * clip.frameRate;
+            // Speed bonuses can move across a whole slash between rendered frames.
+            // Present and sample that crossed window once; ordinary attacks retain their existing policy.
+            bool crossed = frame < settings.startFrame && requested >= settings.endFrame;
+            Tick(hash, crossed ? (settings.startFrame + settings.endFrame) * .5f / (clip.length * clip.frameRate) : normalizedTime);
+            LateUpdate();
+        }
         public void FinishWindow(int hash, float normalizedTime)
         {
             if (!tracking || hash != stateHash || current == null || !CanShow || !settings.IsValid(clip)) return;
