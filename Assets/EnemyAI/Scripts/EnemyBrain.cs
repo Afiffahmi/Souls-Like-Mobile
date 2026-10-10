@@ -62,6 +62,8 @@ namespace SoulsLike.Enemies
         private void Update()
         {
             if (!initialized || profile == null) return;
+            // Older ordinary prefabs can acquire elemental control on their first gem hit.
+            if (status == null) status = GetComponent<EnemyControlStatus>();
             if (Health.IsDead) { if (state != EnemyState.Dying) OnDeath(); return; }
             if (status != null && status.CannotAct)
             {

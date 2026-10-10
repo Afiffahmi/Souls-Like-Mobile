@@ -152,17 +152,13 @@ namespace ElementalGems
                 Vector3 target = collider.bounds.center;
                 if (settings.lineOfSight && Blocked(physics, origin + up * .2f, target, enemy)) continue;
                 seen.Add(enemy);
-                int dealt = ElementalDamage.Hit(attack, baseDamage, owner, enemy, target, target - origin, knockbackDurationMultiplier: settings.knockbackDurationMultiplier);
-                if (firstHitKnockback > 0 && dealt > 0 && !enemy.IsDead && pushedByEruption.Add(enemy))
-                {
-                    var elemental = enemy.GetComponent<ElementalEnemy>();
-                    if (elemental != null)
-                    {
-                        var outward = Vector3.ProjectOnPlane(target - origin, Vector3.up);
-                        if (outward.sqrMagnitude < .0001f) outward = Vector3.ProjectOnPlane(transform.forward, Vector3.up);
-                        elemental.ApplyKnockback(outward, firstHitKnockback, settings.knockbackDurationMultiplier);
-                    }
-                }
+                bool eruption = firstHitKnockback > 0 && !pushedByEruption.Contains(enemy);
+                var outward = Vector3.ProjectOnPlane(target - origin, Vector3.up);
+                if (outward.sqrMagnitude < .0001f) outward = Vector3.ProjectOnPlane(transform.forward, Vector3.up);
+                // Route the eruption through the same hit: it can now prime an ordinary enemy.
+                int dealt = ElementalDamage.Hit(attack, baseDamage, owner, enemy, target, outward,
+                    knockbackDurationMultiplier: settings.knockbackDurationMultiplier, additionalKnockback: eruption ? firstHitKnockback : 0);
+                if (eruption && dealt > 0) pushedByEruption.Add(enemy);
             }
         }
         bool Blocked(PhysicsScene physics, Vector3 start, Vector3 end, Enemy target)
