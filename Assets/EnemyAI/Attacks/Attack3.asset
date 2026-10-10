@@ -1,0 +1,74 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6aeff0118f1adac4c85f170194a156c3, type: 3}
+  m_Name: Attack3
+  m_EditorClassIdentifier: Assembly-CSharp::SoulsLike.Enemies.EnemyAttackDefinition
+  available: 1
+  attackType: 0
+  stateName: Attack3
+  animation: {fileID: 7400000, guid: 70cec0694c7d1e74ea8ba029bc6e86da, type: 2}
+  playbackSpeed: 1
+  windupSpeedMultiplier: 0.5
+  minimumRange: 0
+  range: 2.5
+  arc: 100
+  damage: 25
+  cooldown: 4
+  useFrameWindow: 1
+  damageAtWindowEnd: 1
+  hitStartFrame: 9
+  hitEndFrame: 14
+  hitStart: 0.1764706
+  hitEnd: 0.27450982
+  turnUntil: 0.1764706
+  weight: 1
+  priority: 0
+  minimumHealthRatio: 0
+  maximumHealthRatio: 1
+  effect: {fileID: 11400000, guid: 36328d502b3dcbf488a9dfc600ec5cb2, type: 2}
+  slashPrefab: {fileID: 8455488987529208815, guid: 0be2e103942bac744ba889bc431868b7, type: 3}
+  slash:
+    enabled: 1
+    startFrame: 9
+    endFrame: 14
+    localOffset: {x: 0, y: 1.2, z: 0.05}
+    localEulerAngles: {x: 0, y: 0, z: 45}
+    reverseSweep: 0
+    startSweepAngle: 0
+    endSweepAngle: 0
+    progression:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 1
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 1
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    size: 1
+    forwardDrift: 0
+    followPlayer: 0

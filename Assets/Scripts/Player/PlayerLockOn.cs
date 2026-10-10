@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -41,6 +42,7 @@ public sealed class PlayerLockOn : MonoBehaviour
     private bool previousOmnidirectionalRun;
     private bool ownsMovementFrame;
     private float blockedTime;
+    private readonly List<LockOnTarget> targetCycle = new List<LockOnTarget>();
 
     private void Awake()
     {
@@ -90,10 +92,14 @@ public sealed class PlayerLockOn : MonoBehaviour
         if (viewCamera == null) viewCamera = Camera.main;
     }
 
-    /// <summary>Can also be wired to a mobile UI Button's OnClick.</summary>
+    /// <summary>Acquire, or cycle to another enemy. With no alternative, release the lock.</summary>
     public void ToggleLock()
     {
-        if (ownsMovementFrame) { Unlock(); return; }
+        if (ownsMovementFrame)
+        {
+            if (!CycleTarget()) Unlock();
+            return;
+        }
         ResolveCamera();
         LockOnTarget best = null;
         bool bestVisible = false;
@@ -121,6 +127,41 @@ public sealed class PlayerLockOn : MonoBehaviour
         if (best != null) TryLockOn(best);
     }
 
+    /// <summary>Visit every eligible enemy in a stable order before repeating any target.</summary>
+    public bool CycleTarget()
+    {
+        if (!ownsMovementFrame || !isActiveAndEnabled || !player.isActiveAndEnabled) return false;
+        ResolveCamera();
+        // Keep the order across presses: the lock camera moves when targets change, so
+        // re-ranking by screen centre each time can bounce between the same two enemies.
+        for (int i = targetCycle.Count - 1; i >= 0; i--)
+            if (!IsValidTarget(targetCycle[i]) || (requireLineOfSight && !HasLineOfSight(targetCycle[i])))
+                targetCycle.RemoveAt(i);
+        foreach (var candidate in LockOnTarget.ActiveTargets)
+        {
+            if (!IsValidTarget(candidate) || (requireLineOfSight && !HasLineOfSight(candidate))) continue;
+            bool alreadyListed = false;
+            foreach (var listed in targetCycle)
+                if (SameEnemy(listed, candidate)) { alreadyListed = true; break; }
+            if (!alreadyListed) targetCycle.Add(candidate);
+        }
+        int currentIndex = targetCycle.FindIndex(target => SameEnemy(target, currentTarget));
+        for (int offset = 1; offset <= targetCycle.Count; offset++)
+        {
+            var next = targetCycle[(currentIndex + offset) % targetCycle.Count];
+            if (!SameEnemy(next, currentTarget) && TryLockOn(next)) return true;
+        }
+        return false;
+    }
+
+    private static bool SameEnemy(LockOnTarget a, LockOnTarget b)
+    {
+        if (a == b) return true;
+        if (a == null || b == null) return false;
+        var enemy = a.GetComponentInParent<Enemy>();
+        return enemy != null && enemy == b.GetComponentInParent<Enemy>();
+    }
+
     public bool TryLockOn(LockOnTarget target)
     {
         ResolveCamera();
@@ -128,6 +169,8 @@ public sealed class PlayerLockOn : MonoBehaviour
             || (requireLineOfSight && !HasLineOfSight(target))) return false;
         if (!ownsMovementFrame)
         {
+            targetCycle.Clear();
+            targetCycle.Add(target);
             previousFrame = player.MovementReferenceOverride;
             previousFacing = player.facingMode;
             previousOmnidirectionalRun = player.AllowOmnidirectionalRun;
@@ -145,6 +188,7 @@ public sealed class PlayerLockOn : MonoBehaviour
 
     public void Unlock()
     {
+        targetCycle.Clear();
         if (!ownsMovementFrame) { currentTarget = null; return; }
         if (player != null)
         {
@@ -172,7 +216,8 @@ public sealed class PlayerLockOn : MonoBehaviour
         }
         movementFrame.SetPositionAndRotation(transform.position, movementRotation);
         // Runs while idle too, so a moving enemy remains in front of the character.
-        transform.rotation = Quaternion.RotateTowards(transform.rotation, facingRotation, facingSpeed * dt);
+        if (!player.IsSwordSpecialAttacking)
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, facingRotation, facingSpeed * dt);
     }
 
     private bool IsValidTarget(LockOnTarget target, bool retainingLock = false)

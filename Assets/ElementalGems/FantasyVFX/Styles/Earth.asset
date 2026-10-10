@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 107bc1605842c7a489870062889ec627, type: 3}
+  m_Name: Earth
+  m_EditorClassIdentifier: Assembly-CSharp::ElementalGems.GemVfxStyle
+  element: 4
+  swordAura: {fileID: 5557396199497248268, guid: 2ba5641571d5fd2478ee357e86480fc5, type: 3}
+  bowAura: {fileID: 2502459718260132459, guid: ea8e57d4c2846d846b81a172431931d8, type: 3}
+  arrowheadAura: {fileID: 7194936171775662032, guid: 13afb4e2f93400c4dae3bc045e4c3f97, type: 3}
+  impact: {fileID: 3903376667560746629, guid: c8e0239aa102f444abb3852954c7e69f, type: 3}
+  trailMaterial: {fileID: 2100000, guid: f48998f06820ba841b2e23f80367d4a8, type: 2}
+  trailColor: {r: 0.76449996, g: 0.42450002, b: 0.10775, a: 1}
+  swordTrailWidth: 0.29
+  arrowTrailWidth: 0.1
+  trailDuration: 0.3
+  size: 1
+  speed: 1
+  intensity: 1
+  duration: 1

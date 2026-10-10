@@ -1,0 +1,48 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 89da5dae77543854a949aa9b13c1dc45, type: 3}
+  m_Name: Lightning
+  m_EditorClassIdentifier: Assembly-CSharp::ElementalGems.GemDefinition
+  element: 5
+  displayName: Lightning
+  description: Move 15% faster and shock enemies with stunning hits. Strong against Water; resisted by Earth.
+  icon: {fileID: 21300000, guid: 05061b437f58a08499f0d87ddf490eab, type: 3}
+  color: {r: 0.64, g: 0.48, b: 1, a: 1}
+  damageScale: 1
+  matchups:
+  - defender: 2
+    multiplier: 2
+  - defender: 4
+    multiplier: 0.5
+  statuses:
+  - kind: 5
+    chance: 0.35
+    duration: 0.7
+    magnitude: 1
+  knockback: 0
+  armorReduction: 0
+  movementScale: 1.15
+  projectileSpeedScale: 1
+  healingOnHit: 0
+  lifeSteal: 0
+  comboDamagePerHit: 0
+  maxComboStacks: 5
+  comboTimeout: 2
+  executeHealthThreshold: 0
+  executeDamageScale: 1
+  swordAura: {fileID: 4896637540428235654, guid: 1f8917445174f9344a1c064af24d3c22, type: 3}
+  bowAura: {fileID: 1016976393201410441, guid: 29632381f95f8b54890a13c2dea41d16, type: 3}
+  impact: {fileID: 5760646877253852911, guid: 590c194bc21cfc04ab4456779d9ab91c, type: 3}
+  trailMaterial: {fileID: 2100000, guid: 281a067a085246c44a3eaf82e4ae3e81, type: 2}
+  swordTrailWidth: 0.29
+  arrowTrailWidth: 0.11
+  trailLifetime: 0.3

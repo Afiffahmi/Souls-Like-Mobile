@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d4dec39271d1abf4f993f5ec1aa14171, type: 3}
+  m_Name: Sword_FinisherGrip
+  m_EditorClassIdentifier: Assembly-CSharp::WeaponAccessoryDefinition
+  weapon: 1
+  displayName: Finisher Grip
+  icon: {fileID: 21300000, guid: 22c23bec75c56914a87aa61c26a0f6d9, type: 2}
+  slot: 1
+  description: Boosts only the third light combo attack.
+  modifiers:
+  - attacks: 1
+    attackNumber: 3
+    flatDamage: 0
+    damagePercent: 40
+    agilityPercent: 0
+    knockbackDurationPercent: 35

@@ -35,19 +35,14 @@ public partial class PlayerStateManager
     // Kept to preserve serialization and references from older prototype states.
     // The locomotion controller does not select those states or handle their input.
     [HideInInspector] public PlayerFallState FallingState = new PlayerFallState();
-    [HideInInspector] public PlayerJumpState JumpingState = new PlayerJumpState();
     [HideInInspector] public int currentAttack;
     [HideInInspector] public float timeSinceAttack;
     [HideInInspector] public bool isAttackState;
     [HideInInspector] public bool isAtackking;
     [HideInInspector] public float maxVelocity = 1f;
     [HideInInspector] public float velocity;
-    [HideInInspector] public float jumpTimer = 0.8f;
-    [HideInInspector] public int jumpForce = 15;
     [HideInInspector] public float delta = 1f;
-    [HideInInspector] public bool isJumped;
     [HideInInspector] public float gap = 0.5f;
     [HideInInspector] public ParticleSystem footstepParticleSystem;
     [HideInInspector] public float PlayerSpeed;
-    [HideInInspector] public float jumpHeight = 1f;
 }

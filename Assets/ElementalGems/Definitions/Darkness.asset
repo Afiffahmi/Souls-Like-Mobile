@@ -1,0 +1,44 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 89da5dae77543854a949aa9b13c1dc45, type: 3}
+  m_Name: Darkness
+  m_EditorClassIdentifier: Assembly-CSharp::ElementalGems.GemDefinition
+  element: 7
+  displayName: Darkness
+  description: Void energy drains life and ravages weakened enemies. Deals double damage below 25% health. Matchups can be customized.
+  icon: {fileID: 21300000, guid: b60b4b685af9095498b6d19b716196a0, type: 3}
+  color: {r: 0.7, g: 0.15, b: 0.94, a: 1}
+  damageScale: 1.15
+  matchups: []
+  statuses:
+  - kind: 6
+    chance: 1
+    duration: 4
+    magnitude: 4
+  knockback: 0
+  armorReduction: 0
+  movementScale: 1
+  projectileSpeedScale: 1
+  healingOnHit: 0
+  lifeSteal: 0.2
+  comboDamagePerHit: 0
+  maxComboStacks: 5
+  comboTimeout: 2
+  executeHealthThreshold: 0.25
+  executeDamageScale: 2
+  swordAura: {fileID: 2167190224499980717, guid: 30730f3976e58824982b15662fc64e0a, type: 3}
+  bowAura: {fileID: 7770994229392092062, guid: 0c2bb00e72eb9ff4ebac21fa9a3de81c, type: 3}
+  impact: {fileID: 2491954680050230922, guid: fb01d6b85c1a52e4eaea1f71438d2ec8, type: 3}
+  trailMaterial: {fileID: 2100000, guid: a65a1d06ef73c1f4493518f5c71a179f, type: 2}
+  swordTrailWidth: 0.29
+  arrowTrailWidth: 0.1
+  trailLifetime: 0.3

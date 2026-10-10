@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 107bc1605842c7a489870062889ec627, type: 3}
+  m_Name: Wind
+  m_EditorClassIdentifier: Assembly-CSharp::ElementalGems.GemVfxStyle
+  element: 6
+  swordAura: {fileID: 1701075519708474638, guid: 098ca09328a3c2541ba0e2312554206f, type: 3}
+  bowAura: {fileID: 3881326950645459817, guid: 068b019a52c1deb49a12e5ee416ccc8b, type: 3}
+  arrowheadAura: {fileID: 1637274799827256079, guid: 0fab82fcccdebe64ba9c4836996922f0, type: 3}
+  impact: {fileID: 3280275456736710306, guid: 18d2a51b94f407e479515f741ba3f783, type: 3}
+  trailMaterial: {fileID: 2100000, guid: 48a384be945cddd4398e695e05a7b891, type: 2}
+  trailColor: {r: 0.792, g: 0.9675, b: 1, a: 1}
+  swordTrailWidth: 0.42
+  arrowTrailWidth: 0.1
+  trailDuration: 0.42
+  size: 1
+  speed: 1
+  intensity: 1
+  duration: 1

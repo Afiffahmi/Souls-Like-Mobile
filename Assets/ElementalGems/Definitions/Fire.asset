@@ -1,0 +1,48 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 89da5dae77543854a949aa9b13c1dc45, type: 3}
+  m_Name: Fire
+  m_EditorClassIdentifier: Assembly-CSharp::ElementalGems.GemDefinition
+  element: 1
+  displayName: Fire
+  description: Scorch foes with searing strikes. Higher impact damage and a lingering burn. Strong against Nature; resisted by Water.
+  icon: {fileID: 21300000, guid: 5a4acdea56ca1dd44b1e41a3d6414ec5, type: 3}
+  color: {r: 1, g: 0.26, b: 0.055, a: 1}
+  damageScale: 1.25
+  matchups:
+  - defender: 3
+    multiplier: 2
+  - defender: 2
+    multiplier: 0.5
+  statuses:
+  - kind: 0
+    chance: 1
+    duration: 3
+    magnitude: 5
+  knockback: 0
+  armorReduction: 0
+  movementScale: 1
+  projectileSpeedScale: 1
+  healingOnHit: 0
+  lifeSteal: 0
+  comboDamagePerHit: 0
+  maxComboStacks: 5
+  comboTimeout: 2
+  executeHealthThreshold: 0
+  executeDamageScale: 1
+  swordAura: {fileID: 8208545026785483877, guid: d6d2bc2bbb3eb2940af8528f709227c4, type: 3}
+  bowAura: {fileID: 3238259305224746546, guid: a004369fbad3ee0488d36a67322412a8, type: 3}
+  impact: {fileID: 8276093735884560325, guid: a08a77bacaa5f924fb37a2aa90fc909a, type: 3}
+  trailMaterial: {fileID: 2100000, guid: 5d2dddc0478ea504a881a5fbfc3330fc, type: 2}
+  swordTrailWidth: 0.29
+  arrowTrailWidth: 0.1
+  trailLifetime: 0.3

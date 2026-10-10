@@ -1,0 +1,52 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 89da5dae77543854a949aa9b13c1dc45, type: 3}
+  m_Name: Nature
+  m_EditorClassIdentifier: Assembly-CSharp::ElementalGems.GemDefinition
+  element: 3
+  displayName: Nature
+  description: Bind foes with roots, inflict poison and restore health on each successful hit. Strong against Earth; resisted by Fire.
+  icon: {fileID: 21300000, guid: f7287f1bded235f40a0148032f9d3622, type: 3}
+  color: {r: 0.25, g: 0.92, b: 0.4, a: 1}
+  damageScale: 1
+  matchups:
+  - defender: 4
+    multiplier: 2
+  - defender: 1
+    multiplier: 0.5
+  statuses:
+  - kind: 2
+    chance: 1
+    duration: 1.2
+    magnitude: 1
+  - kind: 3
+    chance: 1
+    duration: 5
+    magnitude: 3
+  knockback: 0
+  armorReduction: 0
+  movementScale: 1
+  projectileSpeedScale: 1
+  healingOnHit: 2
+  lifeSteal: 0.05
+  comboDamagePerHit: 0
+  maxComboStacks: 5
+  comboTimeout: 2
+  executeHealthThreshold: 0
+  executeDamageScale: 1
+  swordAura: {fileID: 249703835675344624, guid: 35d99c0314c4303479fb5502ae4d490f, type: 3}
+  bowAura: {fileID: 3321788011569996447, guid: 7a934d503856a48489346071846a40bd, type: 3}
+  impact: {fileID: 5179082226835817329, guid: 47a1e520f64a759498e618bcd1d0b3c5, type: 3}
+  trailMaterial: {fileID: 2100000, guid: 9bb022af3b92b184497c1d6ae4a391c1, type: 2}
+  swordTrailWidth: 0.29
+  arrowTrailWidth: 0.1
+  trailLifetime: 0.3

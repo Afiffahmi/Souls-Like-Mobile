@@ -20,16 +20,16 @@ All eight directions can walk or run while locked. Translation clamps diagonal m
 The existing `PlayerLocomotion.controller` uses `MoveX`, `MoveY`, and `Speed`.
 Speed 0 = idle, 1 = walk, 2 = run. Analog input and acceleration blend between these values.
 
-| Direction | MoveX | MoveY |
-|---|---:|---:|
-| Forward | 0 | 1 |
-| Forward Right | 1 | 1 |
-| Right | 1 | 0 |
-| Backward Right | 1 | -1 |
-| Backward | 0 | -1 |
-| Backward Left | -1 | -1 |
-| Left | -1 | 0 |
-| Forward Left | -1 | 1 |
+| Direction      | MoveX | MoveY |
+| -------------- | ----: | ----: |
+| Forward        |     0 |     1 |
+| Forward Right  |     1 |     1 |
+| Right          |     1 |     0 |
+| Backward Right |     1 |    -1 |
+| Backward       |     0 |    -1 |
+| Backward Left  |    -1 |    -1 |
+| Left           |    -1 |     0 |
+| Forward Left   |    -1 |     1 |
 
 Both `Walk_8Directions` and `Run_8Directions` use these coordinates while locked on. Exploration selects their forward entries only; a separate Animator is unnecessary. The three existing forward Sprint motions are preserved. The five side/back Run slots use the project's DoubleL in-place Run animations. The existing Walk and forward Sprint clips retain their previous assignments under `Placeholders`; replace any desired motion in the Animator without changing positions or parameters. Root motion stays disabled because the CharacterController owns translation.
 
@@ -68,9 +68,40 @@ Select **Isometric Camera** in the hierarchy and adjust its **Isometric Player C
 - **Orthographic Size**: 8 by default. Increase to zoom out; reduce to zoom in.
 - **Distance**: camera depth from the focus, independent of orthographic zoom.
 - **Follow Damping**: player-follow response speed.
-Zoom is fixed at the configured Orthographic Size; there is no automatic target framing or zoom adjustment.
+  Zoom is fixed at the configured Orthographic Size; there is no automatic target framing or zoom adjustment.
 
 The camera script references only the player and has no dependency on targeting. `PlayerLockOn.viewCamera` and `PlayerStateManager.cameraMain` reference that same render camera. Cinemachine Brain lens override is enabled for orthographic projection. The camera keeps its overhead angle when locking/unlocking; it does not return to the old third-person view.
 
 Other prototype scenes and prefabs are not automatically migrated. To use this setup elsewhere, assign the same locomotion Animator/input assets, camera references, target markers, and indicator visual.
 
+## Bow placeholder (main_scene_test)
+
+`Assets/Revamp/main_scene_test.unity` has `PlayerBowVisuals` on the player.
+Select Bow with **2 / gamepad D-pad right**. Light attack is **left mouse / J / right shoulder**.
+A tap completes the draw and release; holding loops character frames 34-35 until release.
+The character starts at frame 11 of `Bow_Attack_A_1_All` and releases from frame 35 onward.
+`BowTime` controls only the bow attack state, so holding does not pause the entire Animator.
+
+The model's `Bow_Draw.001`, `Bow_Hold.001`, and `Bow_Release.001` clips follow the same
+phase clock. Existing `Bow_Equip` and `Bow_Unequip` animations move the model between
+left-hand and chest/back sockets at configurable swap times. Assets live under
+`Assets/Animation/PlayerLocomotion/Combat/Bow`.
+
+The placeholder is instantiated in Play Mode. Adjust `PlayerBowVisuals` hand/back
+offsets and model scale to fit the final weapon, or assign your own socket transforms.
+For mobile UI, bind PointerDown to `BeginLightAttackHold` and PointerUp/cancel to
+`EndLightAttackHold` on the player. Do not also bind that button's OnClick to
+`LightAttack`, which is the separate one-shot API.
+
+`Bow Attack Speed` scales the entire sequence. `Bow Draw Speed` is an extra draw-only
+multiplier, defaulting to 2 for a roughly 0.38-second draw. To double release speed while
+keeping that draw duration, use Attack Speed 2 and Draw Speed 1.
+
+This is animation-only: no arrows, ammunition, or damage. `BowReleased` is a one-shot
+event for a later projectile implementation. Bow light attacks lock movement and reject
+equipment changes, parry, rolls, and extra shots until recovery finishes.
+
+The **Tools > Combat** menu can rebuild bow-owned assets, attach the placeholder to
+another selected player, validate frame timing, and validate integration in an isolated
+preview of the test scene. Rebuilding preserves locomotion and equipment states but
+overwrites the generated bow animation copies and bow light-attack state.
