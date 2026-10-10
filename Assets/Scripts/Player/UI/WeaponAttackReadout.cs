@@ -118,7 +118,7 @@ public sealed class WeaponAttackReadout
                     result.Add(stats, defaults.damage, draw + release, new GemAttack(null), false);
                     // Add() divides by agility; convert the effective charge time back for that shared path.
                     float charged = Mathf.Max(draw, PlayerStateManager.ChargeDuration(player.bowLightChargeSeconds, defaults, stats) * stats.AgilityMultiplier) + release;
-                    result.Add(stats, defaults.damage, charged, gem, true, defaultKnockbackScale:defaults.knockbackDurationScale);
+                    result.Add(stats, defaults.damage, charged, gem.WithKnockbackMultiplier(1f, shooter.chargedLightKnockback), true, defaultKnockbackScale:defaults.knockbackDurationScale);
                 }
             }
             else if (input == CombatAttackInput.SpecialAttack)

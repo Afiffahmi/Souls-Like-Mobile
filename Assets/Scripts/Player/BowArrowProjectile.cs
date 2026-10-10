@@ -8,6 +8,7 @@ public sealed class BowArrowProjectile : MonoBehaviour
     [Tooltip("Distance from the projectile origin to the arrow tip along local +Z.")]
     [Min(0f)] public float tipOffset = 0.4f;
     [Min(0.001f)] public float hitRadius = 0.015f;
+    [Tooltip("Lifetime after world/normal-arrow impacts. Gem arrows lodged in enemies remain until a different arrow gem hits.")]
     [Min(0f)] public float impactLifetime = 2f;
 
     private Transform owner;
@@ -131,8 +132,15 @@ public sealed class BowArrowProjectile : MonoBehaviour
     private void StopFlight(bool hit, Collider collider = null, Vector3? contact = null, Vector3? normal = null)
     {
         flying = false;
-        if (hit) GetComponent<ElementalGems.GemArrowPayload>()?.Impact(collider, contact ?? groundPoint, normal ?? Vector3.up, groundShot);
+        // Attach before damage applies knockback so the arrow follows the struck object.
+        // Preserve its impact pose; ground shots retain their world-space landing point.
+        if (hit && !groundShot && collider != null)
+            transform.SetParent(collider.transform, true);
+        var payload = GetComponent<ElementalGems.GemArrowPayload>();
+        if (hit) payload?.Impact(collider, contact ?? groundPoint, normal ?? Vector3.up, groundShot);
         name = hit ? "Arrow (Hit)" : "Arrow (Range End)";
-        if (Application.isPlaying) Destroy(gameObject, hit ? impactLifetime : 0f);
+        // Embedded gem arrows and their tip effects live with the enemy, without a timer.
+        if (Application.isPlaying && (payload == null || !payload.IsEmbeddedInEnemy))
+            Destroy(gameObject, hit ? impactLifetime : 0f);
     }
 }

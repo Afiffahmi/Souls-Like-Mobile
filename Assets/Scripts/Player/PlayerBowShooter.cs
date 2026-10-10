@@ -16,6 +16,8 @@ public sealed partial class PlayerBowShooter : MonoBehaviour
     [Min(0.1f)] public float arrowSpeed = 30f;
     [Min(0.1f)] public float arrowLifetime = 5f;
     public LayerMask hitLayers = ~0;
+    [Tooltip("Minimum push strength for a fully charged light arrow; stronger gem knockback is preserved.")]
+    [Min(0f)] public float chargedLightKnockback = 5f;
 
     [HideInInspector] public float arrowDamage = 18f, heavyArrowDamage = 30f; // Legacy attack default migration.
     // Keep serialized values from existing scenes/prefabs for one-time migration.
@@ -82,7 +84,7 @@ public sealed partial class PlayerBowShooter : MonoBehaviour
     private struct ReleaseRequest
     {
         public Vector3 direction, groundPoint;
-        public bool heavy, foundGround, special, highSpecial;
+        public bool heavy, foundGround, special, highSpecial, chargedLight;
         public int specialSequence;
         public BowSpecialAttackSettings specialSettings;
         public float damage, knockbackDuration;
@@ -124,8 +126,10 @@ public sealed partial class PlayerBowShooter : MonoBehaviour
         if (request.special) { request.damage = player.CurrentBowSpecialDamage; request.specialSettings = player.CurrentBowSpecialSettings; }
         request.owner = GetComponent<ElementalGems.GemManager>();
         // Light shots earn gem powers only after a full hold; heavy shots keep their own rules.
-        bool useGem = request.special || request.heavy || player.IsBowLightGemCharged;
+        request.chargedLight = !request.special && !request.heavy && player.IsBowLightGemCharged;
+        bool useGem = request.special || request.heavy || request.chargedLight;
         request.gem = useGem && request.owner != null ? request.owner.Capture() : new ElementalGems.GemAttack(null);
+        if (request.chargedLight) request.gem = request.gem.WithKnockbackMultiplier(1f, chargedLightKnockback);
         if (request.special) request.gem = request.gem.WithKnockbackMultiplier(request.highSpecial ? request.specialSettings.highKnockbackMultiplier : request.specialSettings.lowKnockbackMultiplier, request.specialSettings.baseKnockback);
         request.field = request.heavy && heavyGroundField != null ? heavyGroundField.Capture(request.gem.element, heavyImpactRadius, stats.DamageMultiplier, request.knockbackDuration) : null;
         // Snapshot each release separately; later target movement cannot redirect an arrow in flight.
@@ -185,7 +189,7 @@ public sealed partial class PlayerBowShooter : MonoBehaviour
         SceneManager.MoveGameObjectToScene(arrow.gameObject, gameObject.scene);
         arrow.name = request.special ? "Arrow (Special Low)" : "Arrow (Flying)";
         var payload = arrow.GetComponent<ElementalGems.GemArrowPayload>() ?? arrow.gameObject.AddComponent<ElementalGems.GemArrowPayload>();
-        payload.Initialize(request.gem, request.owner, request.damage, heavyImpactRadius, request.field, request.knockbackDuration);
+        payload.Initialize(request.gem, request.owner, request.damage, heavyImpactRadius, request.field, request.knockbackDuration, request.chargedLight);
         float elementalSpeed = arrowSpeed * request.gem.projectileSpeed;
         if (request.heavy)
             arrow.LaunchAtGround(player.transform, request.groundPoint, request.foundGround, elementalSpeed, arrowLifetime, hitLayers);
