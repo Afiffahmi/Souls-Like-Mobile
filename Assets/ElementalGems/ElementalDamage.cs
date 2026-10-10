@@ -9,23 +9,38 @@ namespace ElementalGems
             float execute = attack.executeThreshold > 0 && healthRatio <= attack.executeThreshold ? attack.executeScale : 1;
             return Mathf.Max(0, Mathf.RoundToInt(baseDamage * attack.damageScale * attack.MultiplierAgainst(defender) * Mathf.Max(0, resistance) * execute));
         }
-        public static int Hit(GemAttack attack, float baseDamage, GemManager source, Enemy enemy, Vector3 point, Vector3 direction, bool? requestHitReaction = null, bool allowControlEffects = true, float knockbackDurationMultiplier = 1f)
+        public static int Hit(GemAttack attack, float baseDamage, GemManager source, Enemy enemy, Vector3 point, Vector3 direction, bool? requestHitReaction = null, bool allowControlEffects = true, float knockbackDurationMultiplier = 1f, float additionalKnockback = 0f)
         {
-            if (enemy == null || enemy.IsDead || !enemy.isActiveAndEnabled) return 0;
-            var elemental = enemy.GetComponent<ElementalEnemy>();
-            var defender = elemental != null ? elemental.element : ElementType.Normal;
+            if (attack == null || enemy == null || enemy.IsDead || !enemy.isActiveAndEnabled) return 0;
+            var elemental = ElementalEnemy.GetOrAdd(enemy);
+            if (!elemental.isActiveAndEnabled) elemental = null;
+            var defender = elemental != null ? elemental.CurrentElement : ElementType.Normal;
             float resistance = elemental != null ? elemental.Resistance(attack.element) : 1;
-            int damage = Calculate(attack, baseDamage, defender, resistance, (float)enemy.CurrentHealth / enemy.MaxHealth);
+            float defense = elemental != null ? elemental.DamageTakenMultiplier : 1;
+            int damage = Calculate(attack, baseDamage, defender, resistance * defense, (float)enemy.CurrentHealth / enemy.MaxHealth);
             int before = enemy.CurrentHealth;
             // Explicit combo permission wins; other impacts interrupt only when they knock back.
-            bool knockback = allowControlEffects && WeaponStatModifier.Finite(knockbackDurationMultiplier, 1) > 0 && attack.knockback > (elemental != null ? elemental.knockbackResistance : 0);
-            enemy.TakeDamage(damage, requestHitReaction ?? knockback);
+            bool knockback = allowControlEffects && elemental != null &&
+                (elemental.CanKnockback(direction, attack.knockback, knockbackDurationMultiplier) || elemental.CanKnockback(direction, additionalKnockback, knockbackDurationMultiplier));
+            bool shieldContact = elemental != null && elemental.HasDarknessShield && attack.element != ElementType.Normal &&
+                baseDamage * attack.damageScale > 0 && resistance > 0;
+            if (damage > 0) enemy.TakeDamage(damage, requestHitReaction ?? knockback);
             int dealt = before - enemy.CurrentHealth;
-            if (dealt > 0)
+            if (dealt > 0 || shieldContact)
             {
-                if (elemental != null && !enemy.IsDead) elemental.Apply(attack, direction, allowControlEffects, knockbackDurationMultiplier);
+                if (elemental != null)
+                {
+                    if (!enemy.IsDead && !shieldContact)
+                    {
+                        elemental.Apply(attack, direction, allowControlEffects, knockbackDurationMultiplier, knockback);
+                        if (allowControlEffects && additionalKnockback > 0) elemental.ApplyKnockback(direction, additionalKnockback, knockbackDurationMultiplier);
+                    }
+                    // Resolve against the element that existed BEFORE this hit, even on a lethal hit.
+                    ElementalReactions.OnHit(elemental, defender, attack, baseDamage, source, allowControlEffects);
+                    if (knockback && !enemy.IsDead && !shieldContact) elemental.Infuse(attack.element, attack);
+                }
                 if (source != null) source.RegisterHit(attack, dealt);
-                if (attack.MultiplierAgainst(defender) > 1 && resistance > 0) GemFeedback.Show(point, "SUPER EFFECTIVE", attack.color);
+                if (dealt > 0 && attack.MultiplierAgainst(defender) > 1 && resistance > 0) GemFeedback.Show(point, "SUPER EFFECTIVE", attack.color);
             }
             return dealt;
         }
