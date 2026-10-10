@@ -24,6 +24,8 @@ namespace ElementalGems
         private float originalSpeed, originalAnimationSpeed;
         private bool ownsAgent, ownsAnimator;
         private Vector3 push;
+        private readonly KnockbackMotion knockbackMotion = new KnockbackMotion();
+        public float KnockbackRemaining => knockbackMotion.Remaining;
         public bool IsStunned { get; private set; }
         public bool IsRooted { get; private set; }
         public float MovementMultiplier { get; private set; } = 1;
@@ -35,7 +37,7 @@ namespace ElementalGems
             return 1;
         }
         public bool HasStatus(StatusKind kind) => active.Exists(s => s.spec.kind == kind);
-        public void Apply(GemAttack attack, Vector3 direction, bool allowControlEffects = true)
+        public void Apply(GemAttack attack, Vector3 direction, bool allowControlEffects = true, float knockbackDurationMultiplier = 1f)
         {
             foreach (var spec in attack.statuses)
             {
@@ -48,13 +50,14 @@ namespace ElementalGems
                 else { var merged = status.spec; merged.magnitude = Mathf.Max(merged.magnitude, spec.magnitude); status.spec = merged; }
                 status.left = Mathf.Max(status.left, spec.duration);
             }
-            if (allowControlEffects) ApplyKnockback(direction, attack.knockback);
+            if (allowControlEffects) ApplyKnockback(direction, attack.knockback, knockbackDurationMultiplier);
             UpdateControls();
         }
-        public void ApplyKnockback(Vector3 direction, float strength)
+        public void ApplyKnockback(Vector3 direction, float strength, float durationMultiplier = 1f)
         {
             if (health == null || health.IsDead || !isActiveAndEnabled) return;
-            push += Vector3.ProjectOnPlane(direction, Vector3.up).normalized * Mathf.Max(0, strength - knockbackResistance);
+            knockbackMotion.Add(direction, Mathf.Max(0, strength - knockbackResistance), durationMultiplier);
+            push = knockbackMotion.Velocity;
         }
         private void Update()
         {
@@ -76,20 +79,37 @@ namespace ElementalGems
                 if (s.left <= 0) { active.RemoveAt(i); changed = true; }
             }
             if (changed) UpdateControls();
-            if (push.sqrMagnitude > 0.0001f)
+            if (!UsesPhysicsBody()) AdvanceKnockback(Time.deltaTime);
+        }
+        // Rigidbody displacement belongs to the physics clock; other movers use the frame clock.
+        private bool UsesPhysicsBody()
+        {
+            if (agent != null && agent.enabled && agent.isOnNavMesh) return false;
+            var controller = GetComponent<CharacterController>();
+            if (controller != null && controller.enabled) return false;
+            var body = GetComponent<Rigidbody>();
+            return body != null && !body.isKinematic;
+        }
+        private void FixedUpdate()
+        {
+            if (health != null && !health.IsDead && UsesPhysicsBody()) AdvanceKnockback(Time.fixedDeltaTime);
+        }
+        private void AdvanceKnockback(float seconds)
+        {
+            if (knockbackMotion.Remaining > 0f)
             {
-                Vector3 delta = push * Time.deltaTime;
+                Vector3 delta = knockbackMotion.Advance(seconds);
                 var controller = GetComponent<CharacterController>();
                 var body = GetComponent<Rigidbody>();
                 if (agent != null && agent.enabled && agent.isOnNavMesh) agent.Move(delta);
                 else if (controller != null && controller.enabled) controller.Move(delta);
-                else if (body != null && !body.isKinematic) body.AddForce(delta, ForceMode.VelocityChange);
+                else if (body != null && !body.isKinematic) body.MovePosition(body.position + delta); // No residual added velocity after the timed push expires.
                 else
                 {
                     // Static practice targets also show knockback, without moving through walls.
                     if (!Physics.Raycast(transform.position + Vector3.up * 0.3f, delta.normalized, delta.magnitude + 0.2f, ~0, QueryTriggerInteraction.Ignore)) transform.position += delta;
                 }
-                push = Vector3.MoveTowards(push, Vector3.zero, Time.deltaTime * 12);
+                push = knockbackMotion.Velocity;
             }
         }
         private void UpdateControls()
@@ -117,7 +137,7 @@ namespace ElementalGems
             else { foreach (var b in suspended) if (b != null) b.enabled = true; suspended.Clear(); }
             StatusChanged?.Invoke();
         }
-        public void ClearStatuses() { active.Clear(); push = Vector3.zero; UpdateControls(); }
+        public void ClearStatuses() { active.Clear(); knockbackMotion.Clear(); push = Vector3.zero; UpdateControls(); }
         private void OnDisable() => ClearStatuses();
     }
 }

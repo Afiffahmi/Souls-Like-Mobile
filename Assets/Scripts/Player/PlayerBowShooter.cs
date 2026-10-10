@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 [DisallowMultipleComponent]
 [RequireComponent(typeof(PlayerStateManager), typeof(PlayerBowVisuals))]
 [DefaultExecutionOrder(100)]
-public sealed class PlayerBowShooter : MonoBehaviour
+public sealed partial class PlayerBowShooter : MonoBehaviour
 {
     public BowArrowProjectile arrowPrefab;
     [Tooltip("Optional custom launch point. Otherwise uses the animated bow model's origin.")]
@@ -17,19 +17,64 @@ public sealed class PlayerBowShooter : MonoBehaviour
     [Min(0.1f)] public float arrowLifetime = 5f;
     public LayerMask hitLayers = ~0;
 
-    [Header("Heavy attack ground targeting")]
-    [Tooltip("Maximum horizontal landing distance measured from the player. A closer locked enemy uses its own ground position.")]
-    [Min(0.1f)] public float heavyGroundDistance = 5f;
-    [Tooltip("Terrain/floor layers. Enemy and player colliders are also filtered by component.")]
-    public LayerMask heavyGroundLayers = ~((1 << 3) | (1 << 7));
-    [Min(0.1f)] public float groundProbeHeight = 10f;
-    [Min(0.1f)] public float groundProbeDepth = 30f;
+    [HideInInspector] public float arrowDamage = 18f, heavyArrowDamage = 30f; // Legacy attack default migration.
+    // Keep serialized values from existing scenes/prefabs for one-time migration.
+    [SerializeField, HideInInspector, UnityEngine.Serialization.FormerlySerializedAs("heavyGroundDistance")]
+    private float legacy_heavyGroundDistance = 5f;
+    [SerializeField, HideInInspector, UnityEngine.Serialization.FormerlySerializedAs("heavyGroundLayers")]
+    private LayerMask legacy_heavyGroundLayers = ~((1 << 3) | (1 << 7));
+    [SerializeField, HideInInspector, UnityEngine.Serialization.FormerlySerializedAs("groundProbeHeight")]
+    private float legacy_groundProbeHeight = 10f;
+    [SerializeField, HideInInspector, UnityEngine.Serialization.FormerlySerializedAs("groundProbeDepth")]
+    private float legacy_groundProbeDepth = 30f;
+    [SerializeField, HideInInspector, UnityEngine.Serialization.FormerlySerializedAs("heavyImpactRadius")]
+    private float legacy_heavyImpactRadius = 4f;
+    [SerializeField, HideInInspector, UnityEngine.Serialization.FormerlySerializedAs("heavyGroundField")]
+    private ElementalGems.GemGroundFieldSettings legacy_heavyGroundField = null;
+    [SerializeField, HideInInspector, UnityEngine.Serialization.FormerlySerializedAs("volleyMinOffset")]
+    private float legacy_volleyMinOffset = 0.75f;
+    [SerializeField, HideInInspector, UnityEngine.Serialization.FormerlySerializedAs("volleyMaxOffset")]
+    private float legacy_volleyMaxOffset = 2f;
+    [SerializeField, HideInInspector, UnityEngine.Serialization.FormerlySerializedAs("volleyEnemyClearance")]
+    private float legacy_volleyEnemyClearance = 0.25f;
+    [SerializeField, HideInInspector, UnityEngine.Serialization.FormerlySerializedAs("volleyPointSeparation")]
+    private float legacy_volleyPointSeparation = 0.35f;
 
-    [Header("Elemental damage (shared GemManager)")] public float arrowDamage = 18f, heavyArrowDamage = 30f;
-    [Tooltip("Ground blast and lingering field radius in metres. Try 3 to 5.")]
-    [Min(.1f)] public float heavyImpactRadius = 4f;
-    [Tooltip("Duration, damage per second, tick interval, and elemental ground effect prefabs.")]
-    public ElementalGems.GemGroundFieldSettings heavyGroundField;
+    private BowHeavyTargetingSettings HeavySettings
+    {
+        get
+        {
+            if (player == null) player = GetComponent<PlayerStateManager>();
+            player.InitializeBowHeavyTargeting();
+            return player.bowHeavyTargeting;
+        }
+    }
+
+    // Compatibility accessors: the State Manager is the only editable source.
+    public float heavyGroundDistance { get => HeavySettings.attackRadius; set => HeavySettings.attackRadius = value; }
+    public LayerMask heavyGroundLayers { get => HeavySettings.groundLayers; set => HeavySettings.groundLayers = value; }
+    public float groundProbeHeight { get => HeavySettings.groundProbeHeight; set => HeavySettings.groundProbeHeight = value; }
+    public float groundProbeDepth { get => HeavySettings.groundProbeDepth; set => HeavySettings.groundProbeDepth = value; }
+    public float heavyImpactRadius { get => HeavySettings.impactRadius; set => HeavySettings.impactRadius = value; }
+    public ElementalGems.GemGroundFieldSettings heavyGroundField { get => HeavySettings.groundField; set => HeavySettings.groundField = value; }
+    public float volleyMinOffset { get => HeavySettings.minOffset; set => HeavySettings.minOffset = value; }
+    public float volleyMaxOffset { get => HeavySettings.maxOffset; set => HeavySettings.maxOffset = value; }
+    public float volleyEnemyClearance { get => HeavySettings.enemyClearance; set => HeavySettings.enemyClearance = value; }
+    public float volleyPointSeparation { get => HeavySettings.pointSeparation; set => HeavySettings.pointSeparation = value; }
+
+    internal void CopyLegacyHeavyTargeting(BowHeavyTargetingSettings settings)
+    {
+        settings.attackRadius = legacy_heavyGroundDistance;
+        settings.groundLayers = legacy_heavyGroundLayers;
+        settings.groundProbeHeight = legacy_groundProbeHeight;
+        settings.groundProbeDepth = legacy_groundProbeDepth;
+        settings.impactRadius = legacy_heavyImpactRadius;
+        settings.groundField = legacy_heavyGroundField;
+        settings.minOffset = legacy_volleyMinOffset;
+        settings.maxOffset = legacy_volleyMaxOffset;
+        settings.enemyClearance = legacy_volleyEnemyClearance;
+        settings.pointSeparation = legacy_volleyPointSeparation;
+    }
     private PlayerStateManager player;
     private PlayerBowVisuals visuals;
     private PlayerLockOn lockOn;
@@ -38,6 +83,7 @@ public sealed class PlayerBowShooter : MonoBehaviour
     {
         public Vector3 direction, groundPoint;
         public bool heavy, foundGround;
+        public float damage, knockbackDuration;
         public ElementalGems.GemAttack gem;
         public ElementalGems.GemManager owner;
         public ElementalGems.GroundFieldSnapshot field;
@@ -63,11 +109,26 @@ public sealed class PlayerBowShooter : MonoBehaviour
     private void QueueArrow()
     {
         var request = new ReleaseRequest { direction = player.transform.forward.normalized, heavy = player.IsBowHeavyAttacking };
+        var stats = player.CurrentWeaponAttackStats;
+        var defaults = player.CurrentAttackDefaults ?? player.CaptureAttackDefaults(PlayerCombatMode.Bow,request.heavy?CombatAttackInput.HeavyAttack:CombatAttackInput.LightAttack);
+        request.knockbackDuration = stats.KnockbackDurationMultiplier * defaults.knockbackDurationScale;
+        request.damage = stats.Damage(defaults.damage);
         request.owner = GetComponent<ElementalGems.GemManager>();
-        request.gem = request.owner != null ? request.owner.Capture() : new ElementalGems.GemAttack(null);
-        request.field = request.heavy && heavyGroundField != null ? heavyGroundField.Capture(request.gem.element, heavyImpactRadius) : null;
+        // Light shots earn gem powers only after a full hold; heavy shots keep their own rules.
+        bool useGem = request.heavy || player.IsBowLightGemCharged;
+        request.gem = useGem && request.owner != null ? request.owner.Capture() : new ElementalGems.GemAttack(null);
+        request.field = request.heavy && heavyGroundField != null ? heavyGroundField.Capture(request.gem.element, heavyImpactRadius, stats.DamageMultiplier, request.knockbackDuration) : null;
         // Snapshot each release separately; later target movement cannot redirect an arrow in flight.
-        if (request.heavy) request.foundGround = TryGetHeavyGroundPoint(out request.groundPoint);
+        if (request.heavy && player.IsBowHeavyChargedAttack)
+        {
+            if (!TryGetChargedVolleyPoint(player.BowHeavyArrowsReleased - 1, out request.groundPoint))
+            {
+                Debug.LogWarning("[Bow] No safe ground near the volley target. Skipping this arrow instead of aiming directly at an enemy.", this);
+                return;
+            }
+            request.foundGround = true;
+        }
+        else if (request.heavy) request.foundGround = TryGetHeavyGroundPoint(out request.groundPoint);
         pendingReleases.Enqueue(request);
     }
 
@@ -88,7 +149,7 @@ public sealed class PlayerBowShooter : MonoBehaviour
             Quaternion.LookRotation(releaseDirection, Mathf.Abs(releaseDirection.y) > 0.999f ? Vector3.forward : Vector3.up));
         arrow.name = "Arrow (Flying)";
         var payload = arrow.GetComponent<ElementalGems.GemArrowPayload>() ?? arrow.gameObject.AddComponent<ElementalGems.GemArrowPayload>();
-        payload.Initialize(request.gem, request.owner, request.heavy ? heavyArrowDamage : arrowDamage, heavyImpactRadius, request.field);
+        payload.Initialize(request.gem, request.owner, request.damage, heavyImpactRadius, request.field, request.knockbackDuration);
         float elementalSpeed = arrowSpeed * request.gem.projectileSpeed;
         if (request.heavy)
             arrow.LaunchAtGround(player.transform, request.groundPoint, request.foundGround, elementalSpeed, arrowLifetime, hitLayers);
@@ -111,6 +172,13 @@ public sealed class PlayerBowShooter : MonoBehaviour
             referenceHeight = Mathf.Max(referenceHeight, targetPosition.y);
         }
         point = playerPosition + planar;
+        return TryProjectHeavyGround(point, referenceHeight, out point);
+    }
+
+    private bool TryProjectHeavyGround(Vector3 desired, float referenceHeight, out Vector3 point)
+    {
+        Vector3 playerPosition = transform.position;
+        point = desired;
         Vector3 probe = point;
         probe.y = referenceHeight + Mathf.Max(0.1f, groundProbeHeight);
         var physics = gameObject.scene.GetPhysicsScene();

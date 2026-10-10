@@ -8,14 +8,31 @@ public sealed class CombatAttackState : StateMachineBehaviour
     private CombatAttackStep windupStep;
     private int windupParameter;
     private bool controlsWindup;
+    private float agility = 1f;
+    private float playbackRatio = 1f, recoverySeconds, comboWindup = 1f, lightRecovery = 1f;
     public static string WindupSpeedParameter(int index) => "SwordLightWindup" + (index + 1);
+
+    public static string AttackSpeedParameter(PlayerCombatMode weapon, CombatAttackInput input, int index) =>
+        weapon == PlayerCombatMode.Sword && input == CombatAttackInput.LightAttack ? WindupSpeedParameter(index) :
+        weapon + "_" + input + "_" + index + "_Agility";
 
     public override void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
         var player = animator.GetComponentInParent<PlayerStateManager>();
+        if (IsChargedSwordHeavy && (player == null || !player.IsSwordHeavyAttacking))
+        {
+            animator.Play(configuration.LocomotionStatePath, layerIndex, 0f);
+            return;
+        }
         if (player != null && !player.NotifyAttackEntered(configuration, input, stepIndex) && configuration != null)
         {
             animator.Play(configuration.LocomotionStatePath, layerIndex, 0f);
+            return;
+        }
+        if (IsChargedSwordHeavy)
+        {
+            player.EnterSwordHeavyAttack(stateInfo.fullPathHash);
+            LockWeapon(animator);
             return;
         }
         if (player != null && configuration != null && configuration.weapon == PlayerCombatMode.Sword && player.IsAttacking)
@@ -30,6 +47,13 @@ public sealed class CombatAttackState : StateMachineBehaviour
             effects?.Begin(stateInfo.fullPathHash, clip, slash);
             effects?.Tick(stateInfo.fullPathHash, stateInfo.normalizedTime);
         }
+        agility = player != null ? player.CurrentWeaponAttackStats.AgilityMultiplier : 1f;
+        var defaults = player != null ? player.CurrentAttackDefaults : null;
+        // Animator state speed comes from its asset. Cancel it so the manager's default wins without rebuilding the controller.
+        playbackRatio = defaults != null ? defaults.speed / Mathf.Max(.01f,Mathf.Abs(stateInfo.speed)) : 1f;
+        recoverySeconds = defaults != null ? defaults.recoverySeconds : 0;
+        comboWindup = player != null ? Mathf.Clamp(player.swordComboWindupSpeed,1,8) : configuration.lightComboWindupSpeed;
+        lightRecovery = player != null ? Mathf.Clamp(player.swordLightRecoverySpeed,1,8) : configuration.lightComboFinisherRecoverySpeed;
         LockWeapon(animator);
         controlsWindup = false;
         windupStep = null;
@@ -37,7 +61,10 @@ public sealed class CombatAttackState : StateMachineBehaviour
             input == CombatAttackInput.LightAttack && stepIndex >= 0 && stepIndex < configuration.lightAttackChain.Count)
         {
             windupStep = configuration.lightAttackChain[stepIndex];
-            windupParameter = Animator.StringToHash(WindupSpeedParameter(stepIndex));
+        }
+        if (configuration != null)
+        {
+            windupParameter = Animator.StringToHash(AttackSpeedParameter(configuration.weapon, input, stepIndex));
             foreach (var parameter in animator.parameters)
                 if (parameter.nameHash == windupParameter && parameter.type == AnimatorControllerParameterType.Float)
                     controlsWindup = true;
@@ -48,6 +75,7 @@ public sealed class CombatAttackState : StateMachineBehaviour
     public override void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
         LockWeapon(animator);
+        if (IsChargedSwordHeavy) return;
         UpdateWindup(animator, stateInfo);
         if (configuration != null && configuration.weapon == PlayerCombatMode.Sword)
         {
@@ -56,11 +84,16 @@ public sealed class CombatAttackState : StateMachineBehaviour
     }
     public override void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
+        if (IsChargedSwordHeavy)
+        {
+            animator.GetComponentInParent<PlayerStateManager>()?.ExitSwordHeavyAttack();
+            return;
+        }
         if (controlsWindup) animator.SetFloat(windupParameter, 1f);
         controlsWindup = false;
         if (configuration != null && configuration.weapon == PlayerCombatMode.Sword)
             animator.GetComponentInParent<ElementalGems.GemLightSlashEffects>()?.FinishWindow(stateInfo.fullPathHash, stateInfo.normalizedTime);
-        animator.GetComponentInParent<PlayerStateManager>()?.NotifyAttackExited(configuration, input, stepIndex, stateInfo.normalizedTime);
+        animator.GetComponentInParent<PlayerStateManager>()?.NotifyAttackExited(configuration, input, stepIndex, stateInfo.normalizedTime, agility,recoverySeconds);
         if (configuration != null && configuration.weapon == PlayerCombatMode.Sword)
         {
             animator.GetComponentInParent<ElementalGems.GemSwordCombat>()?.End(stateInfo.fullPathHash);
@@ -68,15 +101,17 @@ public sealed class CombatAttackState : StateMachineBehaviour
         }
     }
 
+    private bool IsChargedSwordHeavy => configuration != null && configuration.UsesSwordHeavyCharge && input == CombatAttackInput.HeavyAttack && stepIndex == 0;
+
     private void UpdateWindup(Animator animator, AnimatorStateInfo stateInfo)
     {
         if (!controlsWindup) return;
         float delta = animator.updateMode == AnimatorUpdateMode.UnscaledTime ? Time.unscaledDeltaTime :
             animator.updateMode == AnimatorUpdateMode.Fixed ? Time.fixedDeltaTime : Time.deltaTime;
         float multiplier = windupStep != null ? windupStep.WindupMultiplier(stateInfo.normalizedTime,
-            delta * Mathf.Abs(stateInfo.speed * animator.speed), stepIndex > 0 ? configuration.lightComboWindupSpeed : 1f,
-            configuration.lightComboFinisherRecoverySpeed) : 1f;
-        animator.SetFloat(windupParameter, multiplier);
+            delta * Mathf.Abs(stateInfo.speed * animator.speed) * playbackRatio * agility, stepIndex > 0 ? comboWindup : 1f,
+            lightRecovery) : 1f;
+        animator.SetFloat(windupParameter, multiplier * playbackRatio * agility);
     }
 
     private void LockWeapon(Animator animator)

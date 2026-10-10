@@ -19,6 +19,7 @@ namespace ElementalGems
         [Min(.1f)] public float particleRadius = 2.3f;
         [Range(30, 210)] public float arcDegrees = 170;
         MeshRenderer surface;
+        Bounds authoredBounds;
         MaterialPropertyBlock properties;
         Vector3 origin;
         Quaternion rotation;
@@ -36,14 +37,15 @@ namespace ElementalGems
         public const float BodyRadius = 2.12f, BodyWidth = 1.52f, BodyArc = 172f;
         public float RevealedSweep => drivenSettings != null ? drivenSettings.Evaluate(drivenProgress) : 0;
         public bool ReverseSweep => direction < 0;
+        public bool FullCircle => drivenSettings != null && drivenSettings.fullCircle;
         public bool HasDrivenGeometry => drivenSettings != null && gameObject.activeInHierarchy;
         public Quaternion HitFacing { get; private set; } = Quaternion.identity;
 
         public void GetLocalHitSpan(float sweep, out Vector3 inner, out Vector3 outer)
         {
             float u = direction < 0 ? 1 - sweep : sweep;
-            float angle = (u - .5f) * BodyArc * Mathf.Deg2Rad;
-            float taper = Mathf.Pow(Mathf.Max(.001f, Mathf.Sin(u * Mathf.PI)), .7f) * (.7f + .6f * u);
+            float angle = (FullCircle ? u * 360f - 270f : (u - .5f) * BodyArc) * Mathf.Deg2Rad;
+            float taper = FullCircle ? 1f : Mathf.Pow(Mathf.Max(.001f, Mathf.Sin(u * Mathf.PI)), .7f) * (.7f + .6f * u);
             float halfWidth = .5f * BodyWidth * taper * bandWidth;
             var radial = new Vector3(Mathf.Sin(angle), 0, Mathf.Cos(angle));
             inner = radial * (BodyRadius - halfWidth);
@@ -66,6 +68,13 @@ namespace ElementalGems
             direction = settings.reverseSweep ? -1 : 1;
             drivenProgress = 0; emittedParticles = 0;
             transform.localScale = Vector3.one * size * settings.size;
+            if (surface != null)
+            {
+                // Shader expands the front crescent into a full ring; include its back half in culling.
+                float radius = Mathf.Max(Mathf.Abs(authoredBounds.min.x), Mathf.Abs(authoredBounds.max.x),
+                    Mathf.Abs(authoredBounds.min.z), Mathf.Abs(authoredBounds.max.z));
+                surface.localBounds = FullCircle ? new Bounds(Vector3.zero, new Vector3(radius * 2, Mathf.Max(2, authoredBounds.size.y), radius * 2)) : authoredBounds;
+            }
             if (accents == null) return;
             foreach (var ps in accents)
             {
@@ -94,6 +103,7 @@ namespace ElementalGems
                 properties.SetFloat(Intensity, intensity);
                 properties.SetFloat("_WidthScale", bandWidth);
                 properties.SetFloat("_Direction", direction);
+                properties.SetFloat("_FullCircle", FullCircle ? 1f : 0f);
                 surface.SetPropertyBlock(properties);
                 surface.enabled = drivenProgress < 1;
             }
@@ -103,7 +113,7 @@ namespace ElementalGems
             {
                 float u = (emittedParticles + .5f) / Mathf.Max(1, particlesPerLayer);
                 if (direction < 0) u = 1 - u;
-                float a = (u - .5f) * arcDegrees * Mathf.Deg2Rad;
+                float a = (FullCircle ? u * 360f - 270f : (u - .5f) * arcDegrees) * Mathf.Deg2Rad;
                 var radial = new Vector3(Mathf.Sin(a), 0, Mathf.Cos(a));
                 if (accents == null) continue;
                 foreach (var ps in accents)
@@ -121,6 +131,7 @@ namespace ElementalGems
         void Awake()
         {
             surface = GetComponentInChildren<MeshRenderer>();
+            if (surface != null) authoredBounds = surface.localBounds;
             properties = new MaterialPropertyBlock();
             origin = transform.position;
             rotation = transform.rotation;

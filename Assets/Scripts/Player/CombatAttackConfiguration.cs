@@ -71,6 +71,9 @@ public sealed class CombatAttackConfiguration : ScriptableObject
     [InspectorName("Light Attack Recovery Speed"), Range(1f, 8f)] public float lightComboFinisherRecoverySpeed = 2.5f;
     public List<CombatAttackStep> lightAttackChain = new List<CombatAttackStep>();
     public List<CombatAttackStep> heavyAttackChain = new List<CombatAttackStep>();
+    [InspectorName("Sword Heavy Attack")]
+    public SwordHeavyChargeSettings swordHeavyCharge = new SwordHeavyChargeSettings();
+    public bool UsesSwordHeavyCharge => weapon == PlayerCombatMode.Sword && swordHeavyCharge != null && swordHeavyCharge.enabled && heavyAttackChain != null && heavyAttackChain.Count > 0;
     public CombatSpecialAttack specialAttack = new CombatSpecialAttack();
 
     public string AttackMachineName => weapon + "_Attacks";
@@ -88,6 +91,8 @@ public sealed class CombatAttackConfiguration : ScriptableObject
             error = "Assign a combat weapon, Animator Controller, and combat parent path.";
         else if (lightAttackChain == null || heavyAttackChain == null)
             error = "Attack chains must be lists (an empty list disables that attack input).";
+        else if (UsesSwordHeavyCharge && (heavyAttackChain.Count != 1 || !swordHeavyCharge.IsValid(heavyAttackChain[0])))
+            error = "Sword heavy needs one clip, Hold Check before the low slash, at least one held low pass, and valid separate low/high damage windows in order.";
         else if (!Finite(lightComboWindupSpeed) || lightComboWindupSpeed < 1f || lightComboWindupSpeed > 8f)
             error = "Light Combo Windup Speed must be between 1 and 8.";
         else if (!Finite(lightComboFinisherRecoverySpeed) || lightComboFinisherRecoverySpeed < 1f || lightComboFinisherRecoverySpeed > 8f)

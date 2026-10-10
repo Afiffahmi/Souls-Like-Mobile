@@ -17,6 +17,7 @@ public static class SwordComboTimingValidation
     static CombatAttackConfiguration config;
     static int stage;
     static double began, recoveryStarted;
+    static float expectedRecovery;
     static SwordComboTimingValidation()
     {
         EditorApplication.playModeStateChanged += s => {
@@ -72,17 +73,18 @@ public static class SwordComboTimingValidation
     }
     static void FinishUnqueued(int index)
     {
-        float last=0;
-        for(int i=0;i<1000 && At(index);i++) { last=Info.normalizedTime; Advance(.005f); }
-        Check(Info.IsName(config.LocomotionStatePath) && last>=.995f,"Unqueued attack "+(index+1)+" plays its full clip and returns to locomotion");
+        float last=0, lastAdvance=0;
+        for(int i=0;i<1000 && At(index);i++) { last=Info.normalizedTime; lastAdvance=.005f*Mathf.Abs(Info.speed*Info.speedMultiplier)/config.lightAttackChain[index].animation.length; Advance(.005f); }
+        Check(Info.IsName(config.LocomotionStatePath) && last+lastAdvance>=.999f,"Unqueued attack "+(index+1)+" plays its full clip and returns to locomotion");
     }
     static void FinishThird()
     {
         ToFrame(2,40);
         foreach(CombatAttackInput input in Enum.GetValues(typeof(CombatAttackInput)))
             Check(!player.TryAttack(input),"Attack 3 blocks "+input+" before animation completion");
+        expectedRecovery = player.CurrentWeaponAttackStats.Duration(config.lightAttackChain[2].postAttackRecovery);
         FinishUnqueued(2);
-        Check(player.AttackRecoveryRemaining>=.199f && player.AttackRecoveryRemaining<=.201f,"Attack 3 starts exactly 0.2 seconds of recovery after its animation");
+        Check(Mathf.Abs(player.AttackRecoveryRemaining-expectedRecovery)<.001f,"Attack 3 uses configured recovery divided by captured agility: " + expectedRecovery);
         foreach(CombatAttackInput input in Enum.GetValues(typeof(CombatAttackInput)))
             Check(!player.TryAttack(input),"Post-animation recovery blocks "+input);
         recoveryStarted=Time.timeAsDouble;
@@ -96,6 +98,7 @@ public static class SwordComboTimingValidation
             if(stage==-1)
             {
                 if(EditorApplication.timeSinceStartup-began<1) return;
+                Application.runInBackground=true;
                 checks.Clear();
                 foreach(var enemy in UnityEngine.Object.FindObjectsByType<Enemy>(FindObjectsSortMode.None)) enemy.gameObject.SetActive(false);
                 player=UnityEngine.Object.FindFirstObjectByType<PlayerStateManager>();
@@ -119,21 +122,21 @@ public static class SwordComboTimingValidation
             }
             if(stage==0)
             {
-                if(Time.timeAsDouble-recoveryStarted<.2)
+                if(Time.timeAsDouble-recoveryStarted<expectedRecovery)
                 {
-                    if(player.TryAttack(Light)) throw new Exception("Accepted attack before 0.2-second recovery ended");
+                    if(player.TryAttack(Light)) throw new Exception("Accepted attack before configured recovery ended");
                     return;
                 }
-                Check(player.AttackRecoveryRemaining==0,"Recovery expires after 0.2 seconds");
+                Check(player.AttackRecoveryRemaining==0,"Recovery expires after configured duration");
                 StartFirst(); LateChain(0); LateChain(1); FinishThird();
                 stage=1; return;
             }
             if(stage==1)
             {
-                if(Time.timeAsDouble-recoveryStarted<.21) return;
+                if(Time.timeAsDouble-recoveryStarted<expectedRecovery+.01) return;
                 StartFirst();
                 Check(!player.HasBufferedAttack,"Inputs rejected during recovery were not queued");
-                Finish(true,"Actual Animator transitions verified: queued gates at frames 25/28, immediate late follow-ups, full unqueued clips, full third attack plus 0.2-second lockout.");
+                Finish(true,"Actual Animator transitions verified: queued gates at frames 25/28, immediate late follow-ups, full unqueued clips, full third attack plus configured agility-adjusted lockout.");
             }
         }
         catch(Exception ex) { Finish(false,ex.ToString()); }

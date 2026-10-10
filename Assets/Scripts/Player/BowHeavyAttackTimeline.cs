@@ -21,10 +21,12 @@ public sealed class BowHeavyHoldCycle
         Held = held;
         if (Decided) return null;
         bool charged = now - started >= duration;
-        if (held && !charged) return null;
+        if (held) return null; // Fully charged holds still wait for physical release.
         Decided = true;
         return charged;
     }
+    public float Elapsed(double now) => (float)System.Math.Max(0, now - started);
+    public float Progress(double now, double duration) => duration <= 0 ? 1 : UnityEngine.Mathf.Clamp01((float)((now - started) / duration));
     public void Cancel() { Held = false; Decided = true; }
 }
 
@@ -42,12 +44,12 @@ public sealed class BowHeavyAttackTimeline
     private float lastFrame;
     private double target;
 
-    public void Begin(int[] releaseFrames, float endFrame)
+    public void Begin(int[] releaseFrames, float endFrame, float startFrame = 0f)
     {
         frames = (int[])releaseFrames.Clone();
         lastFrame = endFrame;
-        Frame = 0f;
-        target = 0;
+        Frame = UnityEngine.Mathf.Clamp(startFrame, 0, endFrame);
+        target = Frame;
         Shots = 0;
         Finished = false;
     }

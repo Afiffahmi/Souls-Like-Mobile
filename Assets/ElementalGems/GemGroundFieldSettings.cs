@@ -21,21 +21,23 @@ namespace ElementalGems
         [Tooltip("Index order: Normal, Fire, Water, Nature, Earth, Lightning, Wind, Darkness.")]
         public GemGroundField[] elementPrefabs = new GemGroundField[8];
 
-        public GroundFieldSnapshot Capture(ElementType element, float radius) => new GroundFieldSnapshot(this, element, radius);
+        public GroundFieldSnapshot Capture(ElementType element, float radius, float damageMultiplier = 1f, float knockbackDurationMultiplier = 1f) => new GroundFieldSnapshot(this, element, radius, damageMultiplier, knockbackDurationMultiplier);
     }
 
     /// <summary>Immutable launch-time settings; gem switches cannot retint or change a flying heavy arrow.</summary>
     public sealed class GroundFieldSnapshot
     {
         public readonly float radius, duration, damagePerSecond, tickInterval, height, mergeFraction;
+        public readonly float knockbackDurationMultiplier;
         public readonly int enemyLayers, obstacleLayers, maxFields;
         public readonly bool lineOfSight;
         public readonly GemGroundField prefab;
-        public GroundFieldSnapshot(GemGroundFieldSettings settings, ElementType element, float radius)
+        public GroundFieldSnapshot(GemGroundFieldSettings settings, ElementType element, float radius, float damageMultiplier = 1f, float knockbackDurationMultiplier = 1f)
         {
+            this.knockbackDurationMultiplier = Mathf.Clamp(WeaponStatModifier.Finite(knockbackDurationMultiplier, 1), 0, 4);
             this.radius = Mathf.Max(.1f, radius);
             duration = Mathf.Max(.1f, settings.duration);
-            damagePerSecond = Mathf.Max(0, settings.damagePerSecond);
+            damagePerSecond = Mathf.Max(0, settings.damagePerSecond) * Mathf.Clamp(WeaponStatModifier.Finite(damageMultiplier, 1), 0, 100);
             tickInterval = Mathf.Max(.1f, settings.tickInterval);
             height = Mathf.Max(.1f, settings.damageHeight);
             mergeFraction = Mathf.Clamp01(settings.mergeDistanceFraction);

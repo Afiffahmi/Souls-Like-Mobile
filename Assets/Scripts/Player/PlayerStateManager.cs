@@ -31,6 +31,8 @@ public partial class PlayerStateManager : MonoBehaviour
         }
 
         CacheAnimatorParameters();
+        InitializeAttackDefaults();
+        InitializeBowHeavyTargeting();
         InitializeCombat();
         CurrentState = IdlingState;
         CurrentState.EnterState(this);

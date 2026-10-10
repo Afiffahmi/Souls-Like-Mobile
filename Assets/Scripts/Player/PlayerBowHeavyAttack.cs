@@ -12,10 +12,13 @@ public partial class PlayerStateManager
     private BowHeavyAttackConfiguration bowHeavyConfiguration;
     private AnimationClip bowHeavyClip;
     private bool hasBowHeavyControl, bowHeavyActive, bowHeavyCharging, bowHeavyEntered, bowHeavyCharged, bowHeavyUsesInput;
+    private float bowHeavyChargeDuration = 3f, bowHeavyPlaybackSpeed = 1f;
 
     public bool IsChargingBowHeavyAttack => bowHeavyCharging;
     public bool IsBowHeavyAttacking => bowHeavyActive;
-    public float BowHeavyAnimationFrame => bowHeavyTimeline.Frame;
+    public bool IsBowHeavyChargedAttack => bowHeavyActive && !bowHeavyCharging && bowHeavyCharged;
+    public const float BowHeavyHoldFrame = 2f;
+    public float BowHeavyAnimationFrame => bowHeavyCharging ? BowHeavyHoldFrame : bowHeavyTimeline.Frame;
     public int BowHeavyArrowsReleased => bowHeavyTimeline.Shots;
     private double BowHeavyClock => anim.updateMode == AnimatorUpdateMode.UnscaledTime ? Time.unscaledTimeAsDouble : Time.timeAsDouble;
 
@@ -37,13 +40,23 @@ public partial class PlayerStateManager
     private bool TryBeginBowHeavyAttack()
     {
         if (!hasBowHeavyControl || !bowHeavyConfiguration.Validate() || !bowHeavyCycle.Begin(BowHeavyClock)) return false;
+        bowHeavyWeaponStats = CaptureWeaponStats(PlayerCombatMode.Bow, CombatAttackInput.HeavyAttack);
+        // The same base bow SPD drives charge and release; equipment bonuses stay per attack.
+        // Snapshot timing at press so a later Inspector/equipment change cannot retime a volley.
+        bowHeavyAttackDefaults = CaptureAttackDefaults(PlayerCombatMode.Bow,CombatAttackInput.HeavyAttack);
+        bowHeavyChargeDuration = ChargeDuration(bowHeavyAttackDefaults.castSeconds, bowHeavyAttackDefaults, bowHeavyWeaponStats);
+        bowHeavyPlaybackSpeed = bowHeavyAttackDefaults.speed;
         bowHeavyActive = bowHeavyCharging = true;
+        bowHeavyChargeVfxHeld = false;
         bowHeavyEntered = bowHeavyCharged = bowHeavyUsesInput = false;
         bowHeavyTimeline.Reset();
         ClearAttackTriggers();
         anim.ResetTrigger(ParryHash);
         anim.SetBool(BowHeavyFinishedHash, false);
-        anim.SetFloat(BowHeavyTimeHash, 0f);
+        bowHeavyClip = bowHeavyConfiguration.singleAnimation;
+        anim.SetBool(BowHeavyChargedHash, false);
+        anim.SetFloat(BowHeavyTimeHash, BowHeavyHoldFrame / (bowHeavyClip.length * bowHeavyClip.frameRate));
+        anim.Play(BowHeavySingleStatePath, 0, 0f);
         ActionState = PlayerActionState.Attack;
         AttackSubstate = PlayerAttackSubstate.Bow;
         SetActiveStatePath("Attack > Bow > Heavy charge");
@@ -52,12 +65,16 @@ public partial class PlayerStateManager
 
     /// <summary>PointerDown API; the existing OnScreenButton also works via HeavyAttack input.</summary>
     public void BeginHeavyAttackHold() => TryAttack(CombatAttackInput.HeavyAttack);
-    public void EndHeavyAttackHold() => AdvanceBowHeavyHold(BowHeavyClock, false);
+    public void EndHeavyAttackHold()
+    {
+        EndSwordHeavyHold();
+        if (anim != null) AdvanceBowHeavyHold(BowHeavyClock, false);
+    }
 
     // A click-only UnityEvent is an explicit short press; hold controls use the paired API.
     private void RequestHeavyAttackClick()
     {
-        if (TryAttack(CombatAttackInput.HeavyAttack) && bowHeavyCharging) EndHeavyAttackHold();
+        if (TryAttack(CombatAttackInput.HeavyAttack)) EndHeavyAttackHold();
     }
 
     private void PollBowHeavyRelease()
@@ -74,21 +91,28 @@ public partial class PlayerStateManager
 
     private void AdvanceBowHeavyHold(double now, bool held)
     {
-        bool? decision = bowHeavyCycle.Advance(now, held, bowHeavyConfiguration != null ? bowHeavyConfiguration.holdDuration : 3f);
+        // Snapshot the original press before release; animation time never turns a tap into a hold.
+        if (bowHeavyCharging && bowHeavyCycle.Held &&
+            bowHeavyCycle.Elapsed(now) >= ChargeVfxHoldDelay)
+            bowHeavyChargeVfxHeld = true;
+        bool? decision = bowHeavyCycle.Advance(now, held, bowHeavyChargeDuration);
         if (!bowHeavyCharging || !decision.HasValue) return;
         bowHeavyCharging = false;
         bowHeavyCharged = decision.Value;
         bowHeavyClip = bowHeavyCharged ? bowHeavyConfiguration.chargedAnimation : bowHeavyConfiguration.singleAnimation;
         bowHeavyTimeline.Begin(bowHeavyCharged ? bowHeavyConfiguration.chargedReleaseFrames : new[] { bowHeavyConfiguration.singleReleaseFrame },
-            bowHeavyClip.length * bowHeavyClip.frameRate);
+            bowHeavyClip.length * bowHeavyClip.frameRate, BowHeavyHoldFrame);
+        anim.SetFloat(BowHeavyTimeHash, BowHeavyHoldFrame / (bowHeavyClip.length * bowHeavyClip.frameRate));
         anim.SetBool(BowHeavyChargedHash, bowHeavyCharged);
         ClearAttackTriggers();
-        anim.SetTrigger(HeavyAttackHash);
+        // Select the captured single/volley animation only after release, continuing from frame 2.
+        bowHeavyEntered = !bowHeavyCharged && bowHeavyEntered;
+        anim.Play(bowHeavyCharged ? BowHeavyChargedStatePath : BowHeavySingleStatePath, 0, 0f);
     }
 
     public bool NotifyBowHeavyAttackEntered(BowHeavyAttackConfiguration configuration, bool charged)
     {
-        if (!isActiveAndEnabled || !bowHeavyActive || bowHeavyCharging || configuration != bowHeavyConfiguration || charged != bowHeavyCharged) return false;
+        if (!isActiveAndEnabled || !bowHeavyActive || configuration != bowHeavyConfiguration || charged != bowHeavyCharged) return false;
         bowHeavyEntered = true;
         ClearAttackTriggers();
         EquipmentPhase = PlayerEquipmentPhase.None;
@@ -116,8 +140,13 @@ public partial class PlayerStateManager
 
     private void AdvanceBowHeavyAnimation(float dt)
     {
+        if (bowHeavyCharging)
+        {
+            anim.SetFloat(BowHeavyTimeHash, BowHeavyHoldFrame / (bowHeavyClip.length * bowHeavyClip.frameRate));
+            return;
+        }
         if (!bowHeavyEntered) return;
-        bool release = bowHeavyTimeline.Advance(dt * Mathf.Max(0f, anim.speed) * bowHeavyConfiguration.playbackSpeed * bowHeavyClip.frameRate);
+        bool release = bowHeavyTimeline.Advance(dt * Mathf.Max(0f, anim.speed) * bowHeavyPlaybackSpeed * bowHeavyClip.frameRate * bowHeavyWeaponStats.AgilityMultiplier);
         anim.SetFloat(BowHeavyTimeHash, bowHeavyTimeline.Frame / (bowHeavyClip.length * bowHeavyClip.frameRate));
         // Completion is only possible on a later update than the final release.
         anim.SetBool(BowHeavyFinishedHash, bowHeavyTimeline.Finished);
@@ -127,10 +156,12 @@ public partial class PlayerStateManager
     /// <summary>Input cancellation discards an uncommitted hold; a committed volley finishes.</summary>
     public void CancelHeavyAttackHold()
     {
+        CancelSwordHeavyHold();
         bowHeavyCycle.Cancel();
         bowHeavyUsesInput = false;
         if (!bowHeavyCharging) return;
         ResetBowHeavyAttack();
+        if (anim != null && isActiveAndEnabled) anim.Play("Base Layer.Attack.Bow", 0, 0f);
         ActionState = PlayerActionState.Attack;
         AttackSubstate = PlayerAttackSubstate.Bow;
         SetActiveStatePath("Attack > Bow");
@@ -138,7 +169,10 @@ public partial class PlayerStateManager
 
     private void ResetBowHeavyAttack()
     {
+        if (bowHeavyActive && bowHeavyTimeline.Finished && bowHeavyAttackDefaults != null)
+            attackRecoveryUntil = System.Math.Max(attackRecoveryUntil, AttackClock + bowHeavyWeaponStats.Duration(bowHeavyAttackDefaults.recoverySeconds));
         bowHeavyActive = bowHeavyCharging = bowHeavyEntered = false;
+        bowHeavyChargeVfxHeld = false;
         bowHeavyClip = null;
         bowHeavyTimeline.Reset();
         // Keep the input cycle consumed until its physical release.

@@ -84,6 +84,19 @@ namespace ElementalGems
             trailWidth = normal ? 0 : gem.arrowTrailWidth;
             trailLifetime = normal ? 0 : gem.trailLifetime;
         }
+        private GemAttack(GemAttack source, float knockbackMultiplier, float minimumKnockback)
+        {
+            element = source.element; damageScale = source.damageScale;
+            knockback = Mathf.Max(source.knockback, Mathf.Max(0, WeaponStatModifier.Finite(minimumKnockback))) *
+                Mathf.Max(0, WeaponStatModifier.Finite(knockbackMultiplier, 1));
+            lifeSteal = source.lifeSteal; executeThreshold = source.executeThreshold; executeScale = source.executeScale;
+            projectileSpeed = source.projectileSpeed; healing = source.healing;
+            statuses = source.statuses; matchups = source.matchups; impact = source.impact;
+            trailMaterial = source.trailMaterial; color = source.color;
+            trailWidth = source.trailWidth; trailLifetime = source.trailLifetime;
+        }
+        public GemAttack WithKnockbackMultiplier(float multiplier, float minimumKnockback = 0f) =>
+            multiplier == 1f && minimumKnockback <= knockback ? this : new GemAttack(this, multiplier, minimumKnockback);
         public float MultiplierAgainst(ElementType defender)
         {
             foreach (var row in matchups) if (row.defender == defender) return Mathf.Max(0, row.multiplier);

@@ -65,6 +65,7 @@ public partial class PlayerStateManager
     private void UpdateCombat()
     {
         PollBowHeavyRelease();
+        PollSwordHeavyRelease();
         UpdateCombatState();
         // Poll even when combat is busy so rejected button presses are diagnosed.
         // Existing equipment/parry/attack input keeps priority over rolling.
@@ -213,9 +214,9 @@ public partial class PlayerStateManager
         EndEquipmentLegLocomotion();
         bowHeavyCycle.Cancel();
         bowHeavyUsesInput = false;
+        swordHeavyHeld = swordHeavyUsesInput = false;
         ResetAttackSequence();
         ResetParry();
         if (hasCombatParameters && anim != null) anim.ResetTrigger(ParryHash);
     }
 }
-

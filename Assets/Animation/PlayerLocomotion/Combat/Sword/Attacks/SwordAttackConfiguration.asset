@@ -26,6 +26,7 @@ MonoBehaviour:
       localOffset: {x: 0, y: 1, z: 0.05}
       localEulerAngles: {x: 0, y: 0, z: -90}
       reverseSweep: 0
+      fullCircle: 0
       startSweepAngle: 0
       endSweepAngle: 0
       progression:
@@ -70,6 +71,7 @@ MonoBehaviour:
       localOffset: {x: 0, y: 1, z: 0.05}
       localEulerAngles: {x: 0, y: 0, z: 45}
       reverseSweep: 0
+      fullCircle: 0
       startSweepAngle: 0
       endSweepAngle: 0
       progression:
@@ -114,6 +116,7 @@ MonoBehaviour:
       localOffset: {x: 0, y: 1, z: 0.05}
       localEulerAngles: {x: 0, y: 0, z: -90}
       reverseSweep: 0
+      fullCircle: 0
       startSweepAngle: 0
       endSweepAngle: 0
       progression:
@@ -151,14 +154,15 @@ MonoBehaviour:
     chainTransitionFrame: 1
     postAttackRecovery: 0.05
   heavyAttackChain:
-  - animation: {fileID: 7400000, guid: 800ff7cea362bc84eb9c6d3ac85fffee, type: 2}
+  - animation: {fileID: 7400000, guid: 6fb709e10cb0c804ea038c4bc3f68906, type: 2}
     slash:
       enabled: 0
-      startFrame: 11
-      endFrame: 16
+      startFrame: 33
+      endFrame: 50
       localOffset: {x: 0, y: 1, z: 0.05}
       localEulerAngles: {x: 0, y: 0, z: -90}
       reverseSweep: 0
+      fullCircle: 0
       startSweepAngle: 0
       endSweepAngle: 0
       progression:
@@ -188,101 +192,98 @@ MonoBehaviour:
       size: 1
       forwardDrift: 0
       followPlayer: 0
-    playbackSpeed: 1
+    playbackSpeed: 1.2
     comboWindowStart: 0.25
     comboWindowEnd: 0.65
     chainTransitionTime: 0.85
     useChainTransitionFrame: 0
     chainTransitionFrame: 1
     postAttackRecovery: 0
-  - animation: {fileID: 7400000, guid: be6bdb52db3489a4fb0e4742bb22908c, type: 2}
-    slash:
-      enabled: 0
-      startFrame: 11
-      endFrame: 16
-      localOffset: {x: 0, y: 1, z: 0.05}
-      localEulerAngles: {x: 0, y: 0, z: -90}
-      reverseSweep: 0
-      startSweepAngle: 0
-      endSweepAngle: 0
-      progression:
-        serializedVersion: 2
-        m_Curve:
-        - serializedVersion: 3
-          time: 0
-          value: 0
-          inSlope: 0
-          outSlope: 1
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        - serializedVersion: 3
-          time: 1
-          value: 1
-          inSlope: 1
-          outSlope: 0
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        m_PreInfinity: 2
-        m_PostInfinity: 2
-        m_RotationOrder: 4
-      size: 1
-      forwardDrift: 0
-      followPlayer: 0
-    playbackSpeed: 1
-    comboWindowStart: 0.25
-    comboWindowEnd: 0.65
-    chainTransitionTime: 0.85
-    useChainTransitionFrame: 0
-    chainTransitionFrame: 1
-    postAttackRecovery: 0
-  - animation: {fileID: 7400000, guid: 276b9e4abe386c54cbea22e15e73ea4e, type: 2}
-    slash:
-      enabled: 0
-      startFrame: 11
-      endFrame: 16
-      localOffset: {x: 0, y: 1, z: 0.05}
-      localEulerAngles: {x: 0, y: 0, z: -90}
-      reverseSweep: 0
-      startSweepAngle: 0
-      endSweepAngle: 0
-      progression:
-        serializedVersion: 2
-        m_Curve:
-        - serializedVersion: 3
-          time: 0
-          value: 0
-          inSlope: 0
-          outSlope: 1
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        - serializedVersion: 3
-          time: 1
-          value: 1
-          inSlope: 1
-          outSlope: 0
-          tangentMode: 0
-          weightedMode: 0
-          inWeight: 0
-          outWeight: 0
-        m_PreInfinity: 2
-        m_PostInfinity: 2
-        m_RotationOrder: 4
-      size: 1
-      forwardDrift: 0
-      followPlayer: 0
-    playbackSpeed: 1
-    comboWindowStart: 0.25
-    comboWindowEnd: 0.65
-    chainTransitionTime: 0.85
-    useChainTransitionFrame: 0
-    chainTransitionFrame: 1
-    postAttackRecovery: 0
+  swordHeavyCharge:
+    enabled: 1
+    baseKnockback: 5
+    holdCheckFrame: 12
+    heldLowPasses: 2
+    lowDamageHeavyAttack:
+      damageMultiplier: 1
+      knockbackMultiplier: 1
+      slash:
+        enabled: 1
+        startFrame: 17
+        endFrame: 32
+        localOffset: {x: 0, y: 1, z: 0}
+        localEulerAngles: {x: 0, y: 0, z: 0}
+        reverseSweep: 1
+        fullCircle: 1
+        startSweepAngle: 0
+        endSweepAngle: 0
+        progression:
+          serializedVersion: 2
+          m_Curve:
+          - serializedVersion: 3
+            time: 0
+            value: 0
+            inSlope: 0
+            outSlope: 1
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          - serializedVersion: 3
+            time: 1
+            value: 1
+            inSlope: 1
+            outSlope: 0
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        size: 1
+        forwardDrift: 0
+        followPlayer: 0
+    highDamageHeavyAttack:
+      damageMultiplier: 1.25
+      knockbackMultiplier: 1.25
+      slash:
+        enabled: 1
+        startFrame: 48
+        endFrame: 56
+        localOffset: {x: 0, y: 1, z: 0.05}
+        localEulerAngles: {x: 0, y: 0, z: -90}
+        reverseSweep: 0
+        fullCircle: 0
+        startSweepAngle: 0
+        endSweepAngle: 0
+        progression:
+          serializedVersion: 2
+          m_Curve:
+          - serializedVersion: 3
+            time: 0
+            value: 0
+            inSlope: 0
+            outSlope: 1
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          - serializedVersion: 3
+            time: 1
+            value: 1
+            inSlope: 1
+            outSlope: 0
+            tangentMode: 0
+            weightedMode: 0
+            inWeight: 0
+            outWeight: 0
+          m_PreInfinity: 2
+          m_PostInfinity: 2
+          m_RotationOrder: 4
+        size: 1
+        forwardDrift: 0
+        followPlayer: 0
   specialAttack:
     animation: {fileID: 7400000, guid: 9f6c108161960984ea749105a2aead55, type: 2}
     slash:
@@ -292,6 +293,7 @@ MonoBehaviour:
       localOffset: {x: 0, y: 1, z: 0.05}
       localEulerAngles: {x: 0, y: 0, z: -90}
       reverseSweep: 0
+      fullCircle: 0
       startSweepAngle: 0
       endSweepAngle: 0
       progression:

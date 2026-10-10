@@ -152,7 +152,7 @@ namespace ElementalGems
                 Vector3 target = collider.bounds.center;
                 if (settings.lineOfSight && Blocked(physics, origin + up * .2f, target, enemy)) continue;
                 seen.Add(enemy);
-                int dealt = ElementalDamage.Hit(attack, baseDamage, owner, enemy, target, target - origin);
+                int dealt = ElementalDamage.Hit(attack, baseDamage, owner, enemy, target, target - origin, knockbackDurationMultiplier: settings.knockbackDurationMultiplier);
                 if (firstHitKnockback > 0 && dealt > 0 && !enemy.IsDead && pushedByEruption.Add(enemy))
                 {
                     var elemental = enemy.GetComponent<ElementalEnemy>();
@@ -160,7 +160,7 @@ namespace ElementalGems
                     {
                         var outward = Vector3.ProjectOnPlane(target - origin, Vector3.up);
                         if (outward.sqrMagnitude < .0001f) outward = Vector3.ProjectOnPlane(transform.forward, Vector3.up);
-                        elemental.ApplyKnockback(outward, firstHitKnockback);
+                        elemental.ApplyKnockback(outward, firstHitKnockback, settings.knockbackDurationMultiplier);
                     }
                 }
             }

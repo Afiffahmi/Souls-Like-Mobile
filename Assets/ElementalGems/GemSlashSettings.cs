@@ -15,6 +15,8 @@ namespace ElementalGems
         [Tooltip("Rotate the slash plane relative to player facing. Z: 0 left-to-right, -90 top-to-bottom, +45 bottom-left to top-right. Reverse Sweep swaps the endpoints.")]
         public Vector3 localEulerAngles = new Vector3(0, 0, -90);
         public bool reverseSweep;
+        [Tooltip("Full circular visual and 360-degree damage area, including behind the player.")]
+        public bool fullCircle;
         [Tooltip("Additional rotation about the slash plane's local Y axis, from start to end. Use values outside +/-180 for larger arcs.")]
         public float startSweepAngle;
         public float endSweepAngle;

@@ -10,11 +10,13 @@ namespace ElementalGems
         public ElementType Element => Attack != null ? Attack.element : ElementType.Normal;
         private GemManager source;
         private float baseDamage, radius;
+        private float knockbackDuration = 1f;
         private bool impacted;
         private TrailRenderer trail;
         private GroundFieldSnapshot groundField;
-        public void Initialize(GemAttack attack, GemManager owner, float damage, float groundRadius, GroundFieldSnapshot field = null)
+        public void Initialize(GemAttack attack, GemManager owner, float damage, float groundRadius, GroundFieldSnapshot field = null, float knockbackDurationMultiplier = 1f)
         {
+            knockbackDuration = Mathf.Clamp(WeaponStatModifier.Finite(knockbackDurationMultiplier, 1), 0, 4);
             Attack = attack; source = owner; baseDamage = damage; radius = field != null ? field.radius : groundRadius; groundField = field; impacted = false;
             if (trail != null) Destroy(trail.gameObject);
             if (attack.element != ElementType.Normal && attack.trailMaterial != null)
@@ -44,11 +46,11 @@ namespace ElementalGems
                     Vector3 end = c.bounds.center;
                     if (Physics.Linecast(point + Vector3.up * 0.1f, end, out var wall, ~0, QueryTriggerInteraction.Ignore) &&
                         wall.collider.GetComponentInParent<Enemy>() != enemy) continue;
-                    ElementalDamage.Hit(Attack, baseDamage, source, enemy, end, end - point);
+                    ElementalDamage.Hit(Attack, baseDamage, source, enemy, end, end - point, knockbackDurationMultiplier: knockbackDuration);
                 }
             }
             else if (collider != null)
-                ElementalDamage.Hit(Attack, baseDamage, source, collider.GetComponentInParent<Enemy>(), point, transform.forward);
+                ElementalDamage.Hit(Attack, baseDamage, source, collider.GetComponentInParent<Enemy>(), point, transform.forward, knockbackDurationMultiplier: knockbackDuration);
             ElementalDamage.Impact(Attack, point, normal);
             if (ground) GemGroundField.Spawn(groundField, Attack, source, point, normal, gameObject.scene);
         }

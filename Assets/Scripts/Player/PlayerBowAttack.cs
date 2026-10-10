@@ -9,17 +9,22 @@ public partial class PlayerStateManager
     private AnimationClip bowCharacterClip;
     private bool hasBowControl, bowAttackActive, bowStateEntered;
     private bool bowUsesInput, bowButtonHeld;
+    private float bowCapturedBaseSpeed = 1f;
+    private float bowCapturedDrawSpeed = 1f;
 
     [Header("Bow")]
-    [Min(0.01f)] public float bowAttackSpeed = 0.4f;
+    [Tooltip("Shared bow speed: light draw/release, heavy charge and heavy release. Equipment SPD multiplies this value.")]
+    [HideInInspector, Min(0.01f)] public float bowAttackSpeed = 0.4f; // Legacy migration only.
+    public float BowBaseAttackSpeed => CaptureAttackDefaults(PlayerCombatMode.Bow,CombatAttackInput.LightAttack).speed;
     [Tooltip("Draw-only speed multiplier. Does not change hold or release speed.")]
-    [Min(0.01f)] public float bowDrawSpeed = 2f;
+    [HideInInspector, Min(0.01f)] public float bowDrawSpeed = 2f; // Legacy migration only.
     public bool logBowEvents;
 
     public BowAttackPhase BowPhase => bowTimeline.Phase;
     public float BowAnimationFrame => bowTimeline.Frame;
     public float BowLastFrame => bowCharacterClip == null ? 70f : bowCharacterClip.length * bowCharacterClip.frameRate;
     public bool IsHoldingBow => bowAttackActive && BowPhase == BowAttackPhase.Hold;
+    public bool IsBowLightGemCharged => bowAttackActive && bowTimeline.IsGemCharged;
     // Shared by light and heavy frame timelines; the shooter spawns after pose evaluation.
     public event System.Action BowReleased;
 
@@ -40,7 +45,11 @@ public partial class PlayerStateManager
     private bool TryBeginBowAttack()
     {
         if (!hasBowControl || !anim.HasState(0, Animator.StringToHash(BowAttackStatePath))) return false;
-        bowTimeline.Begin();
+        bowWeaponStats = CaptureWeaponStats(PlayerCombatMode.Bow, CombatAttackInput.LightAttack);
+        bowAttackDefaults = CaptureAttackDefaults(PlayerCombatMode.Bow,CombatAttackInput.LightAttack);
+        bowCapturedBaseSpeed = bowAttackDefaults.speed;
+        bowCapturedDrawSpeed = Mathf.Max(.01f,WeaponStatModifier.Finite(bowDefaultDrawSpeed,1));
+        bowTimeline.Begin(ChargeDuration(bowLightChargeSeconds, bowAttackDefaults, bowWeaponStats));
         bowAttackActive = true;
         bowStateEntered = bowUsesInput = bowButtonHeld = false;
         ClearAttackTriggers();
@@ -93,12 +102,12 @@ public partial class PlayerStateManager
 
     private void AdvanceBowAttack(float dt, bool held)
     {
-        if (!held) bowTimeline.RequestRelease();
+        bowTimeline.UpdateCharge(dt, held);
         if (!bowStateEntered) return;
 
         var previous = BowPhase;
-        bowTimeline.Advance(dt * Mathf.Max(0f, anim.speed) * Mathf.Max(0.01f, bowAttackSpeed) *
-            bowCharacterClip.frameRate, BowLastFrame, bowDrawSpeed);
+        bowTimeline.Advance(dt * Mathf.Max(0f, anim.speed) * bowCapturedBaseSpeed *
+            bowCharacterClip.frameRate * bowWeaponStats.AgilityMultiplier, BowLastFrame, bowCapturedDrawSpeed);
         anim.SetFloat(BowTimeHash, BowAnimationFrame / BowLastFrame);
         anim.SetBool(BowFinishedHash, BowPhase == BowAttackPhase.Finished);
         if (previous != BowPhase)
@@ -113,6 +122,8 @@ public partial class PlayerStateManager
 
     private void ResetBowAttack()
     {
+        if (bowAttackActive && bowTimeline.Phase == BowAttackPhase.Finished && bowAttackDefaults != null)
+            attackRecoveryUntil = System.Math.Max(attackRecoveryUntil, AttackClock + bowWeaponStats.Duration(bowAttackDefaults.recoverySeconds));
         bowAttackActive = bowStateEntered = bowUsesInput = bowButtonHeld = false;
         bowTimeline.Reset();
         if (!hasBowControl || anim == null) return;

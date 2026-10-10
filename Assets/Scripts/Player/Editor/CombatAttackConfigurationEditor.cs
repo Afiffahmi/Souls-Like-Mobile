@@ -12,6 +12,8 @@ public sealed class CombatAttackConfigurationEditor : Editor
     {
         DrawDefaultInspector();
         var config = (CombatAttackConfiguration)target;
+        if (config.UsesSwordHeavyCharge)
+            EditorGUILayout.HelpBox("Sword heavy: tap plays the complete clip once. Still held at frame 12: freeze until the button is released, then play the held low-slash passes (17-32) and continue to the high slash (48-56). Low: circular right-to-left, 1x damage/knockback. High: top-down, 1.25x damage/knockback. Each pass can hit an enemy once. Configure these phases below under Sword Heavy Attack; the chain step's Slash is unused for this attack.", MessageType.Info);
         EditorGUILayout.HelpBox("Slash settings and Light Combo Windup Speed apply immediately. Sword light attacks 2 onward accelerate only up to their slash Start Frame, then use normal Playback Speed. Frames use the assigned clip's frame rate (Unity frame 0). Start is visible; End is hidden. Local Euler Z: -90 top-to-bottom, 0 left-to-right, +45 bottom-left to top-right. Reverse Sweep swaps direction. Damage follows the slash.", MessageType.Info);
         foreach (var chain in new[] { config.lightAttackChain, config.heavyAttackChain })
         {
@@ -85,12 +87,22 @@ public static class CombatAttackAnimatorBuilder
                 state.tag="CombatAttack"; state.writeDefaultValues=false;
                 state.motion=input==CombatAttackInput.SpecialAttack?config.specialAttack.animation:chain[i].animation;
                 state.speed=input==CombatAttackInput.SpecialAttack?config.specialAttack.playbackSpeed:chain[i].playbackSpeed;
-                if (config.weapon == PlayerCombatMode.Sword && input == CombatAttackInput.LightAttack)
+                state.timeParameterActive = false;
+                // Each attack gets its own parameter so outgoing states cannot reset incoming attacks.
                 {
-                    string parameter = CombatAttackState.WindupSpeedParameter(i);
+                    string parameter = CombatAttackState.AttackSpeedParameter(config.weapon, input, i);
                     EnsureParameter(controller, parameter, AnimatorControllerParameterType.Float);
                     state.speedParameter = parameter;
                     state.speedParameterActive = true;
+                }
+                if (config.UsesSwordHeavyCharge && input == CombatAttackInput.HeavyAttack)
+                {
+                    EnsureParameter(controller, PlayerStateManager.SwordHeavyTimeParameter, AnimatorControllerParameterType.Float);
+                    EnsureParameter(controller, PlayerStateManager.SwordHeavyFinishedParameter, AnimatorControllerParameterType.Bool);
+                    state.speed = 0f;
+                    state.speedParameterActive = false;
+                    state.timeParameter = PlayerStateManager.SwordHeavyTimeParameter;
+                    state.timeParameterActive = true;
                 }
                 states.Add(state);
             }
@@ -111,6 +123,11 @@ public static class CombatAttackAnimatorBuilder
                     next.AddCondition(AnimatorConditionMode.If,0,"AttackBuffered");
                 }
                 var back=states[i].AddTransition(locomotion); Configure(back,true,1f);
+                if (config.UsesSwordHeavyCharge && input == CombatAttackInput.HeavyAttack)
+                {
+                    back.hasExitTime = false;
+                    back.AddCondition(AnimatorConditionMode.If, 0, PlayerStateManager.SwordHeavyFinishedParameter);
+                }
                 back.name="Finish and reset chain";
             }
             row++;

@@ -10,6 +10,7 @@ Shader "ElementalGems/Broad Crescent Slash"
         _Direction("Sweep direction", Float)=1
         _SweepProgress("Animation sweep (negative uses lifetime)", Float)=-1
         _WidthScale("Crescent band width", Range(.4,1.8))=1
+        _FullCircle("Full circular slash", Float)=0
     }
     SubShader
     {
@@ -23,17 +24,32 @@ Shader "ElementalGems/Broad Crescent Slash"
             #pragma fragment frag
             #include "UnityCG.cginc"
             float4 _Tint;
-            float _Intensity, _Age, _FlowSpeed, _Turbulence, _Direction, _WidthScale, _SweepProgress;
+            float _Intensity, _Age, _FlowSpeed, _Turbulence, _Direction, _WidthScale, _SweepProgress, _FullCircle;
             struct A { float4 vertex:POSITION; float2 uv:TEXCOORD0; float2 layer:TEXCOORD1; float4 color:COLOR; };
             struct V { float4 vertex:SV_POSITION; float2 uv:TEXCOORD0; float2 layer:TEXCOORD1; float4 color:COLOR; };
-            V vert(A v) { V o; float r=length(v.vertex.xz); v.vertex.xz*= (v.layer.y+(r-v.layer.y)*_WidthScale)/max(.001,r); o.vertex=UnityObjectToClipPos(v.vertex);o.uv=v.uv;o.layer=v.layer;o.color=v.color;return o; }
+            V vert(A v)
+            {
+                V o;
+                float r=length(v.vertex.xz);
+                if (_FullCircle>.5)
+                {
+                    // Undo the authored crescent taper and wrap each band into a closed ring.
+                    float taper=pow(max(.001,sin(v.uv.x*3.14159265)),.7)*(.7+.6*v.uv.x);
+                    r=v.layer.y+(r-v.layer.y)*_WidthScale/taper;
+                    float angle=(v.uv.x*360-270)*.01745329252;
+                    v.vertex.xz=float2(sin(angle),cos(angle))*r;
+                    v.vertex.y=(v.vertex.y-v.layer.x*.004)/taper+v.layer.x*.004;
+                }
+                else v.vertex.xz*= (v.layer.y+(r-v.layer.y)*_WidthScale)/max(.001,r);
+                o.vertex=UnityObjectToClipPos(v.vertex);o.uv=v.uv;o.layer=v.layer;o.color=v.color;return o;
+            }
             float ridge(float x,float center,float width) { return exp(-pow((x-center)/width,2)); }
             float4 frag(V i):SV_Target
             {
                 float u=i.uv.x, v=i.uv.y;
                 float phase=u*27-_Age*_FlowSpeed*3+i.layer.y;
                 float wave=sin(phase)*sin(phase*.43+v*7);
-                float endFade=pow(saturate(sin(u*3.14159265)),.38);
+                float endFade=_FullCircle>.5?1:pow(saturate(sin(u*3.14159265)),.38);
                 float reveal=smoothstep(-.09,.05, (_SweepProgress>=0?_SweepProgress:_Age*6)-(_Direction>0?u:1-u));
                 float fade=1-smoothstep(_SweepProgress>=0?.8:.25,1,_Age);
                 float edge=smoothstep(0,.12,v)*(1-smoothstep(.85,1,v));

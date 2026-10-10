@@ -11,10 +11,10 @@ public sealed class CombatSpecialCooldowns
         configuration != null && readyAt.TryGetValue(configuration, out double deadline)
             ? (float)System.Math.Max(0, deadline - now) : 0f;
 
-    public bool TryStart(CombatAttackConfiguration configuration, double now)
+    public bool TryStart(CombatAttackConfiguration configuration, double now, float? defaultCooldown = null)
     {
         if (configuration == null || configuration.specialAttack == null || Remaining(configuration, now) > 0f) return false;
-        readyAt[configuration] = now + Mathf.Max(0f, configuration.specialAttack.cooldown);
+        readyAt[configuration] = now + Mathf.Max(0f, defaultCooldown ?? configuration.specialAttack.cooldown);
         return true;
     }
 }
