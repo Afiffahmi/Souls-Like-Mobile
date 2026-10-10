@@ -46,7 +46,10 @@ namespace ElementalGems
             if (reaction == ElementalReaction.Purification)
             {
                 if (target.Purify(chain.attack.element, linked, chain.attack, chain.control))
+                {
                     target.TakeReactionDamage(chain.baseDamage * chain.attack.damageScale, chain.attack.element, chain.control);
+                    target.ApplyLinkUpElement(chain.attack.element, chain.attack);
+                }
                 return;
             }
             if (!target.BeginReaction()) return;
@@ -135,6 +138,7 @@ namespace ElementalGems
                     ElementalReactionVfx.Vortex(scene, origin, radius, color, chain.attack);
                     break;
             }
+            target.ApplyLinkUpElement(chain.attack.element, chain.attack);
         }
         internal static ElementalEnemy Contact(Enemy enemy, ElementType linked, float damage, Chain chain)
         {
@@ -145,6 +149,8 @@ namespace ElementalGems
             ElementType previous = target.CurrentElement;
             target.TakeReactionDamage(damage, chain.attack.element);
             Resolve(target, previous, linked, chain);
+            // Propagated link-up damage also locks elemental-born receivers in Normal.
+            target.ApplyLinkUpElement(chain.attack.element, chain.attack);
             target.Infuse(chain.attack.element, chain.attack);
             return target;
         }

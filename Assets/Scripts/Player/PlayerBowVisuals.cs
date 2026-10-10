@@ -64,21 +64,26 @@ public sealed class PlayerBowVisuals : MonoBehaviour
 
     private void LateUpdate() => Refresh();
 
-    // Used by the existing paused Play Mode bow-placement editor.
+    // Used by the Inspector in Edit Mode and by the paused Play Mode placement editor.
     public void RefreshPlacement()
+    {
+        ApplySocketPlacement();
+        Refresh();
+    }
+
+    private void ApplySocketPlacement()
     {
         if (handSocket != null)
             handSocket.SetLocalPositionAndRotation(handPosition, Quaternion.Euler(handRotation));
         if (backSocket != null)
             backSocket.SetLocalPositionAndRotation(backPosition, Quaternion.Euler(backRotation));
-        if (model != null && bowPrefab != null)
-            model.transform.localScale = Vector3.Scale(bowPrefab.transform.localScale, modelScale);
-        Refresh();
     }
 
     private void Refresh()
     {
         if (model == null || player == null || player.anim == null) return;
+        // Use the same authored offsets during play and paused placement, after body animation.
+        ApplySocketPlacement();
         var animator = player.anim;
         bool equipmentPose = animator.isInitialized &&
             ((animator.IsInTransition(0) && ApplyEquipmentPose(animator.GetNextAnimatorStateInfo(0))) ||
@@ -111,6 +116,13 @@ public sealed class PlayerBowVisuals : MonoBehaviour
             else { clip = drawAnimation; progress = Mathf.InverseLerp(Mathf.Max(0, last + 3), next, frame); }
         }
         Sample(clip, progress);
+        // Restore the attachment even when the animation sample or equipment state is unchanged.
+        // The limb/string bones still animate; only the model's socket-relative placement is fixed.
+        Transform socket = drawn ? handSocket : backSocket;
+        if (socket != null && model.transform.parent != socket) model.transform.SetParent(socket, false);
+        model.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
+        if (bowPrefab != null)
+            model.transform.localScale = Vector3.Scale(bowPrefab.transform.localScale, modelScale);
     }
 
     private bool ApplyEquipmentPose(AnimatorStateInfo state)

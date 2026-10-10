@@ -9,7 +9,7 @@ namespace ElementalGems
     public sealed class ElementalEnemy : MonoBehaviour
     {
         [Header("Elemental identity")]
-        [InspectorName("Innate Element"), Tooltip("Normal = an ordinary enemy, primed by elemental knockback. Any other value = born from that element; its innate element is never overwritten.")]
+        [InspectorName("Innate Element"), Tooltip("Normal = an ordinary enemy, primed by elemental knockback. Other values = born from that element. Link-up combos lock it in Normal for 10 seconds, then restore this element; hits cannot change the element or restart that window.")]
         public ElementType element;
         [Tooltip("How long an applied element stays. Zero keeps it until replaced, death or disable.")]
         [Min(0)] public float infusionDuration;
@@ -28,7 +28,9 @@ namespace ElementalGems
         public float shieldDamageMultiplier;
         public ElementType InfusedElement { get; private set; }
         public bool IsElementBorn => element != ElementType.Normal;
-        public ElementType CurrentElement => IsElementBorn ? element : InfusedElement;
+        private readonly LinkUpElementWindow linkUpElement = new LinkUpElementWindow();
+        public ElementType CurrentElement => IsElementBorn ? linkUpElement.Resolve(element, Time.timeAsDouble) : InfusedElement;
+        public double LinkUpElementRemaining => IsElementBorn ? linkUpElement.Remaining(Time.timeAsDouble) : 0;
         public bool HasDarknessShield => darknessShieldEnabled && CurrentElement == ElementType.Darkness && !shieldBroken;
         public int ShieldLayersRemaining => HasDarknessShield ? Mathf.Max(0, darknessShieldLayers - purifiedLayers) : 0;
         public float DamageTakenMultiplier => (fractureLeft > 0 ? 1.35f : 1f) * (HasDarknessShield ? shieldDamageMultiplier : 1f);
@@ -131,6 +133,16 @@ namespace ElementalGems
             nextReactionTime = Time.time + Mathf.Max(.1f, reactionCooldown);
             return true;
         }
+        /// <summary>Only confirmed link-up reactions call this; ordinary knockback still uses Infuse.</summary>
+        public void ApplyLinkUpElement(ElementType incoming, GemAttack visual = null)
+        {
+            if (!IsElementBorn || health == null || health.IsDead || !isActiveAndEnabled ||
+                Resistance(incoming) <= 0 || HasDarknessShield) return;
+            // The first combo locks this enemy in Normal until its deadline. No hit can refresh it.
+            if (!linkUpElement.TryBegin(element, incoming, Time.timeAsDouble)) return;
+            ElementChanged?.Invoke();
+            RefreshAura(visual);
+        }
         public void ConsumeInfusion(ElementType expected)
         {
             if (IsElementBorn || InfusedElement != expected || HasDarknessShield) return;
@@ -210,6 +222,7 @@ namespace ElementalGems
         {
             if (health.IsDead) { ClearStatuses(); return; }
             fractureLeft = Mathf.Max(0, fractureLeft - Time.deltaTime);
+            if (linkUpElement.Expire(Time.timeAsDouble)) ElementChanged?.Invoke();
             if (infusionDuration > 0 && InfusedElement != ElementType.Normal && (infusionLeft -= Time.deltaTime) <= 0)
             { InfusedElement = ElementType.Normal; ElementChanged?.Invoke(); }
             RefreshAura();
@@ -292,6 +305,7 @@ namespace ElementalGems
         public void ClearStatuses()
         {
             active.Clear(); knockbackMotion.Clear(); push = Vector3.zero;
+            linkUpElement.Clear();
             InfusedElement = ElementType.Normal; infusionLeft = fractureLeft = nextReactionTime = purificationUntil = 0;
             purificationElements = purifiedLayers = 0; shieldBroken = false;
             if (aura != null) { aura.gameObject.SetActive(false); Destroy(aura.gameObject); aura = null; }
