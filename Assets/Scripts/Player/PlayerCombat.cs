@@ -47,6 +47,7 @@ public partial class PlayerStateManager
         InitializeAttacks();
         InitializeBowAttack();
         InitializeBowHeavyAttack();
+        InitializeBowSpecialAttack();
         InitializeRolls();
     }
 

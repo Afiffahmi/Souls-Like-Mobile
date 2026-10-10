@@ -304,7 +304,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 1
-  m_Motion: {fileID: 7400000, guid: fc45e68d372f5054cbe61390058fd9ee, type: 2}
+  m_Motion: {fileID: 7400000, guid: 1b6b75af2307d6b4c92ff7f9c558ad69, type: 2}
   m_Tag: CombatAttack
   m_SpeedParameter: Sword_SpecialAttack_0_Agility
   m_MirrorParameter: 
@@ -639,6 +639,20 @@ AnimatorStateTransition:
   m_InterruptionSource: 0
   m_OrderedInterruption: 1
   m_CanTransitionToSelf: 0
+--- !u!114 &-5769270375576310045
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e534c5fc35be5d447923dfca5d1da3c9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CombatBowSpecialAttackState
+  animation: {fileID: 7400000, guid: c167512f347c198478115b02e4f64f85, type: 2}
+  highDamage: 1
 --- !u!114 &-5686194061875928196
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -913,7 +927,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 1
-  m_Motion: {fileID: 7400000, guid: 1b6b75af2307d6b4c92ff7f9c558ad69, type: 2}
+  m_Motion: {fileID: 7400000, guid: fc45e68d372f5054cbe61390058fd9ee, type: 2}
   m_Tag: CombatAttack
   m_SpeedParameter: Sword_SpecialAttack_3_Agility
   m_MirrorParameter: 
@@ -2312,6 +2326,12 @@ AnimatorController:
     m_DefaultInt: 0
     m_DefaultBool: 0
     m_Controller: {fileID: 9100000}
+  - m_Name: BowSpecialTime
+    m_Type: 1
+    m_DefaultFloat: 0
+    m_DefaultInt: 0
+    m_DefaultBool: 0
+    m_Controller: {fileID: 9100000}
   m_AnimatorLayers:
   - serializedVersion: 5
     m_Name: Base Layer
@@ -3217,6 +3237,12 @@ AnimatorStateMachine:
   - serializedVersion: 1
     m_State: {fileID: 910000000000020}
     m_Position: {x: 940, y: 900, z: 0}
+  - serializedVersion: 1
+    m_State: {fileID: 3284927070712162145}
+    m_Position: {x: 1150, y: 1050, z: 0}
+  - serializedVersion: 1
+    m_State: {fileID: 4763826703506643138}
+    m_Position: {x: 1470, y: 1050, z: 0}
   m_ChildStateMachines:
   - serializedVersion: 1
     m_StateMachine: {fileID: 7163211349289924436}
@@ -3230,6 +3256,47 @@ AnimatorStateMachine:
   m_ExitPosition: {x: 930, y: 20, z: 0}
   m_ParentStateMachinePosition: {x: 700, y: 10, z: 0}
   m_DefaultState: {fileID: -6050399134049626273}
+--- !u!1102 &3284927070712162145
+AnimatorState:
+  serializedVersion: 6
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Bow_SpecialAttack_Low
+  m_Speed: 0
+  m_CycleOffset: 0
+  m_Transitions: []
+  m_StateMachineBehaviours:
+  - {fileID: 3517751460054178987}
+  m_Position: {x: 50, y: 50, z: 0}
+  m_IKOnFeet: 0
+  m_WriteDefaultValues: 0
+  m_Mirror: 0
+  m_SpeedParameterActive: 0
+  m_MirrorParameterActive: 0
+  m_CycleOffsetParameterActive: 0
+  m_TimeParameterActive: 1
+  m_Motion: {fileID: 7400000, guid: c167512f347c198478115b02e4f64f85, type: 2}
+  m_Tag: CombatAttack
+  m_SpeedParameter: 
+  m_MirrorParameter: 
+  m_CycleOffsetParameter: 
+  m_TimeParameter: BowSpecialTime
+--- !u!114 &3517751460054178987
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e534c5fc35be5d447923dfca5d1da3c9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CombatBowSpecialAttackState
+  animation: {fileID: 7400000, guid: c167512f347c198478115b02e4f64f85, type: 2}
+  highDamage: 0
 --- !u!1102 &3707309024961877793
 AnimatorState:
   serializedVersion: 6
@@ -3346,6 +3413,33 @@ MonoBehaviour:
   configuration: {fileID: 11400000, guid: 5a6b6860d39121b42be1f68bcab899af, type: 2}
   input: 2
   stepIndex: 4
+--- !u!1102 &4763826703506643138
+AnimatorState:
+  serializedVersion: 6
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Bow_SpecialAttack_High
+  m_Speed: 0
+  m_CycleOffset: 0
+  m_Transitions: []
+  m_StateMachineBehaviours:
+  - {fileID: -5769270375576310045}
+  m_Position: {x: 50, y: 50, z: 0}
+  m_IKOnFeet: 0
+  m_WriteDefaultValues: 0
+  m_Mirror: 0
+  m_SpeedParameterActive: 0
+  m_MirrorParameterActive: 0
+  m_CycleOffsetParameterActive: 0
+  m_TimeParameterActive: 1
+  m_Motion: {fileID: 7400000, guid: c167512f347c198478115b02e4f64f85, type: 2}
+  m_Tag: CombatAttack
+  m_SpeedParameter: 
+  m_MirrorParameter: 
+  m_CycleOffsetParameter: 
+  m_TimeParameter: BowSpecialTime
 --- !u!1101 &5016757556842448245
 AnimatorStateTransition:
   m_ObjectHideFlags: 1

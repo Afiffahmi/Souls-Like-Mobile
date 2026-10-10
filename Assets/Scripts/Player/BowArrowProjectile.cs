@@ -11,6 +11,8 @@ public sealed class BowArrowProjectile : MonoBehaviour
     [Min(0f)] public float impactLifetime = 2f;
 
     private Transform owner;
+    private Enemy specialTarget;
+    private bool specialTargeted;
     private Vector3 direction;
     private float speed;
     private float remainingLifetime;
@@ -26,7 +28,18 @@ public sealed class BowArrowProjectile : MonoBehaviour
 
     public void Launch(Transform source, Vector3 forward, float flightSpeed, float lifetime, LayerMask layers)
     {
+        groundShot = specialTargeted = false;
+        specialTarget = null;
+        BeginFlight(source, forward, flightSpeed, lifetime, layers);
+        Advance(0f);
+    }
+
+    /// <summary>Only the assigned enemy can intercept a special low arrow; world geometry still blocks it.</summary>
+    public void LaunchSpecialTargeted(Transform source, Enemy target, Vector3 forward, float flightSpeed, float lifetime, LayerMask layers)
+    {
         groundShot = false;
+        specialTargeted = true;
+        specialTarget = target;
         BeginFlight(source, forward, flightSpeed, lifetime, layers);
         Advance(0f);
     }
@@ -34,6 +47,8 @@ public sealed class BowArrowProjectile : MonoBehaviour
     public void LaunchAtGround(Transform source, Vector3 point, bool foundGround, float flightSpeed, float lifetime, LayerMask layers)
     {
         groundShot = true;
+        specialTargeted = false;
+        specialTarget = null;
         groundPoint = point;
         groundPointFound = foundGround;
         Vector3 delta = point - transform.position;
@@ -82,6 +97,9 @@ public sealed class BowArrowProjectile : MonoBehaviour
                 (owner != null && hit.collider.transform.IsChildOf(owner))) continue;
             // Heavy attacks land below characters rather than stopping at their chest collider.
             if (groundShot && IsCharacterCollider(hit.collider)) continue;
+            // Keep the 1/1/1 or 2/1 distribution when another enemy stands in front.
+            if (specialTargeted && IsCharacterCollider(hit.collider) &&
+                (specialTarget == null || hit.collider.GetComponentInParent<Enemy>() != specialTarget)) continue;
             if (hit.distance >= nearestDistance) continue;
             nearestDistance = hit.distance;
             nearestHit = hit;

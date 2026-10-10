@@ -24,11 +24,11 @@ public sealed class PlayerStateManagerEditor : Editor
             Fields("swordComboWindupSpeed","swordLightRecoverySpeed","swordHeavyBaseKnockback","swordHeavyLowDamageMultiplier","swordHeavyHighDamageMultiplier","swordHeavyLowPushMultiplier","swordHeavyHighPushMultiplier","swordHeavyHeldLowPasses");}
         bow=EditorGUILayout.Foldout(bow,"BOW — default attacks",true);
         if(bow){Weapon("bowDefaults",true,false);Fields("bowDefaultDrawSpeed");
-            EditorGUILayout.HelpBox("Light and Heavy charge times are divided by their attack Speed and equipment SPD from upgrades and accessories. Bow Special is reserved until its gameplay attack is implemented.",MessageType.None);}
+            EditorGUILayout.HelpBox("Light and Heavy charge times are divided by their attack Speed and equipment SPD from upgrades and accessories. Special auto-fires charged low arrows at frames 17, 27 and 35, then a piercing force wave at 63. Low arrows spread across live enemies within Special Range (3 enemies: 1 each; 2: 2/1; 1: all 3). Unlocked low shots turn the player toward their target. High aims at the current lock-on target, or fires along the player's facing when unlocked. Damage and speed use Special equipment bonuses. Area width scales with Bow upgrade level.",MessageType.None);}
         magic=EditorGUILayout.Foldout(magic,"MAGIC — defaults for future spells",true);
         if(magic){Weapon("magicDefaults",false,true);EditorGUILayout.HelpBox("These defaults are available to future spells through CaptureAttackDefaults. No magic casting implementation exists yet.",MessageType.Info);}
         other=EditorGUILayout.Foldout(other,"Movement, equipment and other player settings",true);
-        if(other)DrawPropertiesExcluding(serializedObject,"m_Script","attackDefaultsInitialized","bowHeavyTargetingInitialized","bowHeavyTargeting","swordDefaults","bowDefaults","magicDefaults",
+        if(other)DrawPropertiesExcluding(serializedObject,"m_Script","attackDefaultsInitialized","bowHeavyTargetingInitialized","bowHeavyTargeting","bowSpecial","swordDefaults","bowDefaults","magicDefaults",
             "swordComboWindupSpeed","swordLightRecoverySpeed","swordHeavyBaseKnockback","swordHeavyLowDamageMultiplier","swordHeavyHighDamageMultiplier",
             "swordHeavyLowPushMultiplier","swordHeavyHighPushMultiplier","swordHeavyHeldLowPasses","swordHeavyChargeSecondsPerStage","bowLightChargeSeconds","bowDefaultDrawSpeed","bowAttackSpeed","bowDrawSpeed");
         if(serializedObject.ApplyModifiedProperties()){
@@ -64,6 +64,7 @@ public sealed class PlayerStateManagerEditor : Editor
                 foreach(var field in new[]{"groundLayers","groundProbeHeight","groundProbeDepth"})
                     EditorGUILayout.PropertyField(targeting.FindPropertyRelative(field));
             }
+            if(bow && kind=="special")EditorGUILayout.PropertyField(serializedObject.FindProperty("bowSpecial"),true);
             if(kind=="special")EditorGUILayout.PropertyField(attack.FindPropertyRelative("cooldownSeconds"));
             EditorGUI.indentLevel--;
         }

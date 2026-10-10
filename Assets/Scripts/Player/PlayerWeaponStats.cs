@@ -28,7 +28,7 @@ public partial class PlayerStateManager
     private WeaponAttackStats activeWeaponStats = WeaponAttackStats.Default;
     private WeaponAttackStats bowWeaponStats = WeaponAttackStats.Default;
     private WeaponAttackStats bowHeavyWeaponStats = WeaponAttackStats.Default;
-    public WeaponAttackStats CurrentWeaponAttackStats => bowHeavyActive ? bowHeavyWeaponStats : bowAttackActive ? bowWeaponStats : activeWeaponStats;
+    public WeaponAttackStats CurrentWeaponAttackStats => bowSpecialActive ? bowSpecialStats : bowHeavyActive ? bowHeavyWeaponStats : bowAttackActive ? bowWeaponStats : activeWeaponStats;
 
     /// <summary>Capture this value when a future spell/skill starts; use Damage and Duration on its base values.</summary>
     public WeaponAttackStats CaptureWeaponStats(PlayerCombatMode weapon, CombatAttackInput input, int attackNumber = 1)

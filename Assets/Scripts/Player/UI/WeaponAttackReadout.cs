@@ -121,6 +121,19 @@ public sealed class WeaponAttackReadout
                     result.Add(stats, defaults.damage, charged, gem, true, defaultKnockbackScale:defaults.knockbackDurationScale);
                 }
             }
+            else if (input == CombatAttackInput.SpecialAttack)
+            {
+                var clip = animator.GetBehaviours<CombatBowSpecialAttackState>().Select(s => s.animation).FirstOrDefault(c => c != null);
+                if (clip != null)
+                {
+                    var tuning = (player.bowSpecial ?? new BowSpecialAttackSettings()).Snapshot(player.BowSpecialUpgradeLevel);
+                    float duration = clip.length / defaults.speed + defaults.recoverySeconds;
+                    result.Add(stats, player.CaptureAttackDefaults(mode, CombatAttackInput.LightAttack).damage, duration,
+                        gem.WithKnockbackMultiplier(tuning.lowKnockbackMultiplier, tuning.baseKnockback), true, tuning.lowDamageMultiplier, defaults.knockbackDurationScale);
+                    result.Add(stats, defaults.damage, duration, gem.WithKnockbackMultiplier(tuning.highKnockbackMultiplier, tuning.baseKnockback),
+                        true, tuning.highDamageMultiplier, defaults.knockbackDurationScale);
+                }
+            }
             else if (input == CombatAttackInput.HeavyAttack)
             {
                 var config = animator.GetBehaviours<CombatBowHeavyAttackState>().Select(s => s.configuration).FirstOrDefault(c => c != null);
@@ -132,7 +145,7 @@ public sealed class WeaponAttackReadout
                 }
             }
         }
-        // Magic and bow special have no implemented attack source yet; never fabricate actual values.
+        // Magic has no implemented attack source yet; never fabricate actual values.
         return result;
     }
 }

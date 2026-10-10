@@ -101,6 +101,15 @@ public sealed class PlayerBowVisuals : MonoBehaviour
                 progress = Mathf.InverseLerp(BowAttackTimeline.ReleaseFrame, player.BowLastFrame, player.BowAnimationFrame);
                 break;
         }
+        if (player.IsBowSpecialAttacking)
+        {
+            float frame = player.BowSpecialAnimationFrame;
+            int released = player.BowSpecialShots;
+            float last = released > 0 ? BowSpecialAttackTimeline.ReleaseFrames[released - 1] : -10;
+            float next = released < 4 ? BowSpecialAttackTimeline.ReleaseFrames[released] : 80;
+            if (released > 0 && frame - last <= 3) { clip = releaseAnimation; progress = Mathf.Clamp01((frame - last) / 3); }
+            else { clip = drawAnimation; progress = Mathf.InverseLerp(Mathf.Max(0, last + 3), next, frame); }
+        }
         Sample(clip, progress);
     }
 

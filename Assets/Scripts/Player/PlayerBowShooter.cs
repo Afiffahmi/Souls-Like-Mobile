@@ -82,7 +82,9 @@ public sealed partial class PlayerBowShooter : MonoBehaviour
     private struct ReleaseRequest
     {
         public Vector3 direction, groundPoint;
-        public bool heavy, foundGround;
+        public bool heavy, foundGround, special, highSpecial;
+        public int specialSequence;
+        public BowSpecialAttackSettings specialSettings;
         public float damage, knockbackDuration;
         public ElementalGems.GemAttack gem;
         public ElementalGems.GemManager owner;
@@ -90,6 +92,7 @@ public sealed partial class PlayerBowShooter : MonoBehaviour
     }
     private readonly Queue<ReleaseRequest> pendingReleases = new Queue<ReleaseRequest>();
     public event System.Action<BowArrowProjectile> ArrowSpawned;
+    public event System.Action<BowSpecialWave> SpecialWaveSpawned;
 
     private void Awake()
     {
@@ -104,6 +107,8 @@ public sealed partial class PlayerBowShooter : MonoBehaviour
     {
         player.BowReleased -= QueueArrow;
         pendingReleases.Clear();
+        specialTargetUses.Clear();
+        specialTargetSequence = -1;
     }
 
     private void QueueArrow()
@@ -113,10 +118,15 @@ public sealed partial class PlayerBowShooter : MonoBehaviour
         var defaults = player.CurrentAttackDefaults ?? player.CaptureAttackDefaults(PlayerCombatMode.Bow,request.heavy?CombatAttackInput.HeavyAttack:CombatAttackInput.LightAttack);
         request.knockbackDuration = stats.KnockbackDurationMultiplier * defaults.knockbackDurationScale;
         request.damage = stats.Damage(defaults.damage);
+        request.special = player.IsBowSpecialAttacking;
+        request.specialSequence = player.BowSpecialSequence;
+        request.highSpecial = request.special && player.CurrentBowSpecialDamagePhase == BowSpecialDamagePhase.High;
+        if (request.special) { request.damage = player.CurrentBowSpecialDamage; request.specialSettings = player.CurrentBowSpecialSettings; }
         request.owner = GetComponent<ElementalGems.GemManager>();
         // Light shots earn gem powers only after a full hold; heavy shots keep their own rules.
-        bool useGem = request.heavy || player.IsBowLightGemCharged;
+        bool useGem = request.special || request.heavy || player.IsBowLightGemCharged;
         request.gem = useGem && request.owner != null ? request.owner.Capture() : new ElementalGems.GemAttack(null);
+        if (request.special) request.gem = request.gem.WithKnockbackMultiplier(request.highSpecial ? request.specialSettings.highKnockbackMultiplier : request.specialSettings.lowKnockbackMultiplier, request.specialSettings.baseKnockback);
         request.field = request.heavy && heavyGroundField != null ? heavyGroundField.Capture(request.gem.element, heavyImpactRadius, stats.DamageMultiplier, request.knockbackDuration) : null;
         // Snapshot each release separately; later target movement cannot redirect an arrow in flight.
         if (request.heavy && player.IsBowHeavyChargedAttack)
@@ -139,20 +149,48 @@ public sealed partial class PlayerBowShooter : MonoBehaviour
 
     private void SpawnArrow(ReleaseRequest request)
     {
+        if (request.special && (!player.IsBowSpecialAttacking || player.BowSpecialSequence != request.specialSequence)) return;
         if (arrowPrefab == null || !visuals.isActiveAndEnabled) return;
         Transform origin = launchPoint != null ? launchPoint : visuals.BowModel;
         if (origin == null) return;
         Vector3 start = origin.TransformPoint(launchOffset);
+        if (request.highSpecial)
+        {
+            // Aim at the lock when available; otherwise release forward instead of dropping the shot.
+            request.direction = GetSpecialHighDirection(start);
+            var waveObject = new GameObject("Bow Special (Piercing Force)");
+            SceneManager.MoveGameObjectToScene(waveObject, gameObject.scene);
+            waveObject.transform.position = start;
+            var wave = waveObject.AddComponent<BowSpecialWave>();
+            wave.Initialize(player.transform, request.owner, request.gem, request.damage, request.knockbackDuration, request.specialSettings, request.direction, hitLayers);
+            SpecialWaveSpawned?.Invoke(wave);
+            return;
+        }
         Vector3 releaseDirection = request.heavy ? (request.groundPoint - start).normalized : request.direction;
+        Enemy specialTarget = null;
+        if (request.special)
+        {
+            specialTarget = SelectSpecialLowTarget(start, request, out var aim);
+            if (specialTarget != null)
+            {
+                FaceUnlockedSpecialTarget(aim);
+                // Rotating the body also moves the animated bow socket. Spawn from its new position.
+                start = origin.TransformPoint(launchOffset);
+                releaseDirection = (aim - start).normalized;
+            }
+        }
         if (releaseDirection.sqrMagnitude < 0.0001f) releaseDirection = Vector3.down;
         var arrow = Instantiate(arrowPrefab, start,
             Quaternion.LookRotation(releaseDirection, Mathf.Abs(releaseDirection.y) > 0.999f ? Vector3.forward : Vector3.up));
-        arrow.name = "Arrow (Flying)";
+        SceneManager.MoveGameObjectToScene(arrow.gameObject, gameObject.scene);
+        arrow.name = request.special ? "Arrow (Special Low)" : "Arrow (Flying)";
         var payload = arrow.GetComponent<ElementalGems.GemArrowPayload>() ?? arrow.gameObject.AddComponent<ElementalGems.GemArrowPayload>();
         payload.Initialize(request.gem, request.owner, request.damage, heavyImpactRadius, request.field, request.knockbackDuration);
         float elementalSpeed = arrowSpeed * request.gem.projectileSpeed;
         if (request.heavy)
             arrow.LaunchAtGround(player.transform, request.groundPoint, request.foundGround, elementalSpeed, arrowLifetime, hitLayers);
+        else if (specialTarget != null)
+            arrow.LaunchSpecialTargeted(player.transform, specialTarget, releaseDirection, elementalSpeed, arrowLifetime, hitLayers);
         else
             arrow.Launch(player.transform, releaseDirection, elementalSpeed, arrowLifetime, hitLayers);
         ArrowSpawned?.Invoke(arrow);

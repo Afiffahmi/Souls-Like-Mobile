@@ -57,7 +57,7 @@ public partial class PlayerStateManager
     [Min(.01f)] public float bowLightChargeSeconds = 4f;
     [SerializeField, HideInInspector] private bool attackDefaultsInitialized;
     private AttackDefaultSettings activeAttackDefaults, bowAttackDefaults, bowHeavyAttackDefaults;
-    public AttackDefaultSettings CurrentAttackDefaults => bowHeavyActive ? bowHeavyAttackDefaults :
+    public AttackDefaultSettings CurrentAttackDefaults => bowSpecialActive ? bowSpecialDefaults : bowHeavyActive ? bowHeavyAttackDefaults :
         bowAttackActive ? bowAttackDefaults : activeAttackDefaults;
 
     public AttackDefaultSettings GetAttackDefaults(PlayerCombatMode mode, CombatAttackInput input)

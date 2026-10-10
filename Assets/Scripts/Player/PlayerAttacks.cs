@@ -26,14 +26,14 @@ public partial class PlayerStateManager
     public float AttackRecoveryRemaining => (float)System.Math.Max(0, attackRecoveryUntil - AttackClock);
     private InputAction lightAttackAction, heavyAttackAction, specialAttackAction;
 
-    public bool IsAttacking => bowHeavyActive || bowAttackActive || attackPendingOrActive || (anim != null && anim.isInitialized &&
+    public bool IsAttacking => bowSpecialActive || bowHeavyActive || bowAttackActive || attackPendingOrActive || (anim != null && anim.isInitialized &&
         (anim.GetCurrentAnimatorStateInfo(0).IsTag("CombatAttack") ||
          (anim.IsInTransition(0) && anim.GetNextAnimatorStateInfo(0).IsTag("CombatAttack"))));
     public bool HasBufferedAttack => followUpBuffered;
     // Includes the accepted request before Animator entry and every chained step.
-    public bool IsAttackMovementLocked => swordSpecialActive || swordHeavyActive || bowHeavyActive || bowAttackActive || (attackPendingOrActive && activeAttackInput == CombatAttackInput.LightAttack);
-    public int CurrentAttackNumber => bowHeavyActive ? (bowHeavyCharged ? 2 : 1) : bowAttackActive ? 1 : IsAttacking ? activeAttackIndex + 1 : 0;
-    public CombatAttackInput? CurrentAttackInput => bowHeavyActive ? CombatAttackInput.HeavyAttack : bowAttackActive ? CombatAttackInput.LightAttack :
+    public bool IsAttackMovementLocked => bowSpecialActive || swordSpecialActive || swordHeavyActive || bowHeavyActive || bowAttackActive || (attackPendingOrActive && activeAttackInput == CombatAttackInput.LightAttack);
+    public int CurrentAttackNumber => bowSpecialActive ? (bowSpecialHigh ? 2 : 1) : bowHeavyActive ? (bowHeavyCharged ? 2 : 1) : bowAttackActive ? 1 : IsAttacking ? activeAttackIndex + 1 : 0;
+    public CombatAttackInput? CurrentAttackInput => bowSpecialActive ? CombatAttackInput.SpecialAttack : bowHeavyActive ? CombatAttackInput.HeavyAttack : bowAttackActive ? CombatAttackInput.LightAttack :
         IsAttacking ? activeAttackInput : (CombatAttackInput?)null;
     public float SpecialAttackCooldownRemaining => GetSpecialAttackCooldownRemaining(CombatMode);
 
@@ -83,6 +83,7 @@ public partial class PlayerStateManager
     public void SpecialAttack() => TryAttack(CombatAttackInput.SpecialAttack);
 
     public float GetSpecialAttackCooldownRemaining(PlayerCombatMode weapon) =>
+        weapon == PlayerCombatMode.Bow ? (float)System.Math.Max(0, bowSpecialCooldownUntil - AttackClock) :
         attackConfigurations.TryGetValue(weapon, out var configuration)
             ? specialCooldowns.Remaining(configuration, Time.timeAsDouble) : 0f;
 
@@ -91,9 +92,11 @@ public partial class PlayerStateManager
         if (!isActiveAndEnabled || !hasCombatParameters || anim == null || !anim.isActiveAndEnabled || !anim.isInitialized ||
             IsChangingEquipment || IsParrying || IsRolling || AttackRecoveryRemaining > 0 ||
             !System.Enum.IsDefined(typeof(CombatAttackInput), input)) return false;
-        if (IsAttacking) return !swordHeavyActive && !bowHeavyActive && !bowAttackActive && TryBufferAttack(input);
+        if (IsAttacking) return !bowSpecialActive && !swordHeavyActive && !bowHeavyActive && !bowAttackActive && TryBufferAttack(input);
         if (anim.IsInTransition(0) || !anim.GetCurrentAnimatorStateInfo(0).IsTag("CombatLocomotion") ||
             anim.GetInteger(ParryReturnModeHash) != (int)CombatMode) return false;
+        if (CombatMode == PlayerCombatMode.Bow && input == CombatAttackInput.SpecialAttack)
+            return TryBeginBowSpecialAttack();
         if (CombatMode == PlayerCombatMode.Bow && input == CombatAttackInput.HeavyAttack)
             return TryBeginBowHeavyAttack();
         if (CombatMode == PlayerCombatMode.Bow && input == CombatAttackInput.LightAttack)
@@ -146,6 +149,7 @@ public partial class PlayerStateManager
 
     private void MaintainAttackLock()
     {
+        if (bowSpecialActive) { UpdateBowSpecialAttack(); return; }
         if (swordSpecialActive)
         {
             UpdateSwordSpecialAttack();
@@ -215,6 +219,7 @@ public partial class PlayerStateManager
 
     private void NotifyAttackLocomotionEntered(PlayerCombatMode mode)
     {
+        if (bowSpecialActive && bowSpecialEntered) ResetBowSpecialAttack();
         if (bowHeavyActive && bowHeavyEntered) ResetBowHeavyAttack();
         if (bowAttackActive && bowStateEntered) ResetBowAttack();
         // Do not cancel an accepted trigger before its first attack state enters.
@@ -224,6 +229,7 @@ public partial class PlayerStateManager
 
     private void ResetAttackSequence()
     {
+        ResetBowSpecialAttack();
         ResetSwordSpecialAttack();
         ResetSwordHeavyAttack();
         swordLightCombo.Reset();
