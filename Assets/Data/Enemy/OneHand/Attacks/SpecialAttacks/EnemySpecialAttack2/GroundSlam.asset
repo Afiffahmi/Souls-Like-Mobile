@@ -1,0 +1,44 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b0a784e11731b3944b3dc3c9cc3303ed, type: 3}
+  m_Name: GroundSlam
+  m_EditorClassIdentifier: Assembly-CSharp::SoulsLike.Enemies.EnemyGroundSlamAction
+  radius: 4
+  heightTolerance: 1.5
+  localImpactOffset: {x: 0, y: 0, z: 0}
+  groundAndObstacles:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  requireLineOfSight: 1
+  useInnateElement: 1
+  elementPalette:
+  - {fileID: 11400000, guid: ba705c956669766439c287df10ec5f29, type: 2}
+  - {fileID: 11400000, guid: 6212608da8c335d4181970297fe9e31d, type: 2}
+  - {fileID: 11400000, guid: 632cfb580161996498100bbfe1af4b27, type: 2}
+  - {fileID: 11400000, guid: ec5af00be1dbcb7498075d95fecd4fbc, type: 2}
+  - {fileID: 11400000, guid: c2c86ca0377cef840837d3077173fca9, type: 2}
+  - {fileID: 11400000, guid: bffc41e94cf8c2a4d99a11459c905545, type: 2}
+  - {fileID: 11400000, guid: 8a1c714da87185d47bb359aee070c62f, type: 2}
+  - {fileID: 11400000, guid: 9fe7a519302f4684da1ea5622ab4e8df, type: 2}
+  groundMaterial: {fileID: 2100000, guid: 0a1970bb6ab41e947b6c98e80b5654c7, type: 2}
+  particleMaterial: {fileID: 2100000, guid: 47b83fb02300e6745b8b94e8f00a56d5, type: 2}
+  energyMaterial: {fileID: 2100000, guid: ad6cccbe01bad2f46b322a66dd9473c6, type: 2}
+  effectLifetime: 2.5
+  effectSpeed: 1
+  edgeRoughness: 0.2
+  crackGlow: 2.2
+  crackOpacity: 0.65
+  crackWidth: 0.075
+  coreRadiusRatio: 0.22
+  coreOpacity: 0.85
+  crackDetail: 4
+  particleCount: 24

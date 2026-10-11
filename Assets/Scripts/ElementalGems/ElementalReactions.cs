@@ -41,6 +41,7 @@ namespace ElementalGems
         }
         static void Resolve(ElementalEnemy target, ElementType previous, ElementType linked, Chain chain)
         {
+            if (target.Health != null && target.Health.IsInvulnerable) return;
             var reaction = Recipe(previous, chain.attack.element);
             if (reaction == ElementalReaction.None || chain.reacted.Count >= 24 || !chain.reacted.Add(target.Health)) return;
             if (reaction == ElementalReaction.Purification)
@@ -143,7 +144,7 @@ namespace ElementalGems
         internal static ElementalEnemy Contact(Enemy enemy, ElementType linked, float damage, Chain chain)
         {
             // Each enemy takes propagated damage at most once in the entire reaction chain.
-            if (enemy == null || enemy.IsDead || !enemy.isActiveAndEnabled || chain.contacted.Count >= 24 || !chain.contacted.Add(enemy)) return null;
+            if (enemy == null || enemy.IsDead || enemy.IsInvulnerable || !enemy.isActiveAndEnabled || chain.contacted.Count >= 24 || !chain.contacted.Add(enemy)) return null;
             var target = ElementalEnemy.GetOrAdd(enemy);
             if (!target.isActiveAndEnabled || target.Resistance(chain.attack.element) <= 0) return null;
             ElementType previous = target.CurrentElement;

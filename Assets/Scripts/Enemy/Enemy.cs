@@ -21,6 +21,7 @@ public class Enemy : MonoBehaviour
     [SerializeField] private bool debugLog = true;
 
     public bool IsDead => currentHealth <= 0;
+    public bool IsInvulnerable => TryGetComponent<SoulsLike.Enemies.EnemyBrain>(out var brain) && brain.IsAttackProtected;
     public int MaxHealth => maxHealth;
     public int CurrentHealth => currentHealth;
     /// <summary>Valid during OnDamaged. Damage can reduce health without interrupting an AI animation.</summary>
@@ -53,7 +54,7 @@ public class Enemy : MonoBehaviour
 
     public void TakeDamage(int damage, bool requestHitReaction)
     {
-        if (IsDead) return;
+        if (IsDead || IsInvulnerable) return;
         if (damage < 0) damage = 0;
 
         currentHealth -= damage;

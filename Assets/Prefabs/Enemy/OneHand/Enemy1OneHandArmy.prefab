@@ -1456,6 +1456,11 @@ MonoBehaviour:
   targetOverride: {fileID: 0}
   attackOrigin: {fileID: 1938501571269366396}
   postAttackStandbySeconds: 1
+  debugRepeatSpecialAttacks: 0
+  debugBypassHealthMilestone: 0
+  debugIgnoreSpecialCooldown: 1
+  debugSpecialRepeatDelay: 0.5
+  debugSpecialAttacks: []
   state: 0
 --- !u!114 &2062626576660339232
 MonoBehaviour:
@@ -1498,10 +1503,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5c467fac971030e428294c18ac16cba7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SoulsLike.Enemies.EnemyArmyAura
-  energyMaterial: {fileID: 2100000, guid: c34ce8dfe4c43a34284faf2aec1cf899, type: 2}
+  energyMaterial: {fileID: 2100000, guid: fffe6d1f0fe11ce448c0205529eb1f9d, type: 2}
+  elementPalette:
+  - {fileID: 11400000, guid: ba705c956669766439c287df10ec5f29, type: 2}
+  - {fileID: 11400000, guid: 6212608da8c335d4181970297fe9e31d, type: 2}
+  - {fileID: 11400000, guid: 632cfb580161996498100bbfe1af4b27, type: 2}
+  - {fileID: 11400000, guid: ec5af00be1dbcb7498075d95fecd4fbc, type: 2}
+  - {fileID: 11400000, guid: c2c86ca0377cef840837d3077173fca9, type: 2}
+  - {fileID: 11400000, guid: bffc41e94cf8c2a4d99a11459c905545, type: 2}
+  - {fileID: 11400000, guid: 8a1c714da87185d47bb359aee070c62f, type: 2}
+  - {fileID: 11400000, guid: 9fe7a519302f4684da1ea5622ab4e8df, type: 2}
+  flameShellWidth: 0.065
+  bodyWispsPerSecond: 45
   auraColor: {r: 0.35, g: 0.75, b: 1, a: 1}
-  glowIntensity: 1.25
-  opacity: 0.6
+  glowIntensity: 1.5
+  opacity: 0.85
   modelRenderers:
   - {fileID: 1490816183018306573}
   - {fileID: 6277535981837952418}

@@ -17,7 +17,8 @@ MonoBehaviour:
   trigger: 1
   stateName: EnemySpecialAttack1
   animation: {fileID: 7400000, guid: b495226bfced3464c8fd8198d306d17e, type: 2}
-  playbackSpeed: 1
+  playbackSpeed: 2
+  jumpSpeedMultiplier: 1
   windupSpeedMultiplier: 0.65
   minimumRange: 0
   range: 12
@@ -25,6 +26,14 @@ MonoBehaviour:
   damage: 12
   cooldown: 12
   dealsDamage: 0
+  showAttackCue: 0
+  canBeParried: 1
+  attackCueFrame: 3
+  invulnerableAfterCue: 0
+  cueDuration: 0.65
+  cueRadius: 0.75
+  cueMaterial: {fileID: 0}
+  applyElementToPlayer: 0
   movement: 0
   movementDirection: 2
   movementDistance: 3

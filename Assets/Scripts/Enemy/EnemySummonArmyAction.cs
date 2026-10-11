@@ -12,6 +12,8 @@ namespace SoulsLike.Enemies
         [Range(1, MaximumArmySize)] public int spawnCount = 5;
         [Tooltip("Living soldiers across ALL summon actions on this enemy. Never more than five.")]
         [Range(1, MaximumArmySize)] public int maxAlive = 5;
+        [Tooltip("Clip frames between soldiers. Starts at the attack's Action Frame. Automatically shortened if needed to fit the wave before the same animation ends. Interrupting the cast cancels soldiers not yet spawned.")]
+        [Min(1)] public float spawnDelayFrames = 5f;
         [Min(1)] public float spawnRadius = 3f;
         [Min(.1f)] public float minimumSpacing = 1.2f;
         [Tooltip("How far a ring position can adjust to the NavMesh. Blocked positions are skipped.")]
@@ -29,7 +31,7 @@ namespace SoulsLike.Enemies
             var motor = source.GetComponent<EnemyNavMeshMotor>();
             if (motor == null || !motor.Ready) return false;
             var army = source.GetComponent<EnemySummoner>();
-            return army == null || army.LivingCount < Mathf.Clamp(maxAlive, 1, MaximumArmySize);
+            return army == null || army.LivingCount + army.PendingCount < Mathf.Clamp(maxAlive, 1, MaximumArmySize);
         }
         public override void Execute(EnemyAttackContext context)
         {

@@ -50,7 +50,8 @@ namespace SoulsLike.Enemies.Editor
             if (definitions.TryGetValue(attack.stateName, out var existing) && existing == attack) return;
             if (used.Contains(attack.stateName)) throw new System.InvalidOperationException("Duplicate/reserved state name: " + attack.stateName);
             definitions.Add(attack.stateName, attack);
-            Set(machine, attack.stateName, attack.animation, attack.playbackSpeed, used);
+            // Attack speed comes from the runtime parameter, so Inspector edits apply immediately.
+            Set(machine, attack.stateName, attack.animation, 1f, used);
             var state = Find(machine, attack.stateName);
             state.speedParameter = EnemyAnimationDriver.AttackPhaseSpeedParameter;
             state.speedParameterActive = true;
@@ -153,10 +154,30 @@ namespace SoulsLike.Enemies.Editor
                 (followUp ? "Follow-up: " : "") + attack.name + (attack.available ? "" : " (disabled)"), true);
             if (expanded) expandedAttacks.Add(attack); else expandedAttacks.Remove(attack);
             EditorGUILayout.PropertyField(view.FindProperty("dealsDamage"));
-            using (new EditorGUI.DisabledScope(!view.FindProperty("dealsDamage").boolValue))
+            using (new EditorGUI.DisabledScope(!view.FindProperty("dealsDamage").boolValue && !(attack.animationAction is EnemyGroundSlamAction)))
                 EditorGUILayout.PropertyField(view.FindProperty("damage"), new GUIContent("Damage to Player"));
-            if (expanded) DrawPropertiesExcluding(view, "m_Script", "dealsDamage", "damage");
+            if (expanded)
+            {
+                EditorGUILayout.HelpBox("Playback Speed changes the whole clip. Jump Speed Multiplier changes only the movement frames; Windup Speed Multiplier also applies before impact. Cue Frame starts the red/yellow warning and optional protection until animation completion. Yellow attacks can still be interrupted by a successful parry. Apply Element To Player enables gem changes/reactions; leave it off for normal attacks.", MessageType.None);
+                DrawPropertiesExcluding(view, "m_Script", "dealsDamage", "damage");
+            }
             view.ApplyModifiedProperties();
+            if (expanded && attack.animationAction is EnemySummonArmyAction summon)
+            {
+                EditorGUILayout.LabelField("Summon Army Settings", EditorStyles.boldLabel);
+                EditorGUILayout.HelpBox("Spawn Delay Frames spaces soldiers within this same cast. Each soldier inherits the summoner's Innate Element once at spawn, overriding the army prefab's element. Temporary changes to the boss never affect this choice or existing soldiers. Each soldier then uses its OWN elemental state, aura and reaction timers.", MessageType.None);
+                var summonView = Inline(summon);
+                DrawPropertiesExcluding(summonView, "m_Script");
+                summonView.ApplyModifiedProperties();
+            }
+            else if (expanded && attack.animationAction != null)
+            {
+                EditorGUILayout.LabelField("Animation Action Settings", EditorStyles.boldLabel);
+                EditorGUILayout.HelpBox("Ground Slam uses Damage to Player above. Action Frame triggers the impact once; Movement Start/End Frame controls the jump. These action settings are shared by attacks using this asset.", MessageType.None);
+                var actionView = Inline(attack.animationAction);
+                DrawPropertiesExcluding(actionView, "m_Script");
+                actionView.ApplyModifiedProperties();
+            }
             EditorGUILayout.EndVertical();
             if (attack.followUpSteps != null)
                 foreach (var step in attack.followUpSteps) DrawAttack(step, true);

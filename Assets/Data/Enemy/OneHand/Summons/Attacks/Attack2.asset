@@ -18,6 +18,7 @@ MonoBehaviour:
   stateName: Attack2
   animation: {fileID: 7400000, guid: 738785cbbaf0e3f46a116d072b49de6a, type: 2}
   playbackSpeed: 1
+  jumpSpeedMultiplier: 1
   windupSpeedMultiplier: 0.5
   minimumRange: 0
   range: 2.6
@@ -25,6 +26,14 @@ MonoBehaviour:
   damage: 20
   cooldown: 3
   dealsDamage: 1
+  showAttackCue: 1
+  canBeParried: 1
+  attackCueFrame: 3
+  invulnerableAfterCue: 1
+  cueDuration: 0.65
+  cueRadius: 0.75
+  cueMaterial: {fileID: 2100000, guid: d51b4da13c690cc4c9c8462ccfdc4e4f, type: 2}
+  applyElementToPlayer: 0
   movement: 0
   movementDirection: 2
   movementDistance: 3

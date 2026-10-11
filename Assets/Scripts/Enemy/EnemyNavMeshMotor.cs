@@ -8,9 +8,13 @@ namespace SoulsLike.Enemies
     {
         public NavMeshAgent Agent { get; private set; }
         public bool Ready => Agent != null && Agent.enabled && Agent.isOnNavMesh;
+        public Vector3 NavigationPosition => Ready ? Agent.nextPosition : transform.position;
         private float nextPath;
         private Vector3[] resetCorners;
         private float resetLength, resetProgress;
+        private int resetNextCorner, attackNextCorner;
+        private Vector3[] attackCorners;
+        private Vector3 attackMoveStart;
         private Vector3 attackMoveDirection;
         private float attackMoveDistance, attackMoveProgress;
         private void Awake() => Agent = GetComponent<NavMeshAgent>();
@@ -19,6 +23,15 @@ namespace SoulsLike.Enemies
             if (Agent == null) Agent = GetComponent<NavMeshAgent>();
             Agent.updateRotation = false; Agent.speed = profile.movementSpeed;
             Agent.acceleration = profile.acceleration; Agent.autoBraking = true;
+        }
+        public Vector3 ResolveHomePosition(Vector3 spawnPosition)
+        {
+            // Scene roots can sit above/below the baked surface before the first
+            // agent synchronization. Store a reachable home, not that visual height.
+            if (Agent != null && NavMesh.SamplePosition(spawnPosition, out var hit, 2f,
+                new NavMeshQueryFilter { agentTypeID = Agent.agentTypeID, areaMask = Agent.areaMask }))
+                return hit.position;
+            return spawnPosition;
         }
         public void Stop()
         {
@@ -55,6 +68,7 @@ namespace SoulsLike.Enemies
             var path = new NavMeshPath();
             if (!Agent.CalculatePath(home, path) || path.status != NavMeshPathStatus.PathComplete) return false;
             resetCorners = path.corners; resetLength = resetProgress = 0;
+            resetNextCorner = 1;
             for (int i = 1; i < resetCorners.Length; i++) resetLength += Vector3.Distance(resetCorners[i - 1], resetCorners[i]);
             Stop();
             // Face away from travel so the animation reads as a backward jump.
@@ -68,33 +82,19 @@ namespace SoulsLike.Enemies
         public void TickResetPosition(float progress, float rotationSpeed)
         {
             if (!Ready || resetCorners == null) return;
-            if (progress <= resetProgress || resetCorners.Length < 2) return;
+            if (resetCorners.Length < 2) return;
             resetProgress = Mathf.Max(resetProgress, progress);
-            float remaining = Mathf.Clamp01(progress) * resetLength;
-            Vector3 destination = resetCorners[resetCorners.Length - 1];
-            for (int i = 1; i < resetCorners.Length; i++)
-            {
-                float length = Vector3.Distance(resetCorners[i - 1], resetCorners[i]);
-                if (remaining <= length)
-                {
-                    destination = Vector3.Lerp(resetCorners[i - 1], resetCorners[i], length > .0001f ? remaining / length : 1);
-                    break;
-                }
-                remaining -= length;
-            }
-            // Absolute animation progress avoids dropping travel when the agent's
-            // Transform synchronization occurs later than this Update.
-            Vector3 delta = destination - Agent.nextPosition;
-            if (delta.sqrMagnitude < .000001f) return;
-            Face(-delta, rotationSpeed);
-            Agent.Move(delta);
+            Vector3 before = Agent.nextPosition;
+            MoveAlongPath(resetCorners, resetProgress * resetLength, ref resetNextCorner);
+            Face(before - Agent.nextPosition, rotationSpeed);
         }
         public void CancelResetPosition() { resetCorners = null; resetProgress = resetLength = 0; Stop(); }
         public void BeginAttackMovement(EnemyAttackDefinition attack, EnemyTarget target)
         {
             CancelAttackMovement();
             if (!Ready || attack.movement == EnemyAttackMotion.AnimationOnly) return;
-            Vector3 toward = target != null ? target.GroundPosition - transform.position : transform.forward;
+            attackMoveStart = Agent.nextPosition;
+            Vector3 toward = target != null ? target.GroundPosition - attackMoveStart : transform.forward;
             toward = Vector3.ProjectOnPlane(toward, Vector3.up);
             attackMoveDirection = attack.movementDirection == EnemyAttackDirection.Backward ? -transform.forward :
                 attack.movementDirection == EnemyAttackDirection.TowardTarget ? toward.normalized :
@@ -103,9 +103,29 @@ namespace SoulsLike.Enemies
             attackMoveDistance = attack.movementDistance;
             if (attack.movementDirection == EnemyAttackDirection.TowardTarget)
                 attackMoveDistance = Mathf.Min(attackMoveDistance, Mathf.Max(0, toward.magnitude - attack.targetStoppingDistance));
-            // A dash/jump cannot cut through a NavMesh boundary or across a gap.
-            if (Agent.Raycast(transform.position + attackMoveDirection * attackMoveDistance, out var hit))
-                attackMoveDistance = Mathf.Min(attackMoveDistance, Mathf.Max(0, Vector3.Distance(transform.position, hit.position) - .05f));
+            Vector3 destination = attackMoveStart + attackMoveDirection * attackMoveDistance;
+            if (attack.movement == EnemyAttackMotion.Jump)
+            {
+                // Use the baked route rather than silently shortening a jump to zero
+                // at the first edge. Never teleport through an obstruction or gap.
+                var filter = new NavMeshQueryFilter { agentTypeID = Agent.agentTypeID, areaMask = Agent.areaMask };
+                if (target != null && attack.movementDirection == EnemyAttackDirection.TowardTarget)
+                    destination.y = target.GroundPosition.y;
+                var path = new NavMeshPath();
+                if (NavMesh.SamplePosition(destination, out var landing, 2f, filter) &&
+                    Agent.CalculatePath(landing.position, path) && path.status == NavMeshPathStatus.PathComplete)
+                {
+                    attackCorners = path.corners;
+                    attackNextCorner = 1;
+                    float length = 0;
+                    for (int i = 1; i < attackCorners.Length; i++) length += Vector3.Distance(attackCorners[i - 1], attackCorners[i]);
+                    attackMoveDistance = Mathf.Min(Mathf.Max(0, attack.movementDistance), length);
+                    return;
+                }
+            }
+            // Dashes and unreachable jumps stop safely before a boundary.
+            if (Agent.Raycast(destination, out var hit))
+                attackMoveDistance = Mathf.Min(attackMoveDistance, Mathf.Max(0, Vector3.Distance(attackMoveStart, hit.position) - .05f));
         }
         public void TickAttackMovement(EnemyAttackDefinition attack, float time)
         {
@@ -113,11 +133,33 @@ namespace SoulsLike.Enemies
             float frame = time * attack.animation.length * attack.animation.frameRate;
             float progress = Mathf.InverseLerp(attack.movementStartFrame, attack.movementEndFrame, frame);
             if (attack.movement == EnemyAttackMotion.Jump) progress = Mathf.SmoothStep(0, 1, progress);
-            float distance = Mathf.Max(0, progress - attackMoveProgress) * attackMoveDistance;
             attackMoveProgress = Mathf.Max(attackMoveProgress, progress);
-            if (distance > 0) Agent.Move(attackMoveDirection * distance);
+            if (attackCorners != null)
+                MoveAlongPath(attackCorners, attackMoveProgress * attackMoveDistance, ref attackNextCorner);
+            else if (attackMoveDistance > 0)
+                Agent.Move(attackMoveStart + attackMoveDirection * (attackMoveProgress * attackMoveDistance) - Agent.nextPosition);
         }
-        public void CancelAttackMovement() { attackMoveDistance = attackMoveProgress = 0; attackMoveDirection = Vector3.zero; }
+        private void MoveAlongPath(Vector3[] corners, float distance, ref int nextCorner)
+        {
+            // Visit every crossed corner in order, even if one animation tick covers
+            // several segments. Moving directly to the final point cuts across walls.
+            float remaining = Mathf.Max(0, distance);
+            for (int i = 1; i < corners.Length; i++)
+            {
+                float length = Vector3.Distance(corners[i - 1], corners[i]);
+                bool reachedCorner = remaining >= length;
+                if (i >= nextCorner)
+                {
+                    Vector3 destination = reachedCorner ? corners[i] : Vector3.Lerp(corners[i - 1], corners[i], length > .0001f ? remaining / length : 1);
+                    Agent.Move(destination - Agent.nextPosition);
+                    if (!reachedCorner || (Agent.nextPosition - destination).sqrMagnitude > .0025f) return;
+                    nextCorner = i + 1;
+                }
+                if (!reachedCorner) return;
+                remaining -= length;
+            }
+        }
+        public void CancelAttackMovement() { attackCorners = null; attackNextCorner = 1; attackMoveDistance = attackMoveProgress = 0; attackMoveDirection = Vector3.zero; }
         private void OnDisable() => Stop();
     }
 }

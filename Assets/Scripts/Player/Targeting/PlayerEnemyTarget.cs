@@ -23,15 +23,26 @@ namespace SoulsLike.Enemies
         public override bool ReceiveDamage(int damage, EnemyBrain source) => ReceiveDamage(damage, source, true);
         public override bool ReceiveDamage(int damage, EnemyBrain source, bool allowParry)
         {
-            if (!IsAlive || health.IsInvulnerable || damage <= 0 || (evadeDuringRoll && player != null && player.IsRolling)) return false;
-            if (allowParry && TryParryAttack(source)) return false;
-            if (blockWhileHoldingGuard && player != null && player.IsDefending) return false;
+            if (!CanReceiveHit(damage, source, allowParry)) return false;
+            int before = health.currentHealth;
+            health.TakeDamage(damage);
+            return health.currentHealth < before;
+        }
+        public override bool ReceiveElementalDamage(int damage, EnemyBrain source, ElementalGems.ElementType incoming, bool allowParry)
+        {
+            if (!CanReceiveHit(damage, source, allowParry)) return false;
+            var elemental = GetComponent<ElementalGems.PlayerElementalState>();
+            if (elemental != null && elemental.isActiveAndEnabled)
+            {
+                return elemental.ReceiveHit(damage, incoming);
+            }
             int before = health.currentHealth;
             health.TakeDamage(damage);
             return health.currentHealth < before;
         }
         public override bool TryParryAttack(EnemyBrain source)
         {
+            if (source != null && source.CurrentAttack != null && !source.CurrentAttack.canBeParried) return false;
             if (!IsAlive || health.IsInvulnerable || (evadeDuringRoll && player != null && player.IsRolling)) return false;
             // Confirm success at actual impact, using the same window as the held pose.
             // This releases the hold frame and lets the player's full follow-through play.
@@ -40,7 +51,7 @@ namespace SoulsLike.Enemies
                 ElementalGems.GemFeedback.Show(AimPosition, "PARRY!", new Color(.35f, .85f, 1f));
                 if (source != null && !source.Health.IsDead)
                 {
-                    source.Interrupt();
+                    source.ReceiveSuccessfulParry();
                     var elemental = source.GetComponent<ElementalGems.ElementalEnemy>();
                     Vector3 away = Vector3.ProjectOnPlane(source.transform.position - GroundPosition, Vector3.up);
                     if (away.sqrMagnitude < .0001f) away = transform.forward;
@@ -57,6 +68,12 @@ namespace SoulsLike.Enemies
                 return true;
             }
             return false;
+        }
+        private bool CanReceiveHit(int damage, EnemyBrain source, bool allowParry)
+        {
+            if (!IsAlive || health.IsInvulnerable || damage <= 0 || (evadeDuringRoll && player != null && player.IsRolling)) return false;
+            if (allowParry && TryParryAttack(source)) return false;
+            return !(blockWhileHoldingGuard && player != null && player.IsDefending);
         }
     }
 }

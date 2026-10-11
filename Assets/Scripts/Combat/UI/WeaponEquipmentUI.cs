@@ -22,6 +22,8 @@ using UnityEngine.UI;
 public sealed class WeaponEquipmentUI : MonoBehaviour
 {
     public PlayerWeaponEquipment equipment;
+    public SoulsLike.Riding.HorseEquipmentUI horseUI;
+    public bool HorseSelected { get; private set; }
     public WeaponAccessoryDefinition[] catalog;
     public GameObject panel;
     public Button openButton, closeButton, attachButton, removeButton, upgradeButton;
@@ -112,7 +114,7 @@ public sealed class WeaponEquipmentUI : MonoBehaviour
         panel.SetActive(true);
         openButton.gameObject.SetActive(false);
         Refresh();
-        feedback.text = "DMG per hit / TIME per action / KB before resistance. Ranges cover combo steps or tap / held attacks.";
+        feedback.text = HorseSelected ? SoulsLike.Riding.HorseEquipmentUI.Help : "DMG per hit / TIME per action / KB before resistance. Ranges cover combo steps or tap / held attacks.";
     }
     public void Close()
     {
@@ -129,11 +131,16 @@ public sealed class WeaponEquipmentUI : MonoBehaviour
     {
         var loadout = equipment != null ? equipment.Loadout(mode) : null;
         if (loadout?.definition == null || !loadout.definition.IsValid) return;
+        HorseSelected = false;
+        if (horseUI) horseUI.Leave();
+        upgradeButton.gameObject.SetActive(true);
+        weaponImage.enabled = true;
         SelectedWeapon = mode;
         SelectSlot(0);
     }
     public void SelectSlot(int index)
     {
+        if (HorseSelected && horseUI) { horseUI.SelectSlot(index); return; }
         var definition = equipment.Loadout(SelectedWeapon)?.definition;
         if (definition == null || index < 0 || index >= definition.slots.Length) return;
         SelectedSlot = definition.slots[index];
@@ -146,29 +153,40 @@ public sealed class WeaponEquipmentUI : MonoBehaviour
     }
     public void SelectAccessory(int index)
     {
+        if (HorseSelected && horseUI) { horseUI.SelectItem(index); return; }
         if (index < 0 || index >= visible.Length) return;
         SelectedAccessory = visible[index]; Refresh();
     }
     public void AttachSelected()
     {
+        if (HorseSelected && horseUI) { horseUI.Equip(); return; }
         if (SelectedAccessory == null || !visible.Contains(SelectedAccessory)) return;
         if (equipment.TryEquip(SelectedWeapon, SelectedSlot, SelectedAccessory))
         { Refresh(); feedback.text = DisplayName(SelectedAccessory) + " attached. Applies to the next attack."; }
     }
     public void RemoveSelectedSlot()
     {
+        if (HorseSelected && horseUI) { horseUI.Remove(); return; }
         if (equipment.TryEquip(SelectedWeapon, SelectedSlot, null))
         { Refresh(); feedback.text = SelectedSlot + " cleared. Accessory remains in your collection."; }
     }
     public void UpgradeSelectedWeapon()
     {
+        if (HorseSelected) { if (horseUI) horseUI.Upgrade(); return; }
         var loadout = equipment.Loadout(SelectedWeapon);
         if (loadout != null && equipment.TrySetUpgradeLevel(SelectedWeapon, loadout.upgradeLevel + 1))
         { Refresh(); feedback.text = WeaponTitle(loadout.definition) + " upgraded to level " + loadout.upgradeLevel + "."; }
     }
     void OnEquipmentChanged(PlayerCombatMode _) { if (equipment != null) Refresh(); }
+    public void SelectHorse()
+    {
+        if (!horseUI || !horseUI.equipment) return;
+        HorseSelected = true;
+        horseUI.SelectSlot(0);
+    }
     public void Refresh()
     {
+        if (HorseSelected && horseUI) { horseUI.Refresh(); return; }
         var loadout = equipment?.Loadout(SelectedWeapon);
         var definition = loadout?.definition;
         if (definition == null || !definition.IsValid) return;

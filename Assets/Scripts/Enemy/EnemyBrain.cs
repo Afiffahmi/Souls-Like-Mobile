@@ -49,6 +49,19 @@ namespace SoulsLike.Enemies
         private Vector3 progressPosition;
         private bool appliedHit, pendingContact, attackEntered, initialized, hitAnimationActive, hitAnimationEntered;
         private bool actionExecuted;
+        private bool attackCueShown, protectionBrokenByParry;
+        private EnemyAttackCue attackCue;
+        public bool IsAttackProtected
+        {
+            get
+            {
+                var attack = CurrentAttack;
+                if (!isActiveAndEnabled || state != EnemyState.Attacking || protectionBrokenByParry || attack == null ||
+                    !attack.HasDamagePayload || !attack.showAttackCue || !attack.invulnerableAfterCue || attack.animation == null) return false;
+                return animationDriver != null && animationDriver.TryGetTime(attack.stateName, out float time) &&
+                    time < 1f && time * attack.animation.length * attack.animation.frameRate >= attack.attackCueFrame;
+            }
+        }
         private bool spawnAnimationEntered;
         private int pendingHealthSpecials, healthSpecialThresholdsCrossed, lastHealthSpecialIndex = -1;
         private bool healthSpecialReturnRequired;
@@ -72,7 +85,7 @@ namespace SoulsLike.Enemies
             return false;
         }
         public int PendingHealthSpecials => pendingHealthSpecials;
-        private float nextResetHealthPercent, resetRetryAt;
+        private float nextResetHealthPercent;
         private bool resetPositionPending;
         private readonly RaycastHit[] sightHits = new RaycastHit[32];
         public Vector3 AttackPosition => attackOrigin != null ? attackOrigin.position : transform.position + Vector3.up;
@@ -86,8 +99,8 @@ namespace SoulsLike.Enemies
         private void Start()
         {
             if (profile == null) { Debug.LogError("Enemy AI requires an EnemyProfile.", this); enabled = false; return; }
-            HomePosition = transform.position; homeRotation = transform.rotation;
             attackReady = new float[profile.attacks.Length]; motor.Configure(profile);
+            HomePosition = motor.ResolveHomePosition(transform.position); homeRotation = transform.rotation;
             nextSense = Time.time + UnityEngine.Random.Range(0, profile.detectionInterval);
             initialized = true;
             nextResetHealthPercent = 100f - Mathf.Clamp(profile.resetPositionHealthInterval, 1f, 100f);
@@ -105,6 +118,7 @@ namespace SoulsLike.Enemies
         }
         private void OnDisable()
         {
+            if (attackCue != null) attackCue.Hide();
             if (Health != null) { Health.OnDamaged -= OnDamaged; Health.OnDeath -= OnDeath; }
             if (motor != null) motor.Stop();
             if (motor != null) motor.CancelResetPosition();
@@ -120,17 +134,17 @@ namespace SoulsLike.Enemies
             // Older ordinary prefabs can acquire elemental control on their first gem hit.
             if (status == null) status = GetComponent<EnemyControlStatus>();
             if (Health.IsDead) { if (state != EnemyState.Dying) OnDeath(); return; }
-            if (status != null && status.CannotAct)
+            if (status != null && status.CannotAct && !IsAttackProtected)
             {
                 if (state != EnemyState.TakingDamage && state != EnemyState.ResetPosition && state != EnemyState.Spawning) Interrupt();
                 motor.Stop(); return;
             }
             if (state == EnemyState.Spawning) { TickSpawn(); return; }
             if (state == EnemyState.ResetPosition) { TickResetPosition(); return; }
-            if (resetPositionPending && !ImmediateSpecialDebug && state != EnemyState.TakingDamage && Time.time >= resetRetryAt)
+            if (resetPositionPending && !ImmediateSpecialDebug && state != EnemyState.TakingDamage && !IsAttackProtected)
             {
                 if (BeginResetPosition()) return;
-                resetRetryAt = Time.time + 1f;
+                FallBackToWalkingReset();
             }
             if (state == EnemyState.TakingDamage)
             {
@@ -158,7 +172,7 @@ namespace SoulsLike.Enemies
                 if (healthSpecialReturnRequired)
                 {
                     // Failed/unavailable jump paths fall back to walking home; no attacks before arrival.
-                    if (Vector3.Distance(transform.position, HomePosition) > profile.homeTolerance)
+                    if (!HasReachedHome())
                     {
                         motor.MoveTo(HomePosition, profile.homeTolerance * .5f, profile, status != null ? status.MovementMultiplier : 1);
                         AnimateMotion(); return;
@@ -188,7 +202,7 @@ namespace SoulsLike.Enemies
                 }
                 if (state == EnemyState.Returning) { ReturnHome(); return; }
             }
-            if (state != EnemyState.Idle && !CanPursueTarget())
+            if (state != EnemyState.Idle && !CanPursueTarget() && !IsAttackProtected)
             { BeginReturn(); return; }
             if (state == EnemyState.Standby)
             {
@@ -242,6 +256,7 @@ namespace SoulsLike.Enemies
         }
         private static bool Valid(EnemyTarget target) => target != null && target.isActiveAndEnabled && target.IsAlive;
         private bool OutsideTerritory(Vector3 position) => (position - HomePosition).sqrMagnitude > profile.chaseRadius * profile.chaseRadius;
+        private bool HasReachedHome() => Vector3.Distance(motor.NavigationPosition, HomePosition) <= profile.homeTolerance;
         private bool CanPursueTarget() => Valid(Target) && !OutsideTerritory(Target.GroundPosition) && !OutsideTerritory(transform.position);
         private void Acquire()
         {
@@ -370,6 +385,8 @@ namespace SoulsLike.Enemies
             CurrentAttack = step;
             appliedHit = pendingContact = attackEntered = false; previousAttackTime = 0;
             actionExecuted = false;
+            attackCueShown = protectionBrokenByParry = false;
+            if (attackCue != null) attackCue.Hide();
             SetState(EnemyState.Attacking);
             motor.BeginAttackMovement(step, Target);
             animationDriver.PlayAttack(CurrentAttack, profile.transitionDuration);
@@ -378,16 +395,23 @@ namespace SoulsLike.Enemies
         private void TickAttack()
         {
             var attack = CurrentAttack;
-            if (attack == null || !Valid(Target)) { BeginReturn(); return; }
+            if (attack == null || (!Valid(Target) && !IsAttackProtected)) { BeginReturn(); return; }
             if (!animationDriver.TryGetTime(attack.stateName, out float time))
             {
                 if (attackEntered || Time.time - stateEntered > 1) FinishAttack();
                 return;
             }
             attackEntered = true;
+            float frame = time * attack.animation.length * attack.animation.frameRate;
+            if (!attackCueShown && attack.showAttackCue && attack.HasDamagePayload && frame >= attack.attackCueFrame && time < 1f)
+            {
+                attackCueShown = true;
+                if (attackCue == null) attackCue = gameObject.AddComponent<EnemyAttackCue>();
+                attackCue.Show(attack, animationDriver.animator);
+            }
             animationDriver.UpdateAttackSpeed(attack, time);
             motor.TickAttackMovement(attack, time);
-            if (time <= attack.turnUntil) motor.Face(Target.GroundPosition - transform.position, profile.rotationSpeed);
+            if (time <= attack.turnUntil && Valid(Target)) motor.Face(Target.GroundPosition - transform.position, profile.rotationSpeed);
             // Exact frame mode never delivers a delayed hit outside the authored window.
             // Legacy normalized mode retains crossing detection for existing profiles.
             bool inWindow = attack.useFrameWindow ? attack.IsInsideFrameWindow(time)
@@ -400,7 +424,7 @@ namespace SoulsLike.Enemies
                 if (activeWindow && CanHit(Target, attack))
                 {
                     pendingContact = true;
-                    if (Target.TryParryAttack(this)) { appliedHit = true; return; }
+                    if (attack.canBeParried && Target.TryParryAttack(this)) { appliedHit = true; return; }
                 }
                 float end = attack.useFrameWindow
                     ? attack.hitEndFrame / (attack.animation.length * attack.animation.frameRate) : attack.hitEnd;
@@ -464,6 +488,7 @@ namespace SoulsLike.Enemies
         }
         public void Interrupt()
         {
+            if (IsAttackProtected) return;
             if (!initialized || Health.IsDead || state == EnemyState.Dying || state == EnemyState.TakingDamage || state == EnemyState.ResetPosition || state == EnemyState.Spawning) return;
             hitElapsed = 0; hitAnimationEntered = false;
             float duration = profile.hit == null ? profile.hitReactionMilliseconds * .001f : 0;
@@ -472,6 +497,12 @@ namespace SoulsLike.Enemies
             float blend = duration > 0 ? Mathf.Min(profile.transitionDuration, duration * .25f) : profile.transitionDuration;
             hitAnimationActive = profile.hit != null && animationDriver.Play("Hit", blend, true);
             if (!hitAnimationActive) animationDriver.Locomotion(false, blend);
+        }
+        public void ReceiveSuccessfulParry()
+        {
+            if (CurrentAttack == null || !CurrentAttack.canBeParried || state != EnemyState.Attacking) return;
+            protectionBrokenByParry = true;
+            Interrupt();
         }
         private void OnDeath()
         {
@@ -487,7 +518,13 @@ namespace SoulsLike.Enemies
             if (motor.Agent != null) motor.Agent.enabled = false;
             if (profile.corpseLifetime > 0) Destroy(gameObject, Mathf.Max(profile.corpseLifetime, profile.die != null ? profile.die.length : 0));
         }
-        private void BeginReturn() { Target = null; CurrentAttack = null; standbyUntil = 0; SetState(EnemyState.Returning); }
+        private void BeginReturn()
+        {
+            Target = null; CurrentAttack = null; standbyUntil = 0;
+            motor.Stop();
+            SetState(EnemyState.Returning);
+            animationDriver.Locomotion(false, profile.transitionDuration);
+        }
         private void TickSpawn()
         {
             if (animationDriver.TryGetTime("Spawn", out float time))
@@ -519,6 +556,7 @@ namespace SoulsLike.Enemies
         }
         private void CompleteHealthSpecialReturn()
         {
+            RestoreElementAfterReset();
             healthSpecialReturnRequired = false;
             resetPositionPending = false;
             standbyUntil = Time.time + Mathf.Max(0, profile.resetPositionRecovery);
@@ -544,6 +582,7 @@ namespace SoulsLike.Enemies
             resetPositionPending = false;
             CurrentAttack = null; appliedHit = true; pendingContact = false;
             SetState(EnemyState.ResetPosition);
+            RestoreElementAfterReset();
             animationDriver.Play("ResetPosition", profile.transitionDuration, true);
             return true;
         }
@@ -553,8 +592,7 @@ namespace SoulsLike.Enemies
             {
                 if (Time.time - stateEntered > 1f)
                 {
-                    motor.CancelResetPosition(); resetPositionPending = true;
-                    resetRetryAt = Time.time + 1f; BeginReturn();
+                    FallBackToWalkingReset();
                 }
                 return;
             }
@@ -564,22 +602,32 @@ namespace SoulsLike.Enemies
             float travel = Mathf.InverseLerp(start, end, time * frames);
             motor.TickResetPosition(Mathf.SmoothStep(0, 1, travel), profile.rotationSpeed);
             if (time < 1) return;
+            bool reachedHome = HasReachedHome();
             motor.CancelResetPosition();
-            if (Vector3.Distance(transform.position, HomePosition) > profile.homeTolerance)
+            if (!reachedHome)
             {
-                // A newly blocked route must not teleport through the obstruction.
-                resetPositionPending = true; resetRetryAt = Time.time + 1f; BeginReturn(); return;
+                FallBackToWalkingReset(); return;
             }
-            healthSpecialReturnRequired = false;
-            resetPositionPending = false;
-            standbyUntil = Time.time + Mathf.Max(0, profile.resetPositionRecovery);
-            nextAttack = Mathf.Max(nextAttack, standbyUntil);
+            CompleteHealthSpecialReturn();
             if (CanPursueTarget()) SetState(EnemyState.Standby);
             else { Target = null; nextSense = standbyUntil; SetState(EnemyState.Idle); }
         }
+        private void FallBackToWalkingReset()
+        {
+            // Consume the attempted jump, but keep the health special queued.
+            // Replaying the jump every second could permanently prevent the special.
+            motor.CancelResetPosition();
+            resetPositionPending = false;
+            BeginReturn();
+        }
+        private void RestoreElementAfterReset()
+        {
+            var elemental = GetComponent<ElementalGems.ElementalEnemy>();
+            if (elemental != null) elemental.RestoreInnateElementForReset();
+        }
         private void ReturnHome()
         {
-            if (Vector3.Distance(transform.position, HomePosition) <= profile.homeTolerance)
+            if (HasReachedHome())
             {
                 motor.Stop(); transform.rotation = Quaternion.RotateTowards(transform.rotation, homeRotation, profile.rotationSpeed * Time.deltaTime);
                 animationDriver.Locomotion(false, profile.transitionDuration);
@@ -603,6 +651,7 @@ namespace SoulsLike.Enemies
         private void AnimateMotion() => animationDriver.Locomotion(motor.Ready && motor.Agent.velocity.sqrMagnitude > .01f, profile.transitionDuration);
         private void SetState(EnemyState next)
         {
+            if (next != EnemyState.Attacking && attackCue != null) attackCue.Hide();
             if (next != EnemyState.Attacking) { CurrentSequence = null; CurrentSequenceStep = 0; motor.CancelAttackMovement(); }
             if (next != EnemyState.Attacking) animationDriver.ResetAttackSpeed();
             state = next; stateEntered = lastProgress = Time.time; progressPosition = transform.position;

@@ -6,6 +6,7 @@ namespace SoulsLike.Enemies
     public abstract class EnemyAnimationAction : ScriptableObject
     {
         public abstract bool IsConfigured { get; }
+        public virtual bool DealsDamage => false;
         public virtual bool CanStart(EnemyBrain source) => IsConfigured && source != null &&
             source.isActiveAndEnabled && source.Health != null && !source.Health.IsDead;
         public abstract void Execute(EnemyAttackContext context);

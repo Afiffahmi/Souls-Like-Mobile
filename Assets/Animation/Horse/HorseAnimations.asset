@@ -1,0 +1,107 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 10da217d33a6bf14ba4e551c93ab6275, type: 3}
+  m_Name: HorseAnimations
+  m_EditorClassIdentifier: Assembly-CSharp::SoulsLike.Riding.HorseAnimationSet
+  horseController: {fileID: 9100000, guid: 2122e8e208651cf49bc3fd41b6ddc666, type: 2}
+  playerController: {fileID: 9100000, guid: 90abb2230c270cd42abb11a7d6409dd1, type: 2}
+  timeParameter: RideTime
+  transitionSeconds: 0.1
+  animations:
+  - motion: 0
+    horseState: Base Layer.Idle
+    playerState: Base Layer.PlayerHorseIdle
+    horseClip: {fileID: 7400000, guid: c354ae0e1c328d34bafb475f37c7cdad, type: 2}
+    playerClip: {fileID: 7400000, guid: 7d499baa7153595419d16f776a19a48b, type: 2}
+    horseControllerClip: {fileID: 7400000, guid: c354ae0e1c328d34bafb475f37c7cdad, type: 2}
+    playerControllerClip: {fileID: 7400000, guid: 7d499baa7153595419d16f776a19a48b, type: 2}
+    duration: 0
+  - motion: 1
+    horseState: Base Layer.Walk
+    playerState: Base Layer.PlayerHorseWalk
+    horseClip: {fileID: 7400000, guid: 5764109308c91404780c702cd07dfa03, type: 2}
+    playerClip: {fileID: 7400000, guid: 172d0379faf3b234485ca5428476738d, type: 2}
+    horseControllerClip: {fileID: 7400000, guid: 5764109308c91404780c702cd07dfa03, type: 2}
+    playerControllerClip: {fileID: 7400000, guid: 172d0379faf3b234485ca5428476738d, type: 2}
+    duration: 0
+  - motion: 2
+    horseState: Base Layer.WalkLeft
+    playerState: Base Layer.PlayerHorseWalkLeft
+    horseClip: {fileID: 7400000, guid: 29f81b1f21608124490b399b6475c129, type: 2}
+    playerClip: {fileID: 7400000, guid: 296c4f478a0491541965bc3a3ef434d6, type: 2}
+    horseControllerClip: {fileID: 7400000, guid: 29f81b1f21608124490b399b6475c129, type: 2}
+    playerControllerClip: {fileID: 7400000, guid: 296c4f478a0491541965bc3a3ef434d6, type: 2}
+    duration: 0
+  - motion: 3
+    horseState: Base Layer.WalkRight
+    playerState: Base Layer.PlayerHorseWalkRight
+    horseClip: {fileID: 7400000, guid: e0d8f971d0d15e4458548555abbf7a55, type: 2}
+    playerClip: {fileID: 7400000, guid: a9ec079c9d4547a4ab42179c6dd9e46a, type: 2}
+    horseControllerClip: {fileID: 7400000, guid: e0d8f971d0d15e4458548555abbf7a55, type: 2}
+    playerControllerClip: {fileID: 7400000, guid: a9ec079c9d4547a4ab42179c6dd9e46a, type: 2}
+    duration: 0
+  - motion: 4
+    horseState: Base Layer.Run
+    playerState: Base Layer.PlayerHorseRun
+    horseClip: {fileID: 7400000, guid: 3f2bd77cc47ebc444a50a844864589dd, type: 2}
+    playerClip: {fileID: 7400000, guid: a4fd72ba648fc794a973dadbd5eb7b95, type: 2}
+    horseControllerClip: {fileID: 7400000, guid: 3f2bd77cc47ebc444a50a844864589dd, type: 2}
+    playerControllerClip: {fileID: 7400000, guid: a4fd72ba648fc794a973dadbd5eb7b95, type: 2}
+    duration: 0
+  - motion: 5
+    horseState: Base Layer.SpecialAttack
+    playerState: Base Layer.PlayerHorseSpecialAttack
+    horseClip: {fileID: 7400000, guid: 64897a95d6f2aba41996ef4dda5f7721, type: 2}
+    playerClip: {fileID: 7400000, guid: 03f5cb8cd38f9294a9a12fd9c47d997f, type: 2}
+    horseControllerClip: {fileID: 7400000, guid: 64897a95d6f2aba41996ef4dda5f7721, type: 2}
+    playerControllerClip: {fileID: 7400000, guid: 03f5cb8cd38f9294a9a12fd9c47d997f, type: 2}
+    duration: 0
+  - motion: 6
+    horseState: Base Layer.Death1
+    playerState: 
+    horseClip: {fileID: 7400000, guid: 4c59f0eb2b7845a4aa4fb94c70e22a4b, type: 2}
+    playerClip: {fileID: 0}
+    horseControllerClip: {fileID: 7400000, guid: 4c59f0eb2b7845a4aa4fb94c70e22a4b, type: 2}
+    playerControllerClip: {fileID: 0}
+    duration: 1.6
+  - motion: 7
+    horseState: Base Layer.Death2
+    playerState: 
+    horseClip: {fileID: 7400000, guid: 2b22542ac4d541846b58dd13c633ba4a, type: 2}
+    playerClip: {fileID: 0}
+    horseControllerClip: {fileID: 7400000, guid: 2b22542ac4d541846b58dd13c633ba4a, type: 2}
+    playerControllerClip: {fileID: 0}
+    duration: 1
+  - motion: 8
+    horseState: 
+    playerState: Base Layer.PlayerHorseMount
+    horseClip: {fileID: 0}
+    playerClip: {fileID: 7400000, guid: 630fb1c2aa41cd94b932532bd7afca16, type: 2}
+    horseControllerClip: {fileID: 0}
+    playerControllerClip: {fileID: 7400000, guid: 630fb1c2aa41cd94b932532bd7afca16, type: 2}
+    duration: 0
+  - motion: 9
+    horseState: 
+    playerState: Base Layer.PlayerHorseDismount
+    horseClip: {fileID: 0}
+    playerClip: {fileID: 7400000, guid: 82ce363d0ae519a41bd82a56c2dd8b10, type: 2}
+    horseControllerClip: {fileID: 0}
+    playerControllerClip: {fileID: 7400000, guid: 82ce363d0ae519a41bd82a56c2dd8b10, type: 2}
+    duration: 0
+  - motion: 10
+    horseState: 
+    playerState: Base Layer.PlayerHorseEjected
+    horseClip: {fileID: 0}
+    playerClip: {fileID: 7400000, guid: 66c276d4621d48541882bbfe69712d8c, type: 2}
+    horseControllerClip: {fileID: 0}
+    playerControllerClip: {fileID: 7400000, guid: 66c276d4621d48541882bbfe69712d8c, type: 2}
+    duration: 0

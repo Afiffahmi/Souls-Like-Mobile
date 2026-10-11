@@ -16,6 +16,8 @@ namespace SoulsLike.Enemies
         public string stateName = "Attack1";
         public AnimationClip animation;
         [Min(.05f)] public float playbackSpeed = 1;
+        [Tooltip("Extra animation speed during Movement Start Frame through Movement End Frame for Jump attacks. Travel and impact remain synchronized to the clip. 1 = normal, 1.5 = faster, 0.5 = slower.")]
+        [Min(.05f)] public float jumpSpeedMultiplier = 1f;
         [Tooltip("Animation speed multiplier before Hit Start Frame (or normalized Hit Start). 1 disables slowdown; 0.5 is half speed. Attack and recovery use the normal Playback Speed.")]
         [Range(.05f, 1f)] public float windupSpeedMultiplier = 1f;
         [Min(0)] public float minimumRange;
@@ -26,6 +28,20 @@ namespace SoulsLike.Enemies
         [Header("Step behavior")]
         [Tooltip("Disable for a reposition/prepare animation that should not deal damage.")]
         public bool dealsDamage = true;
+        [Header("Attack warning and protection")]
+        public bool showAttackCue;
+        [Tooltip("Yellow warning permits a timed parry. Red warning cannot be parried.")]
+        public bool canBeParried = true;
+        [Tooltip("Zero-based animation frame that shows the warning and starts attack protection. Only damage-dealing attacks use this cue.")]
+        [Min(0)] public float attackCueFrame = 3;
+        [Tooltip("Ignore damage, hit reactions, knockback and elemental changes from Cue Frame until this attack animation ends. A successful permitted parry still interrupts.")]
+        public bool invulnerableAfterCue;
+        [Min(.1f)] public float cueDuration = .65f;
+        [Min(.1f)] public float cueRadius = .75f;
+        public Material cueMaterial;
+        [Tooltip("Only enable for attacks that should apply an element, trigger link-up reactions and change the player's equipped gem. Normal attacks use plain health damage.")]
+        public bool applyElementToPlayer;
+        public bool HasDamagePayload => dealsDamage || (animationAction != null && animationAction.DealsDamage);
         public EnemyAttackMotion movement;
         public EnemyAttackDirection movementDirection = EnemyAttackDirection.TowardTarget;
         [Min(0)] public float movementDistance = 3f;
@@ -87,6 +103,13 @@ namespace SoulsLike.Enemies
             if (!dealsDamage && animationAction != null && animation != null && animation.length * animation.frameRate > 0)
                 start = actionFrame / (animation.length * animation.frameRate);
             return normalizedTime < start ? Mathf.Clamp(windupSpeedMultiplier, .05f, 1f) : 1f;
+        }
+        public float PlaybackMultiplierAt(float normalizedTime)
+        {
+            float frame = animation != null ? normalizedTime * animation.length * animation.frameRate : 0;
+            float jump = movement == EnemyAttackMotion.Jump && frame >= movementStartFrame && frame < movementEndFrame
+                ? Mathf.Max(.05f, jumpSpeedMultiplier) : 1f;
+            return Mathf.Max(.05f, playbackSpeed) * WindupMultiplierAt(normalizedTime) * jump;
         }
         public bool IsInsideFrameWindow(float normalizedTime)
         {
