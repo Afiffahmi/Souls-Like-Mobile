@@ -14,15 +14,35 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SoulsLike.Enemies.EnemyAttackDefinition
   available: 1
   attackType: 0
+  trigger: 0
   stateName: Attack1
   animation: {fileID: 7400000, guid: 16a52db702f44ed4a9935af7865e6649, type: 2}
   playbackSpeed: 1
+  jumpSpeedMultiplier: 1
   windupSpeedMultiplier: 0.5
   minimumRange: 0
   range: 2.3
   arc: 100
   damage: 12
   cooldown: 2
+  dealsDamage: 1
+  showAttackCue: 1
+  canBeParried: 1
+  attackCueFrame: 3
+  invulnerableAfterCue: 1
+  cueDuration: 0.65
+  cueRadius: 0.75
+  cueMaterial: {fileID: 2100000, guid: d51b4da13c690cc4c9c8462ccfdc4e4f, type: 2}
+  applyElementToPlayer: 0
+  movement: 0
+  movementDirection: 2
+  movementDistance: 3
+  movementStartFrame: 0
+  movementEndFrame: 14
+  targetStoppingDistance: 1
+  animationAction: {fileID: 0}
+  actionFrame: 10
+  followUpSteps: []
   useFrameWindow: 1
   damageAtWindowEnd: 1
   hitStartFrame: 14
@@ -43,6 +63,7 @@ MonoBehaviour:
     localOffset: {x: 0, y: 1.2, z: 0.05}
     localEulerAngles: {x: 0, y: 0, z: -90}
     reverseSweep: 0
+    fullCircle: 0
     startSweepAngle: 0
     endSweepAngle: 0
     progression:
@@ -70,5 +91,6 @@ MonoBehaviour:
       m_PostInfinity: 2
       m_RotationOrder: 4
     size: 1
+    visualScale: {x: 1, y: 1, z: 1}
     forwardDrift: 0
     followPlayer: 0

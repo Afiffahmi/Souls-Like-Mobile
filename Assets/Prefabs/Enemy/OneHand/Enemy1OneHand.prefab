@@ -19,6 +19,7 @@ GameObject:
   - component: {fileID: 6290836272508563774}
   - component: {fileID: 78858966769893152}
   - component: {fileID: 7225455177558656621}
+  - component: {fileID: 901170000000000002}
   m_Layer: 0
   m_Name: Enemy1OneHand
   m_TagString: Untagged
@@ -159,7 +160,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e1e6229b0f2204b47aec83fde2f8aa04, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ElementalGems.ElementalEnemy
-  element: 0
+  element: 1
   resistances: []
   immunities: 
   interruptOnStun: []
@@ -814,3 +815,20 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &901170000000000002
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1162985367512093051}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 57c902da77c54c20a0176612ef2acf8b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ElementalGems.EnemyEyeParticles
+  arrowVisualsSource: {fileID: 8723608089948372503, guid: e12600e3e9b401041bc0a5874fd78417, type: 3}
+  eyeMarkers: []
+  useEyeBonesWhenMarkersMissing: 1
+  eyeSize: 0.35
+  chargedParticleTrails: 1

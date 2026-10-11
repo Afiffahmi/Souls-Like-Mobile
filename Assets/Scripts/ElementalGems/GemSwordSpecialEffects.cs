@@ -9,6 +9,12 @@ namespace ElementalGems
     public sealed class GemSwordSpecialEffects : MonoBehaviour
     {
         [Range(0, 3)] public float glowIntensity = 1.25f;
+        [Header("Subtle player aura")]
+        [Range(0,1)] public float bodyAuraOpacity = .16f;
+        [Range(0,1)] public float ribbonOpacity = .22f;
+        [Range(0,1)] public float afterimageOpacity = .12f;
+        [Range(0,30)] public float wispsPerSecond = 12;
+        GemSurfaceFlames bodyWisps;
         [Range(.04f, .2f)] public float afterimageInterval = .085f;
         [Range(.1f, .5f)] public float afterimageLifetime = .28f;
         [Range(.05f, .4f)] public float trailLifetime = .18f;
@@ -50,6 +56,7 @@ namespace ElementalGems
             shell.bones = source.bones; shell.rootBone = source.rootBone; shell.localBounds = source.localBounds;
             shell.quality = source.quality;
             Assign(shell, source.sharedMaterials.Length);
+            bodyWisps = GemSurfaceFlames.Create(source, wispsPerSecond, .17f, .4f);
             pool = new GameObject("Sword Special Afterimages (Runtime)");
             for (int i = 0; i < PoolSize; i++)
             {
@@ -65,7 +72,7 @@ namespace ElementalGems
                 go = new GameObject("Special Motion Ribbon " + i); go.layer = source.gameObject.layer; go.transform.SetParent(transform, false);
                 trails[i] = go.AddComponent<TrailRenderer>(); trails[i].sharedMaterial = material;
                 trails[i].time = trailLifetime; trails[i].minVertexDistance = .06f;
-                trails[i].widthMultiplier = i == 0 ? .3f : .12f;
+                trails[i].widthMultiplier = i == 0 ? .12f : .055f;
                 trails[i].widthCurve = AnimationCurve.Linear(0, 1, 1, 0);
                 trails[i].numCornerVertices = 2; trails[i].numCapVertices = 2;
                 trails[i].shadowCastingMode = ShadowCastingMode.Off; trails[i].receiveShadows = false;
@@ -88,15 +95,15 @@ namespace ElementalGems
             if (player == null) Awake();
             Active = true; debt = 0; nextGhost = 0;
             if (!EnsureVisuals()) return;
-            // Keep the rig, equipment logic and particles running. Only suppress solid geometry;
-            // the separate energy shell, motion ribbons and afterimages remain visible.
+            // Preserve the normal body and equipment throughout the special.
             foreach (var renderer in GetComponentsInChildren<Renderer>(true))
                 if (renderer != shell && (renderer is MeshRenderer || renderer is SkinnedMeshRenderer))
                     characterVisibility[renderer] = renderer.forceRenderingOff;
-            RevealCharacter(false);
+            RevealCharacter(true);
             lastGhostPosition = transform.position;
             shell.enabled = true;
             RefreshTint();
+            if (bodyWisps != null) { bodyWisps.SetTint(Tint, glowIntensity); bodyWisps.SetActive(true); }
             foreach (var trail in trails) { trail.Clear(); trail.emitting = true; }
         }
         void RevealCharacter(bool reveal)
@@ -141,15 +148,15 @@ namespace ElementalGems
         public void Tick(float delta)
         {
             if (!Active || shell == null) return;
-            // Share the slash presentation clock, including windows crossed at high attack speed.
-            RevealCharacter(slashTiming != null && slashTiming.isActiveAndEnabled && slashTiming.TrailActive);
+            RevealCharacter(true);
             RefreshTint();
-            Paint(shell, .45f + .25f * Mathf.Exp(-player.SwordSpecialStepProgress * 8), 0);
+            Paint(shell, bodyAuraOpacity * (.85f + .15f * Mathf.Exp(-player.SwordSpecialStepProgress * 8)), 0);
+            if (bodyWisps != null) bodyWisps.SetTint(Tint, glowIntensity);
             for (int i = 0; i < trails.Length; i++)
             {
                 trails[i].transform.position = trailBones[i] != null ? trailBones[i].position : transform.position + Vector3.up;
                 trails[i].startColor = Color.white; trails[i].endColor = new Color(1,1,1,0);
-                Paint(trails[i], .8f, 1);
+                Paint(trails[i], ribbonOpacity, 1);
             }
             delta = Mathf.Max(0, delta);
             debt += delta;
@@ -170,7 +177,7 @@ namespace ElementalGems
                 ages[i] += delta;
                 float fade = Mathf.Clamp01(1 - ages[i] / Mathf.Max(.01f, afterimageLifetime));
                 ghosts[i].enabled = fade > 0;
-                if (fade > 0) { Paint(ghosts[i], fade * .42f, 0); VisibleAfterimages++; }
+                if (fade > 0) { Paint(ghosts[i], fade * afterimageOpacity, 0); VisibleAfterimages++; }
             }
         }
         public void End()
@@ -179,6 +186,7 @@ namespace ElementalGems
             characterVisibility.Clear();
             Active = false; VisibleAfterimages = 0;
             if (shell != null) shell.enabled = false;
+            if (bodyWisps != null) bodyWisps.SetActive(false);
             foreach (var ghost in ghosts) if (ghost != null) ghost.enabled = false;
             for (int i = 0; i < PoolSize; i++) ages[i] = afterimageLifetime;
             foreach (var trail in trails) if (trail != null) { trail.emitting = false; trail.Clear(); }
@@ -188,6 +196,7 @@ namespace ElementalGems
         {
             End();
             if (shell != null) Destroy(shell.gameObject);
+            if (bodyWisps != null) Destroy(bodyWisps.gameObject);
             foreach (var trail in trails) if (trail != null) Destroy(trail.gameObject);
             if (pool != null) Destroy(pool);
             foreach (var mesh in meshes) if (mesh != null) Destroy(mesh);

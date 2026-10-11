@@ -41,7 +41,7 @@ namespace SoulsLike.Enemies
         public void UpdateAttackSpeed(EnemyAttackDefinition attack, float normalizedTime)
         {
             // State multiplier leaves Animator.speed owned by stun/pause systems.
-            if (Ready && hasAttackPhaseSpeed) animator.SetFloat(AttackPhaseSpeedHash, attack.WindupMultiplierAt(normalizedTime));
+            if (Ready && hasAttackPhaseSpeed) animator.SetFloat(AttackPhaseSpeedHash, attack.PlaybackMultiplierAt(normalizedTime));
         }
         public void ResetAttackSpeed()
         {

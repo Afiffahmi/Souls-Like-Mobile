@@ -11,7 +11,7 @@ namespace ElementalGems
         }
         public static int Hit(GemAttack attack, float baseDamage, GemManager source, Enemy enemy, Vector3 point, Vector3 direction, bool? requestHitReaction = null, bool allowControlEffects = true, float knockbackDurationMultiplier = 1f, float additionalKnockback = 0f)
         {
-            if (attack == null || enemy == null || enemy.IsDead || !enemy.isActiveAndEnabled) return 0;
+            if (attack == null || enemy == null || enemy.IsDead || enemy.IsInvulnerable || !enemy.isActiveAndEnabled) return 0;
             var elemental = ElementalEnemy.GetOrAdd(enemy);
             if (!elemental.isActiveAndEnabled) elemental = null;
             var defender = elemental != null ? elemental.CurrentElement : ElementType.Normal;

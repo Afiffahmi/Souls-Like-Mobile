@@ -13,6 +13,9 @@ namespace SoulsLike.Enemies
         public abstract bool ReceiveDamage(int damage, EnemyBrain source);
         public virtual bool TryParryAttack(EnemyBrain source) => false;
         public virtual bool ReceiveDamage(int damage, EnemyBrain source, bool allowParry) => ReceiveDamage(damage, source);
+        // Elemental actions carry a snapshot so damage cannot silently re-read a different source state.
+        public virtual bool ReceiveElementalDamage(int damage, EnemyBrain source, ElementalGems.ElementType element, bool allowParry) =>
+            ReceiveDamage(damage, source, allowParry);
         protected virtual void OnEnable() => active.Add(this);
         protected virtual void OnDisable() => active.Remove(this);
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]

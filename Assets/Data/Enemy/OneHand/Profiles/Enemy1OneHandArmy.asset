@@ -1,0 +1,54 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fb66e02b62df5634689ec68204e25241, type: 3}
+  m_Name: Enemy1OneHandArmy
+  m_EditorClassIdentifier: Assembly-CSharp::SoulsLike.Enemies.EnemyProfile
+  detectionRadius: 12
+  chaseRadius: 22
+  detectionInterval: 0.25
+  requireLineOfSight: 1
+  obstructionLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  lostSightGrace: 3
+  movementSpeed: 2.8
+  acceleration: 10
+  rotationSpeed: 420
+  repathInterval: 0.25
+  homeTolerance: 0.25
+  unreachableTimeout: 5
+  globalAttackCooldown: 0.65
+  avoidRepeatingAttack: 1
+  attacks:
+  - {fileID: 11400000, guid: 39328b4b1b27ac240b30157e837a62da, type: 2}
+  - {fileID: 11400000, guid: 5cf424af328268247ab3e90fb4f8af9a, type: 2}
+  selector: {fileID: 0}
+  healthLossSpecialsEnabled: 0
+  healthLossSpecialInterval: 25
+  resetPositionEnabled: 0
+  resetPositionHealthInterval: 25
+  resetPositionAnimation: {fileID: 0}
+  resetPositionPlaybackSpeed: 0.5
+  resetPositionJumpStartFrame: 2
+  resetPositionJumpEndFrame: 16
+  resetPositionRecovery: 1
+  idle: {fileID: 7400000, guid: 85db619d564135f44b2eb469b68c737d, type: 2}
+  walk: {fileID: 7400000, guid: 861baa11ea78c1e4fac3574e932d288e, type: 2}
+  run: {fileID: 7400000, guid: 861baa11ea78c1e4fac3574e932d288e, type: 2}
+  hit: {fileID: 7400000, guid: ab000953d71ac61468aa1c989c902f40, type: 2}
+  die: {fileID: 7400000, guid: 3f29610e20b173f43a73e079202105c9, type: 2}
+  spawnAnimation: {fileID: 7400000, guid: 4cf9d4f5b4116704eb6bec9d93584e13, type: 2}
+  spawnPlaybackSpeed: 1
+  transitionDuration: 0.12
+  hitFallbackDuration: 0.5
+  hitReactionMilliseconds: 0
+  corpseLifetime: 2

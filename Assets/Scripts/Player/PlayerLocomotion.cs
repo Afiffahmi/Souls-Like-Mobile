@@ -78,7 +78,8 @@ public partial class PlayerStateManager
         }
 
         if (RequiresWalking) targetSpeed = Mathf.Min(targetSpeed, walkSpeed);
-        if (IsAttackMovementLocked) targetSpeed = 0f;
+        if (IsAttackMovementLocked || ElementalMovementBlocked) targetSpeed = 0f;
+        targetSpeed *= ElementalMovementScale;
         float dt = Time.deltaTime;
         if (cameraMain == null && Camera.main != null) cameraMain = Camera.main.transform;
         Transform reference = MovementReferenceOverride != null ? MovementReferenceOverride : cameraMain;

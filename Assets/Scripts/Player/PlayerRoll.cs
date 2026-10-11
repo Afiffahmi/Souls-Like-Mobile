@@ -61,6 +61,7 @@ public partial class PlayerStateManager
 
     public bool TryRoll()
     {
+        if (ElementalMovementBlocked) return RejectRoll("Elemental status prevents movement.");
         if (!isActiveAndEnabled) return RejectRoll("PlayerStateManager is disabled.");
         if (anim == null) return RejectRoll("Animator is missing.");
         if (!hasCombatParameters) return RejectRoll("Animator needs CombatMode (Int), Parry (Trigger), and ParryReturnMode (Int).");

@@ -89,6 +89,10 @@ public partial class PlayerStateManager
 
     public bool TryAttack(CombatAttackInput input)
     {
+        var mounted = GetComponent<SoulsLike.Riding.MountedPlayerController>();
+        if (mounted != null && mounted.IsBusy)
+            return input == CombatAttackInput.SpecialAttack && mounted.TrySpecialAttack();
+        if (ElementalActionBlocked) return false;
         if (!isActiveAndEnabled || !hasCombatParameters || anim == null || !anim.isActiveAndEnabled || !anim.isInitialized ||
             IsChangingEquipment || IsParrying || IsRolling || AttackRecoveryRemaining > 0 ||
             !System.Enum.IsDefined(typeof(CombatAttackInput), input)) return false;
@@ -179,6 +183,7 @@ public partial class PlayerStateManager
 
     public bool NotifyAttackEntered(CombatAttackConfiguration config, CombatAttackInput input, int index)
     {
+        if (ElementalActionBlocked) return false;
         if (config == null || !isActiveAndEnabled || AttackRecoveryRemaining > 0) return false;
         bool acceptedSpecialRequest = attackPendingOrActive && !attackStateEntered && activeAttackConfiguration == config && activeAttackInput == input;
         // Direct Animator triggers must respect Special's cooldown too.

@@ -9,11 +9,12 @@ namespace ElementalGems
     public sealed class ElementalEnemy : MonoBehaviour
     {
         [Header("Elemental identity")]
-        [InspectorName("Innate Element"), Tooltip("Normal = an ordinary enemy, primed by elemental knockback. Any other value = born from that element; its innate element is never overwritten.")]
+        [InspectorName("Innate Element"), Tooltip("Normal = an ordinary enemy, primed by elemental knockback. Other values = born from that element. Link-up combos lock it in Normal for 10 seconds, then restore this element; hits cannot change the element or restart that window.")]
         public ElementType element;
         [Tooltip("How long an applied element stays. Zero keeps it until replaced, death or disable.")]
         [Min(0)] public float infusionDuration;
-        public bool showElementAura = true;
+        [UnityEngine.Serialization.FormerlySerializedAs("showElementAura")]
+        public bool showDarknessShield = true;
         [Header("Link-up reactions")]
         [Min(.1f)] public float reactionRadius = 4f;
         [Min(0)] public float reactionDamageScale = .65f;
@@ -28,17 +29,19 @@ namespace ElementalGems
         public float shieldDamageMultiplier;
         public ElementType InfusedElement { get; private set; }
         public bool IsElementBorn => element != ElementType.Normal;
-        public ElementType CurrentElement => IsElementBorn ? element : InfusedElement;
+        private readonly LinkUpElementWindow linkUpElement = new LinkUpElementWindow();
+        public ElementType CurrentElement => IsElementBorn ? linkUpElement.Resolve(element, Time.timeAsDouble) : InfusedElement;
+        public double LinkUpElementRemaining => IsElementBorn ? linkUpElement.Remaining(Time.timeAsDouble) : 0;
         public bool HasDarknessShield => darknessShieldEnabled && CurrentElement == ElementType.Darkness && !shieldBroken;
         public int ShieldLayersRemaining => HasDarknessShield ? Mathf.Max(0, darknessShieldLayers - purifiedLayers) : 0;
         public float DamageTakenMultiplier => (fractureLeft > 0 ? 1.35f : 1f) * (HasDarknessShield ? shieldDamageMultiplier : 1f);
         public Enemy Health => health;
+        private bool Protected => health != null && health.IsInvulnerable;
         public event Action ElementChanged;
         private float infusionLeft, fractureLeft, nextReactionTime, purificationUntil;
         private int purificationElements, purifiedLayers;
         private bool shieldBroken;
-        private ElementalReactionVfx aura, shieldAura;
-        private ElementType auraElement;
+        private ElementalReactionVfx shieldAura;
         [Header("Resistances and control")]
         [Tooltip("Incoming element multipliers; omitted elements take 1x. Zero grants immunity.")]
         public ElementMatchup[] resistances = Array.Empty<ElementMatchup>();
@@ -89,6 +92,7 @@ namespace ElementalGems
         public bool HasStatus(StatusKind kind) => active.Exists(s => s.spec.kind == kind);
         public void Apply(GemAttack attack, Vector3 direction, bool allowControlEffects = true, float knockbackDurationMultiplier = 1f, bool applyElementStatuses = false)
         {
+            if (Protected) return;
             bool primes = allowControlEffects && (applyElementStatuses || CanKnockback(direction, attack.knockback, knockbackDurationMultiplier));
             // Ordinary enemies only acquire a gem's status package from a real knockback.
             if (IsElementBorn || primes) foreach (var spec in attack.statuses)
@@ -106,12 +110,13 @@ namespace ElementalGems
             UpdateControls();
         }
         public bool CanKnockback(Vector3 direction, float strength, float durationMultiplier = 1f) =>
-            isActiveAndEnabled && health != null && !health.IsDead &&
+            isActiveAndEnabled && health != null && !health.IsDead && !Protected &&
             WeaponStatModifier.Finite(strength) > knockbackResistance && WeaponStatModifier.Finite(durationMultiplier, 1) > 0 &&
             Vector3.ProjectOnPlane(direction, Vector3.up).sqrMagnitude > .000001f;
 
         public void Infuse(ElementType incoming, GemAttack visual = null)
         {
+            if (IsResettingPosition || Protected) return;
             if (IsElementBorn || incoming == ElementType.Normal || health == null || health.IsDead || !isActiveAndEnabled || Resistance(incoming) <= 0) return;
             // A Darkness coating stays protected until its combination shield is broken.
             if (HasDarknessShield && incoming != ElementType.Darkness) return;
@@ -127,19 +132,44 @@ namespace ElementalGems
         }
         public bool BeginReaction()
         {
-            if (Time.time < nextReactionTime) return false;
+            if (Protected || Time.time < nextReactionTime) return false;
             nextReactionTime = Time.time + Mathf.Max(.1f, reactionCooldown);
             return true;
         }
+        /// <summary>Only confirmed link-up reactions call this; ordinary knockback still uses Infuse.</summary>
+        public void ApplyLinkUpElement(ElementType incoming, GemAttack visual = null)
+        {
+            if (IsResettingPosition || Protected) return;
+            if (!IsElementBorn || health == null || health.IsDead || !isActiveAndEnabled ||
+                Resistance(incoming) <= 0 || HasDarknessShield) return;
+            // The first combo locks this enemy in Normal until its deadline. No hit can refresh it.
+            if (!linkUpElement.TryBegin(element, incoming, Time.timeAsDouble)) return;
+            ElementChanged?.Invoke();
+            RefreshAura(visual);
+        }
+        private bool IsResettingPosition => TryGetComponent<SoulsLike.Enemies.EnemyBrain>(out var brain) &&
+            brain.State == SoulsLike.Enemies.EnemyState.ResetPosition;
+
+        /// <summary>Returning for a special ends the temporary elemental window immediately.</summary>
+        public void RestoreInnateElementForReset()
+        {
+            if (health == null || health.IsDead) return;
+            linkUpElement.Clear();
+            InfusedElement = ElementType.Normal;
+            infusionLeft = 0;
+            // This is an element reset, not healing or a refill of a broken Darkness shield.
+            ElementChanged?.Invoke();
+            RefreshAura();
+        }
         public void ConsumeInfusion(ElementType expected)
         {
-            if (IsElementBorn || InfusedElement != expected || HasDarknessShield) return;
+            if (Protected || IsElementBorn || InfusedElement != expected || HasDarknessShield) return;
             InfusedElement = ElementType.Normal; infusionLeft = 0;
             ElementChanged?.Invoke(); RefreshAura();
         }
         public void AddStatus(StatusKind kind, float duration, float magnitude = 1)
         {
-            if (health == null || health.IsDead || !isActiveAndEnabled || duration <= 0 || Array.IndexOf(immunities, kind) >= 0) return;
+            if (Protected || health == null || health.IsDead || !isActiveAndEnabled || duration <= 0 || Array.IndexOf(immunities, kind) >= 0) return;
             if (HasDarknessShield && (kind == StatusKind.Burn || kind == StatusKind.Poison || kind == StatusKind.Void)) return;
             var status = active.Find(s => s.spec.kind == kind);
             if (status == null)
@@ -151,16 +181,17 @@ namespace ElementalGems
             status.left = Mathf.Max(status.left, duration);
             UpdateControls();
         }
-        public void FractureArmor(float duration) { fractureLeft = Mathf.Max(fractureLeft, duration); }
+        public void FractureArmor(float duration) { if (Protected) return; fractureLeft = Mathf.Max(fractureLeft, duration); }
         public void GroundElectricity()
         {
+            if (Protected) return;
             // The innate identity of a Lightning-born creature remains Lightning.
             if (!IsElementBorn && InfusedElement == ElementType.Lightning)
             { InfusedElement = ElementType.Normal; infusionLeft = 0; ElementChanged?.Invoke(); RefreshAura(); }
         }
         public bool Purify(ElementType incoming, ElementType linked, GemAttack visual, bool allowControlEffects = true)
         {
-            if (!HasDarknessShield || health == null || health.IsDead || !isActiveAndEnabled) return false;
+            if (Protected || !HasDarknessShield || health == null || health.IsDead || !isActiveAndEnabled) return false;
             if (Time.time > purificationUntil) purificationElements = 0;
             int incomingBit = PurificationBit(incoming), linkedBit = PurificationBit(linked);
             if (incomingBit == 0 && linkedBit == 0) return false;
@@ -183,7 +214,7 @@ namespace ElementalGems
         private static int PurificationBit(ElementType value) => value == ElementType.Normal || value == ElementType.Darkness ? 0 : 1 << (int)value;
         public int TakeReactionDamage(float amount, ElementType incoming, bool hitReaction = false)
         {
-            if (health == null || health.IsDead || !isActiveAndEnabled) return 0;
+            if (Protected || health == null || health.IsDead || !isActiveAndEnabled) return 0;
             int before = health.CurrentHealth;
             health.TakeDamage(Mathf.Max(0, Mathf.RoundToInt(amount * Resistance(incoming) * DamageTakenMultiplier)), hitReaction);
             return before - health.CurrentHealth;
@@ -191,18 +222,15 @@ namespace ElementalGems
         private void RefreshAura(GemAttack visual = null)
         {
             var current = CurrentElement;
-            if (!showElementAura || health == null || health.IsDead || !isActiveAndEnabled) current = ElementType.Normal;
+            if (!showDarknessShield || health == null || health.IsDead || !isActiveAndEnabled) current = ElementType.Normal;
             bool shieldVisible = current != ElementType.Normal && HasDarknessShield;
             if (shieldVisible && shieldAura == null) shieldAura = ElementalReactionVfx.Shield(transform, visual);
             if (!shieldVisible && shieldAura != null) { shieldAura.gameObject.SetActive(false); Destroy(shieldAura.gameObject); shieldAura = null; }
-            if (aura != null && current == auraElement) return;
-            if (aura != null) { aura.gameObject.SetActive(false); Destroy(aura.gameObject); aura = null; }
-            auraElement = current;
-            if (current != ElementType.Normal) aura = ElementalReactionVfx.Aura(transform, current, visual);
+            // Element identity is displayed beside the health bar; no floor ring or aura.
         }
         public void ApplyKnockback(Vector3 direction, float strength, float durationMultiplier = 1f)
         {
-            if (health == null || health.IsDead || !isActiveAndEnabled) return;
+            if (Protected || health == null || health.IsDead || !isActiveAndEnabled) return;
             knockbackMotion.Add(direction, Mathf.Max(0, strength - knockbackResistance), durationMultiplier);
             push = knockbackMotion.Velocity;
         }
@@ -210,6 +238,7 @@ namespace ElementalGems
         {
             if (health.IsDead) { ClearStatuses(); return; }
             fractureLeft = Mathf.Max(0, fractureLeft - Time.deltaTime);
+            if (linkUpElement.Expire(Time.timeAsDouble)) ElementChanged?.Invoke();
             if (infusionDuration > 0 && InfusedElement != ElementType.Normal && (infusionLeft -= Time.deltaTime) <= 0)
             { InfusedElement = ElementType.Normal; ElementChanged?.Invoke(); }
             RefreshAura();
@@ -248,6 +277,7 @@ namespace ElementalGems
         }
         private void AdvanceKnockback(float seconds)
         {
+            if (Protected) { knockbackMotion.Clear(); push = Vector3.zero; return; }
             if (knockbackMotion.Remaining > 0f)
             {
                 Vector3 delta = knockbackMotion.Advance(seconds);
@@ -292,9 +322,9 @@ namespace ElementalGems
         public void ClearStatuses()
         {
             active.Clear(); knockbackMotion.Clear(); push = Vector3.zero;
+            linkUpElement.Clear();
             InfusedElement = ElementType.Normal; infusionLeft = fractureLeft = nextReactionTime = purificationUntil = 0;
             purificationElements = purifiedLayers = 0; shieldBroken = false;
-            if (aura != null) { aura.gameObject.SetActive(false); Destroy(aura.gameObject); aura = null; }
             UpdateControls(); ElementChanged?.Invoke();
             if (shieldAura != null) { shieldAura.gameObject.SetActive(false); Destroy(shieldAura.gameObject); shieldAura = null; }
         }

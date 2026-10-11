@@ -41,12 +41,16 @@ namespace ElementalGems
         }
         static void Resolve(ElementalEnemy target, ElementType previous, ElementType linked, Chain chain)
         {
+            if (target.Health != null && target.Health.IsInvulnerable) return;
             var reaction = Recipe(previous, chain.attack.element);
             if (reaction == ElementalReaction.None || chain.reacted.Count >= 24 || !chain.reacted.Add(target.Health)) return;
             if (reaction == ElementalReaction.Purification)
             {
                 if (target.Purify(chain.attack.element, linked, chain.attack, chain.control))
+                {
                     target.TakeReactionDamage(chain.baseDamage * chain.attack.damageScale, chain.attack.element, chain.control);
+                    target.ApplyLinkUpElement(chain.attack.element, chain.attack);
+                }
                 return;
             }
             if (!target.BeginReaction()) return;
@@ -135,16 +139,19 @@ namespace ElementalGems
                     ElementalReactionVfx.Vortex(scene, origin, radius, color, chain.attack);
                     break;
             }
+            target.ApplyLinkUpElement(chain.attack.element, chain.attack);
         }
         internal static ElementalEnemy Contact(Enemy enemy, ElementType linked, float damage, Chain chain)
         {
             // Each enemy takes propagated damage at most once in the entire reaction chain.
-            if (enemy == null || enemy.IsDead || !enemy.isActiveAndEnabled || chain.contacted.Count >= 24 || !chain.contacted.Add(enemy)) return null;
+            if (enemy == null || enemy.IsDead || enemy.IsInvulnerable || !enemy.isActiveAndEnabled || chain.contacted.Count >= 24 || !chain.contacted.Add(enemy)) return null;
             var target = ElementalEnemy.GetOrAdd(enemy);
             if (!target.isActiveAndEnabled || target.Resistance(chain.attack.element) <= 0) return null;
             ElementType previous = target.CurrentElement;
             target.TakeReactionDamage(damage, chain.attack.element);
             Resolve(target, previous, linked, chain);
+            // Propagated link-up damage also locks elemental-born receivers in Normal.
+            target.ApplyLinkUpElement(chain.attack.element, chain.attack);
             target.Infuse(chain.attack.element, chain.attack);
             return target;
         }

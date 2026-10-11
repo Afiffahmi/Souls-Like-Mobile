@@ -48,7 +48,11 @@ public class PlayerOverall : MonoBehaviour
 	{
         // Central gate covers melee, projectiles, hazards and periodic damage using this health API.
         if (IsInvulnerable) return;
+        var mounted = GetComponent<SoulsLike.Riding.MountedPlayerController>();
+        if (mounted != null && mounted.RedirectDamage(damage)) return;
 		var gems = GetComponent<ElementalGems.GemManager>();
+        var elemental = GetComponent<ElementalGems.PlayerElementalState>();
+        if (elemental != null) damage = Mathf.RoundToInt(damage * elemental.DamageTakenMultiplier);
         damage = gems != null ? gems.ReduceIncomingDamage(damage) : Mathf.Max(0, damage);
         int minimumHealth = keepAliveForCombatTesting ? 1 : 0;
         currentHealth = Mathf.Clamp(currentHealth - damage, minimumHealth, Mathf.Max(1, maxHealth));

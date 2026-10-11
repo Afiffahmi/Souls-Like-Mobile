@@ -65,6 +65,7 @@ public partial class PlayerStateManager
 
     private void UpdateCombat()
     {
+        if (ElementalActionBlocked) return;
         PollBowHeavyRelease();
         PollSwordHeavyRelease();
         UpdateCombatState();
@@ -146,6 +147,7 @@ public partial class PlayerStateManager
     /// <summary>Parry/equipment animations finish before accepting another mode change.</summary>
     public bool TrySetCombatMode(PlayerCombatMode mode)
     {
+        if (ElementalActionBlocked) return false;
         if (!hasCombatParameters || anim == null || !isActiveAndEnabled ||
             !anim.isActiveAndEnabled || (int)mode < 0 || (int)mode > 3 || IsParrying || IsChangingEquipment || IsAttacking || IsRolling) return false;
         if (mode == CombatMode) return true;
@@ -171,6 +173,7 @@ public partial class PlayerStateManager
 
     public bool TryParry()
     {
+        if (ElementalActionBlocked) return false;
         if (!hasCombatParameters || anim == null || !isActiveAndEnabled || !anim.isActiveAndEnabled ||
             !anim.isInitialized || IsParrying || IsChangingEquipment || IsAttacking || IsRolling ||
             CombatMode == PlayerCombatMode.Normal || CombatMode == PlayerCombatMode.Bow || anim.IsInTransition(0) ||
