@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7d4c017f0c168844d9f5185a875e5bdd, type: 3}
+  m_Name: SummonArmy
+  m_EditorClassIdentifier: Assembly-CSharp::SoulsLike.Enemies.EnemySummonArmyAction
+  armyPrefab: {fileID: 9100903540109117054, guid: f3ad2e8cdf80dc54a8861f4ada7647a4, type: 3}
+  spawnCount: 5
+  maxAlive: 5
+  spawnRadius: 3
+  minimumSpacing: 1.2
+  navMeshSampleRadius: 0.5
+  attemptsPerSoldier: 6
+  spawnBlockingLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  lifetimeSeconds: 0
+  dismissOnSummonerDeath: 1

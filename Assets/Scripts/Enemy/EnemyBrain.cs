@@ -3,7 +3,13 @@ using UnityEngine;
 
 namespace SoulsLike.Enemies
 {
-    public enum EnemyState { Idle, Chasing, Attacking, TakingDamage, Dying, Returning, Standby }
+    [Serializable]
+    public sealed class EnemySpecialDebugSlot
+    {
+        public bool play;
+        public EnemyAttackDefinition attack;
+    }
+    public enum EnemyState { Idle, Chasing, Attacking, TakingDamage, Dying, Returning, Standby, ResetPosition, Spawning }
     [DisallowMultipleComponent, RequireComponent(typeof(Enemy), typeof(EnemyNavMeshMotor), typeof(EnemyAnimationDriver))]
     public sealed class EnemyBrain : MonoBehaviour
     {
@@ -14,6 +20,14 @@ namespace SoulsLike.Enemies
         [Header("Attack standby (per enemy)")]
         [Tooltip("Seconds spent standing idle after each completed attack animation before chasing or attacking again. Set per scene enemy, or on its prefab. Zero disables this pause; attack cooldowns still apply.")]
         [Min(0)] public float postAttackStandbySeconds = 2f;
+        [Header("Enemy Special Attack Debug (this instance only)")]
+        [Tooltip("Use only the checked specials on THIS enemy. Health milestones and return-to-spawn still apply unless Bypass Health Milestone is enabled. Editor/development builds only.")]
+        public bool debugRepeatSpecialAttacks;
+        [Tooltip("OFF: lose the configured HP, return home, then play a checked special. ON: immediately repeat checked specials for animation debugging.")]
+        public bool debugBypassHealthMilestone;
+        public bool debugIgnoreSpecialCooldown = true;
+        [Min(0)] public float debugSpecialRepeatDelay = .5f;
+        public EnemySpecialDebugSlot[] debugSpecialAttacks = Array.Empty<EnemySpecialDebugSlot>();
         [SerializeField] private EnemyState state;
         public EnemyState State => state;
         public float StandbyRemaining => Mathf.Max(0, standbyUntil - Time.time);
@@ -22,6 +36,8 @@ namespace SoulsLike.Enemies
         public EnemyAttackDefinition CurrentAttack { get; private set; }
         public Vector3 HomePosition { get; private set; }
         public int LastAttackIndex { get; private set; } = -1;
+        public EnemyAttackDefinition CurrentSequence { get; private set; }
+        public int CurrentSequenceStep { get; private set; }
         public event Action<EnemyState> StateChanged;
         public event Action<EnemyAttackDefinition> AttackStarted;
         private EnemyNavMeshMotor motor;
@@ -32,6 +48,32 @@ namespace SoulsLike.Enemies
         private float nextSense, nextAttack, stateEntered, previousAttackTime, lastProgress, hitElapsed, standbyUntil;
         private Vector3 progressPosition;
         private bool appliedHit, pendingContact, attackEntered, initialized, hitAnimationActive, hitAnimationEntered;
+        private bool actionExecuted;
+        private bool spawnAnimationEntered;
+        private int pendingHealthSpecials, healthSpecialThresholdsCrossed, lastHealthSpecialIndex = -1;
+        private bool healthSpecialReturnRequired;
+        private bool ImmediateSpecialDebug => SpecialDebugActive && debugBypassHealthMilestone;
+        private bool SpecialDebugActive
+        {
+            get
+            {
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+                return isActiveAndEnabled && debugRepeatSpecialAttacks && profile != null;
+#else
+                return false;
+#endif
+            }
+        }
+        private bool IsSpecialChecked(EnemyAttackDefinition attack)
+        {
+            if (attack == null || debugSpecialAttacks == null) return false;
+            foreach (var slot in debugSpecialAttacks)
+                if (slot != null && slot.play && slot.attack == attack) return true;
+            return false;
+        }
+        public int PendingHealthSpecials => pendingHealthSpecials;
+        private float nextResetHealthPercent, resetRetryAt;
+        private bool resetPositionPending;
         private readonly RaycastHit[] sightHits = new RaycastHit[32];
         public Vector3 AttackPosition => attackOrigin != null ? attackOrigin.position : transform.position + Vector3.up;
 
@@ -48,14 +90,27 @@ namespace SoulsLike.Enemies
             attackReady = new float[profile.attacks.Length]; motor.Configure(profile);
             nextSense = Time.time + UnityEngine.Random.Range(0, profile.detectionInterval);
             initialized = true;
-            if (Health.IsDead) OnDeath(); else SetState(EnemyState.Idle);
+            nextResetHealthPercent = 100f - Mathf.Clamp(profile.resetPositionHealthInterval, 1f, 100f);
+            QueueResetPosition();
+            QueueHealthSpecial();
+            if (Health.IsDead) OnDeath();
+            else if (profile.spawnAnimation != null && !profile.spawnAnimation.isLooping && animationDriver.HasState("Spawn"))
+            {
+                SetState(EnemyState.Spawning);
+                // Start at frame zero with no idle-to-spawn blend exposing the standing pose.
+                animationDriver.Play("Spawn", 0, true);
+            }
+            else SetState(EnemyState.Idle);
             if (!motor.Ready) Debug.LogWarning("Enemy is not on a baked NavMesh. Position its root on a compatible surface.", this);
         }
         private void OnDisable()
         {
             if (Health != null) { Health.OnDamaged -= OnDamaged; Health.OnDeath -= OnDeath; }
             if (motor != null) motor.Stop();
+            if (motor != null) motor.CancelResetPosition();
+            if (motor != null) motor.CancelAttackMovement();
             CurrentAttack = null;
+            CurrentSequence = null; CurrentSequenceStep = 0;
             standbyUntil = 0;
             if (initialized && !Health.IsDead) state = EnemyState.Returning;
         }
@@ -67,8 +122,15 @@ namespace SoulsLike.Enemies
             if (Health.IsDead) { if (state != EnemyState.Dying) OnDeath(); return; }
             if (status != null && status.CannotAct)
             {
-                if (state != EnemyState.TakingDamage) Interrupt();
+                if (state != EnemyState.TakingDamage && state != EnemyState.ResetPosition && state != EnemyState.Spawning) Interrupt();
                 motor.Stop(); return;
+            }
+            if (state == EnemyState.Spawning) { TickSpawn(); return; }
+            if (state == EnemyState.ResetPosition) { TickResetPosition(); return; }
+            if (resetPositionPending && !ImmediateSpecialDebug && state != EnemyState.TakingDamage && Time.time >= resetRetryAt)
+            {
+                if (BeginResetPosition()) return;
+                resetRetryAt = Time.time + 1f;
             }
             if (state == EnemyState.TakingDamage)
             {
@@ -88,6 +150,32 @@ namespace SoulsLike.Enemies
                     animationDriver.Locomotion(false, profile.transitionDuration);
                     if (!CanPursueTarget()) BeginReturn();
                     else SetState(StandbyRemaining > 0 ? EnemyState.Standby : EnemyState.Chasing);
+                }
+                return;
+            }
+            if (!ImmediateSpecialDebug && pendingHealthSpecials > 0 && state != EnemyState.Attacking)
+            {
+                if (healthSpecialReturnRequired)
+                {
+                    // Failed/unavailable jump paths fall back to walking home; no attacks before arrival.
+                    if (Vector3.Distance(transform.position, HomePosition) > profile.homeTolerance)
+                    {
+                        motor.MoveTo(HomePosition, profile.homeTolerance * .5f, profile, status != null ? status.MovementMultiplier : 1);
+                        AnimateMotion(); return;
+                    }
+                    CompleteHealthSpecialReturn();
+                }
+                if (!Valid(Target) && Time.time >= nextSense) { nextSense = Time.time + profile.detectionInterval; Acquire(); }
+                motor.Stop();
+                animationDriver.Locomotion(false, profile.transitionDuration);
+                if (CanPursueTarget())
+                {
+                    motor.Face(Target.GroundPosition - transform.position, profile.rotationSpeed);
+                    if (Time.time >= nextAttack)
+                    {
+                        int special = ChooseAttack(true);
+                        if (special >= 0 && WithinArc(Target, profile.attacks[special].arc)) BeginAttack(special);
+                    }
                 }
                 return;
             }
@@ -118,8 +206,9 @@ namespace SoulsLike.Enemies
             float distance = Vector3.Distance(transform.position, Target.GroundPosition);
             if (Time.time >= nextAttack)
             {
-                int index = profile.selector != null ? profile.selector.Select(this, Target) : ChooseAttack();
-                if (CanSelectAttack(index))
+                int index = ImmediateSpecialDebug ? ChooseAttack(true) : -1;
+                if (index < 0 && !ImmediateSpecialDebug) index = profile.selector != null ? profile.selector.Select(this, Target) : ChooseAttack();
+                if (CanUseAttack(index) && (profile.attacks[index].trigger == EnemyAttackTrigger.Normal || SpecialDebugActive || pendingHealthSpecials > 0))
                 {
                     var attack = profile.attacks[index];
                     motor.Face(Target.GroundPosition - transform.position, profile.rotationSpeed);
@@ -194,28 +283,46 @@ namespace SoulsLike.Enemies
             Vector3.Distance(transform.position, target.GroundPosition) <= attack.range &&
             WithinArc(target, attack.arc) && HasLineOfSight(target);
         public bool CanSelectAttack(int index)
+            => CanUseAttack(index) && profile.attacks[index].trigger == EnemyAttackTrigger.Normal && !ImmediateSpecialDebug;
+        private bool CanUseAttack(int index)
         {
             if (profile == null || !Valid(Target) || index < 0 || index >= profile.attacks.Length || index >= attackReady.Length) return false;
             var attack = profile.attacks[index];
-            if (attack == null || !attack.IsUsable || Time.time < attackReady[index] || !animationDriver.HasState(attack.stateName)) return false;
+            bool debug = SpecialDebugActive && IsSpecialChecked(attack);
+            if (attack == null || !attack.IsUsable ||
+                (Time.time < attackReady[index] && !(debug && debugIgnoreSpecialCooldown)) || !animationDriver.HasState(attack.stateName)) return false;
+            if (!debug && attack.animationAction != null && !attack.animationAction.CanStart(this)) return false;
+            if (attack.followUpSteps != null) foreach (var step in attack.followUpSteps)
+                if (step.available && !animationDriver.HasState(step.stateName)) return false;
             float hp = (float)Health.CurrentHealth / Health.MaxHealth;
             float distance = Vector3.Distance(transform.position, Target.GroundPosition);
-            return hp >= attack.minimumHealthRatio && hp <= attack.maximumHealthRatio && distance >= attack.minimumRange && distance <= attack.range && HasLineOfSight(Target);
+            bool selfCast = attack.animationAction != null && !attack.dealsDamage;
+            return (debug || (hp >= attack.minimumHealthRatio && hp <= attack.maximumHealthRatio)) &&
+                (selfCast || (distance >= attack.minimumRange && distance <= attack.range && HasLineOfSight(Target)));
         }
-        private int ChooseAttack()
+        private bool CanChooseAttack(int index, bool special)
         {
+            if (!CanUseAttack(index)) return false;
+            var attack = profile.attacks[index];
+            if ((attack.trigger == EnemyAttackTrigger.HealthLossSpecial) != special) return false;
+            if (special) return !SpecialDebugActive || IsSpecialChecked(attack);
+            return !ImmediateSpecialDebug;
+        }
+        private int ChooseAttack(bool special = false)
+        {
+            int last = special ? lastHealthSpecialIndex : LastAttackIndex;
             int priority = int.MinValue, alternatives = 0;
-            for (int i = 0; i < profile.attacks.Length; i++) if (CanSelectAttack(i))
+            for (int i = 0; i < profile.attacks.Length; i++) if (CanChooseAttack(i, special))
             {
                 int p = profile.attacks[i].priority;
                 if (p > priority) { priority = p; alternatives = 0; }
-                if (p == priority && i != LastAttackIndex) alternatives++;
+                if (p == priority && i != last) alternatives++;
             }
             bool skipLast = profile.avoidRepeatingAttack && alternatives > 0;
             float total = 0;
-            for (int i = 0; i < profile.attacks.Length; i++) if (CanSelectAttack(i) && profile.attacks[i].priority == priority && (!skipLast || i != LastAttackIndex)) total += profile.attacks[i].weight;
+            for (int i = 0; i < profile.attacks.Length; i++) if (CanChooseAttack(i, special) && profile.attacks[i].priority == priority && (!skipLast || i != last)) total += profile.attacks[i].weight;
             float roll = UnityEngine.Random.value * total;
-            for (int i = 0; i < profile.attacks.Length; i++) if (CanSelectAttack(i) && profile.attacks[i].priority == priority && (!skipLast || i != LastAttackIndex))
+            for (int i = 0; i < profile.attacks.Length; i++) if (CanChooseAttack(i, special) && profile.attacks[i].priority == priority && (!skipLast || i != last))
             { roll -= profile.attacks[i].weight; if (roll <= 0) return i; }
             return -1;
         }
@@ -225,8 +332,10 @@ namespace SoulsLike.Enemies
             foreach (var attack in profile.attacks)
             {
                 if (attack == null || !attack.IsUsable) continue;
+                if (!ConsiderAttackForMovement(attack)) continue;
+                if (!SpecialDebugActive && attack.animationAction != null && !attack.animationAction.CanStart(this)) continue;
                 float hp = (float)Health.CurrentHealth / Health.MaxHealth;
-                if (hp < attack.minimumHealthRatio || hp > attack.maximumHealthRatio) continue;
+                if (!SpecialDebugActive && (hp < attack.minimumHealthRatio || hp > attack.maximumHealthRatio)) continue;
                 float cost = Mathf.Abs(distance - attack.range * .85f);
                 if (cost < score) { score = cost; best = attack.range * .85f; }
             }
@@ -238,17 +347,31 @@ namespace SoulsLike.Enemies
             foreach (var attack in profile.attacks)
             {
                 if (attack == null || !attack.IsUsable) continue;
+                if (!ConsiderAttackForMovement(attack)) continue;
+                if (!SpecialDebugActive && attack.animationAction != null && !attack.animationAction.CanStart(this)) continue;
                 float hp = (float)Health.CurrentHealth / Health.MaxHealth;
-                if (hp >= attack.minimumHealthRatio && hp <= attack.maximumHealthRatio) minimum = Mathf.Min(minimum, attack.minimumRange);
+                if (SpecialDebugActive || (hp >= attack.minimumHealthRatio && hp <= attack.maximumHealthRatio)) minimum = Mathf.Min(minimum, attack.minimumRange);
             }
             return minimum == float.MaxValue ? 0 : minimum;
         }
         private void BeginAttack(int index)
         {
-            CurrentAttack = profile.attacks[index]; LastAttackIndex = index;
-            attackReady[index] = Time.time + CurrentAttack.cooldown;
+            CurrentSequence = profile.attacks[index]; CurrentSequenceStep = 0; LastAttackIndex = index;
+            if (CurrentSequence.trigger == EnemyAttackTrigger.HealthLossSpecial)
+            {
+                pendingHealthSpecials = Mathf.Max(0, pendingHealthSpecials - 1);
+                lastHealthSpecialIndex = index;
+            }
+            attackReady[index] = Time.time + CurrentSequence.cooldown;
+            BeginAttackStep(CurrentSequence);
+        }
+        private void BeginAttackStep(EnemyAttackDefinition step)
+        {
+            CurrentAttack = step;
             appliedHit = pendingContact = attackEntered = false; previousAttackTime = 0;
+            actionExecuted = false;
             SetState(EnemyState.Attacking);
+            motor.BeginAttackMovement(step, Target);
             animationDriver.PlayAttack(CurrentAttack, profile.transitionDuration);
             AttackStarted?.Invoke(CurrentAttack);
         }
@@ -263,12 +386,13 @@ namespace SoulsLike.Enemies
             }
             attackEntered = true;
             animationDriver.UpdateAttackSpeed(attack, time);
+            motor.TickAttackMovement(attack, time);
             if (time <= attack.turnUntil) motor.Face(Target.GroundPosition - transform.position, profile.rotationSpeed);
             // Exact frame mode never delivers a delayed hit outside the authored window.
             // Legacy normalized mode retains crossing detection for existing profiles.
             bool inWindow = attack.useFrameWindow ? attack.IsInsideFrameWindow(time)
                 : time >= attack.hitStart && previousAttackTime <= attack.hitEnd;
-            if (attack.damageAtWindowEnd && !appliedHit)
+            if (attack.dealsDamage && attack.damageAtWindowEnd && !appliedHit)
             {
                 // Give the target the whole visible window to parry. The end
                 // resolution cannot hit a target that only arrives afterward.
@@ -288,7 +412,7 @@ namespace SoulsLike.Enemies
                     if (state != EnemyState.Attacking) return;
                 }
             }
-            else if (!attack.damageAtWindowEnd && !appliedHit && inWindow)
+            else if (attack.dealsDamage && !attack.damageAtWindowEnd && !appliedHit && inWindow)
             {
                 if (CanHit(Target, attack))
                 {
@@ -298,26 +422,49 @@ namespace SoulsLike.Enemies
                 else if (!attack.useFrameWindow) appliedHit = true;
                 if (state != EnemyState.Attacking) return; // A parry can interrupt inside Execute.
             }
+            if (!actionExecuted && attack.animationAction != null &&
+                time * attack.animation.length * attack.animation.frameRate >= attack.actionFrame)
+            {
+                // Timeline crossing survives a slow frame, but cannot run after a parry or interruption above.
+                actionExecuted = true;
+                if (attack.animationAction.CanStart(this))
+                    attack.animationAction.Execute(new EnemyAttackContext(this, Target, attack));
+                if (state != EnemyState.Attacking || CurrentAttack != attack) return;
+            }
             previousAttackTime = time;
-            if (time >= 1) FinishAttack();
+            if (time >= 1)
+            {
+                while (CurrentSequence != null && CurrentSequence.followUpSteps != null &&
+                    CurrentSequenceStep < CurrentSequence.followUpSteps.Length && CanPursueTarget() && (!resetPositionPending || ImmediateSpecialDebug))
+                {
+                    var next = CurrentSequence.followUpSteps[CurrentSequenceStep++];
+                    if (next != null && !next.available) continue;
+                    if (!SpecialDebugActive && next != null && next.animationAction != null && !next.animationAction.CanStart(this)) continue;
+                    if (next != null && next.IsUsable && animationDriver.HasState(next.stateName)) { BeginAttackStep(next); return; }
+                    break;
+                }
+                FinishAttack();
+            }
         }
         private void FinishAttack()
         {
             CurrentAttack = null;
             if (!CanPursueTarget()) { BeginReturn(); return; }
-            standbyUntil = Time.time + Mathf.Max(0, postAttackStandbySeconds);
+            standbyUntil = Time.time + Mathf.Max(0, ImmediateSpecialDebug ? debugSpecialRepeatDelay : postAttackStandbySeconds);
             nextAttack = Mathf.Max(standbyUntil, Time.time + profile.globalAttackCooldown);
             SetState(StandbyRemaining > 0 ? EnemyState.Standby : EnemyState.Chasing);
         }
         private void OnDamaged(int damage)
         {
+            if (damage > 0 && initialized && !Health.IsDead) { QueueResetPosition(); QueueHealthSpecial(); }
+            if (state == EnemyState.ResetPosition || state == EnemyState.Spawning) return;
             if (damage <= 0 || Health.IsDead || !initialized || state == EnemyState.TakingDamage) return;
             if (!Valid(Target)) Acquire();
             if (Health.DamageRequestsHitReaction) Interrupt();
         }
         public void Interrupt()
         {
-            if (!initialized || Health.IsDead || state == EnemyState.Dying || state == EnemyState.TakingDamage) return;
+            if (!initialized || Health.IsDead || state == EnemyState.Dying || state == EnemyState.TakingDamage || state == EnemyState.ResetPosition || state == EnemyState.Spawning) return;
             hitElapsed = 0; hitAnimationEntered = false;
             float duration = profile.hit == null ? profile.hitReactionMilliseconds * .001f : 0;
             CurrentAttack = null; nextAttack = Mathf.Max(nextAttack, Time.time + (duration > 0 ? duration : profile.globalAttackCooldown));
@@ -329,6 +476,8 @@ namespace SoulsLike.Enemies
         private void OnDeath()
         {
             if (!initialized || state == EnemyState.Dying) return;
+            motor.CancelResetPosition(); resetPositionPending = false;
+            pendingHealthSpecials = 0;
             CurrentAttack = null; Target = null; standbyUntil = 0;
             if (status != null) status.ClearOnDeath();
             SetState(EnemyState.Dying);
@@ -339,6 +488,95 @@ namespace SoulsLike.Enemies
             if (profile.corpseLifetime > 0) Destroy(gameObject, Mathf.Max(profile.corpseLifetime, profile.die != null ? profile.die.length : 0));
         }
         private void BeginReturn() { Target = null; CurrentAttack = null; standbyUntil = 0; SetState(EnemyState.Returning); }
+        private void TickSpawn()
+        {
+            if (animationDriver.TryGetTime("Spawn", out float time))
+            {
+                spawnAnimationEntered = true;
+                if (time < 1f) return;
+            }
+            else if (!spawnAnimationEntered && Time.time - stateEntered <= 1f) return;
+            else Debug.LogWarning("Spawn animation left its state before completion. Rebuild this enemy's controller.", this);
+            SetState(EnemyState.Idle);
+            nextSense = Time.time;
+            Acquire();
+        }
+        private bool ConsiderAttackForMovement(EnemyAttackDefinition attack)
+        {
+            if (ImmediateSpecialDebug) return attack.trigger == EnemyAttackTrigger.HealthLossSpecial && IsSpecialChecked(attack);
+            if (SpecialDebugActive && attack.trigger == EnemyAttackTrigger.HealthLossSpecial && !IsSpecialChecked(attack)) return false;
+            return attack.trigger == EnemyAttackTrigger.Normal || pendingHealthSpecials > 0;
+        }
+        private void QueueHealthSpecial()
+        {
+            if (!profile.healthLossSpecialsEnabled || Health.IsDead) return;
+            int crossed = (Health.MaxHealth - Health.CurrentHealth) / Mathf.Max(1, profile.healthLossSpecialInterval);
+            if (crossed <= healthSpecialThresholdsCrossed) return;
+            pendingHealthSpecials += crossed - healthSpecialThresholdsCrossed;
+            healthSpecialThresholdsCrossed = crossed;
+            healthSpecialReturnRequired = true;
+            resetPositionPending = true;
+        }
+        private void CompleteHealthSpecialReturn()
+        {
+            healthSpecialReturnRequired = false;
+            resetPositionPending = false;
+            standbyUntil = Time.time + Mathf.Max(0, profile.resetPositionRecovery);
+            nextAttack = Mathf.Max(nextAttack, standbyUntil);
+        }
+        private void QueueResetPosition()
+        {
+            // Health-special profiles use the HP milestone as the single return trigger.
+            if (profile.healthLossSpecialsEnabled) return;
+            if (!profile.resetPositionEnabled || profile.resetPositionAnimation == null || Health.IsDead) return;
+            float percent = 100f * Health.CurrentHealth / Mathf.Max(1, Health.MaxHealth);
+            // One large hit may cross several thresholds: one return consumes them together.
+            while (nextResetHealthPercent > .001f && percent <= nextResetHealthPercent)
+            {
+                resetPositionPending = true;
+                nextResetHealthPercent -= Mathf.Clamp(profile.resetPositionHealthInterval, 1f, 100f);
+            }
+        }
+        private bool BeginResetPosition()
+        {
+            if (!profile.resetPositionEnabled || profile.resetPositionAnimation == null) return false;
+            if (!animationDriver.HasState("ResetPosition") || !motor.PrepareResetPosition(HomePosition)) return false;
+            resetPositionPending = false;
+            CurrentAttack = null; appliedHit = true; pendingContact = false;
+            SetState(EnemyState.ResetPosition);
+            animationDriver.Play("ResetPosition", profile.transitionDuration, true);
+            return true;
+        }
+        private void TickResetPosition()
+        {
+            if (!animationDriver.TryGetTime("ResetPosition", out float time))
+            {
+                if (Time.time - stateEntered > 1f)
+                {
+                    motor.CancelResetPosition(); resetPositionPending = true;
+                    resetRetryAt = Time.time + 1f; BeginReturn();
+                }
+                return;
+            }
+            float frames = profile.resetPositionAnimation.length * profile.resetPositionAnimation.frameRate;
+            float start = Mathf.Clamp(profile.resetPositionJumpStartFrame, 0, Mathf.Max(0, frames - 1));
+            float end = Mathf.Clamp(profile.resetPositionJumpEndFrame, start + 1, Mathf.Max(start + 1, frames));
+            float travel = Mathf.InverseLerp(start, end, time * frames);
+            motor.TickResetPosition(Mathf.SmoothStep(0, 1, travel), profile.rotationSpeed);
+            if (time < 1) return;
+            motor.CancelResetPosition();
+            if (Vector3.Distance(transform.position, HomePosition) > profile.homeTolerance)
+            {
+                // A newly blocked route must not teleport through the obstruction.
+                resetPositionPending = true; resetRetryAt = Time.time + 1f; BeginReturn(); return;
+            }
+            healthSpecialReturnRequired = false;
+            resetPositionPending = false;
+            standbyUntil = Time.time + Mathf.Max(0, profile.resetPositionRecovery);
+            nextAttack = Mathf.Max(nextAttack, standbyUntil);
+            if (CanPursueTarget()) SetState(EnemyState.Standby);
+            else { Target = null; nextSense = standbyUntil; SetState(EnemyState.Idle); }
+        }
         private void ReturnHome()
         {
             if (Vector3.Distance(transform.position, HomePosition) <= profile.homeTolerance)
@@ -365,6 +603,7 @@ namespace SoulsLike.Enemies
         private void AnimateMotion() => animationDriver.Locomotion(motor.Ready && motor.Agent.velocity.sqrMagnitude > .01f, profile.transitionDuration);
         private void SetState(EnemyState next)
         {
+            if (next != EnemyState.Attacking) { CurrentSequence = null; CurrentSequenceStep = 0; motor.CancelAttackMovement(); }
             if (next != EnemyState.Attacking) animationDriver.ResetAttackSpeed();
             state = next; stateEntered = lastProgress = Time.time; progressPosition = transform.position;
             if (next != EnemyState.Chasing && next != EnemyState.Returning) motor.Stop();

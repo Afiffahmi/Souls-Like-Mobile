@@ -29,8 +29,30 @@ namespace SoulsLike.Enemies
         public bool avoidRepeatingAttack = true;
         public EnemyAttackDefinition[] attacks = new EnemyAttackDefinition[0];
         public EnemyAttackSelector selector;
+        [Header("Random specials after health loss")]
+        public bool healthLossSpecialsEnabled;
+        [Tooltip("Actual HP, not percent. Each threshold is consumed once per life. Healing does not rearm it. Completed hit reactions and reset-position jumps take priority.")]
+        [Min(1)] public int healthLossSpecialInterval = 25;
+        [Header("Reset Position")]
+        public bool resetPositionEnabled;
+        [Tooltip("Health lost between jump-backs. 25 triggers at 75%, 50%, and 25% remaining. Each threshold is consumed once per life; healing does not rearm it.")]
+        [Range(1, 100)] public float resetPositionHealthInterval = 25f;
+        public AnimationClip resetPositionAnimation;
+        [Min(.05f)] public float resetPositionPlaybackSpeed = 1f;
+        [InspectorName("Jump Start Frame")]
+        [Tooltip("Clip frame where travel toward spawn begins. Uses the animation's own frame rate.")]
+        [Min(0)] public float resetPositionJumpStartFrame = 2f;
+        [InspectorName("Jump End Frame")]
+        [Tooltip("Landing frame: travel reaches spawn here, then stays still for the rest of the animation.")]
+        [Min(1)] public float resetPositionJumpEndFrame = 16f;
+        [Tooltip("Brief idle recovery at spawn before normal AI resumes.")]
+        [Min(0)] public float resetPositionRecovery = 1f;
         [Header("Animations (replace placeholders, then rebuild controller)")]
         public AnimationClip idle, walk, run, hit, die;
+        [Header("Spawn entrance (optional)")]
+        [Tooltip("Play once on spawn before detection, walking or attacks. Leave empty for ordinary enemies. Hit reactions wait until this finishes; damage and death still apply.")]
+        public AnimationClip spawnAnimation;
+        [Min(.05f)] public float spawnPlaybackSpeed = 1f;
         [Min(.01f)] public float transitionDuration = .12f;
         [Min(.1f)] public float hitFallbackDuration = .5f;
         [InspectorName("Hit Fallback Milliseconds")]
@@ -44,6 +66,8 @@ namespace SoulsLike.Enemies
             chaseRadius = Mathf.Max(detectionRadius, chaseRadius);
             detectionInterval = Mathf.Max(.05f, detectionInterval);
             repathInterval = Mathf.Max(.05f, repathInterval);
+            resetPositionJumpStartFrame = Mathf.Max(0, resetPositionJumpStartFrame);
+            resetPositionJumpEndFrame = Mathf.Max(resetPositionJumpStartFrame + 1, resetPositionJumpEndFrame);
         }
     }
 }
