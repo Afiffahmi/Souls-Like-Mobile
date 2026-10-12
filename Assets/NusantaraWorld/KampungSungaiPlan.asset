@@ -1,0 +1,320 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a452e0f2d511a45cfb854bd8462dc221, type: 3}
+  m_Name: KampungSungaiPlan
+  m_EditorClassIdentifier: Assembly-CSharp::Nusantara.World.KampungVillagePlan
+  center: {x: 3176.4897, y: 997.5498}
+  footprint:
+  - {x: 3044.4897, y: 1005.5498}
+  - {x: 3064.4897, y: 929.5498}
+  - {x: 3114.4897, y: 881.5498}
+  - {x: 3214.4897, y: 872.5498}
+  - {x: 3300.4897, y: 923.5498}
+  - {x: 3335.4897, y: 985.5498}
+  - {x: 3319.4897, y: 1056.5498}
+  - {x: 3251.4897, y: 1120.5498}
+  - {x: 3151.4897, y: 1111.5498}
+  - {x: 3071.4897, y: 1071.5498}
+  buildings:
+  - id: longhouse
+    asset: long_house
+    offset: {x: 0, y: 31}
+    yaw: 0
+    height: 8
+    entrance: {x: 0, y: 23}
+  - id: house-01
+    asset: stilt_house
+    offset: {x: -18, y: 12}
+    yaw: -56.309933
+    height: 5.1
+    entrance: {x: -13.007698, y: 8.671799}
+  - id: house-02
+    asset: stilt_house
+    offset: {x: 15, y: 11}
+    yaw: 53.746162
+    height: 5.1
+    entrance: {x: 10.161571, y: 7.4518185}
+  - id: house-03
+    asset: stilt_house
+    offset: {x: -36, y: 31}
+    yaw: -49.267895
+    height: 5.4
+    entrance: {x: -31.453388, y: 27.084862}
+  - id: house-04
+    asset: stilt_house
+    offset: {x: 30, y: 30}
+    yaw: 45
+    height: 5.7000003
+    entrance: {x: 25.757359, y: 25.757359}
+  - id: house-05
+    asset: stilt_house
+    offset: {x: -45, y: 9}
+    yaw: -78.69007
+    height: 6
+    entrance: {x: -39.116516, y: 7.823303}
+  - id: house-06
+    asset: stilt_house
+    offset: {x: -48, y: -13}
+    yaw: -105.15407
+    height: 5.4
+    entrance: {x: -42.20864, y: -11.431507}
+  - id: house-07
+    asset: stilt_house
+    offset: {x: -15, y: -34}
+    yaw: -156.19405
+    height: 5.7000003
+    entrance: {x: -12.578159, y: -28.510494}
+  - id: house-08
+    asset: stilt_house
+    offset: {x: 16, y: -34}
+    yaw: 154.79887
+    height: 6
+    entrance: {x: 13.445217, y: -28.571087}
+  - id: house-09
+    asset: stilt_house
+    offset: {x: 39, y: -18}
+    yaw: 114.77514
+    height: 5.4
+    entrance: {x: 33.552246, y: -15.485651}
+  - id: house-10
+    asset: stilt_house
+    offset: {x: 54, y: 9}
+    yaw: 80.53768
+    height: 5.7000003
+    entrance: {x: 48.081635, y: 8.013606}
+  - id: house-11
+    asset: stilt_house
+    offset: {x: 43, y: 52}
+    yaw: 39.58813
+    height: 6
+    entrance: {x: 39.176414, y: 47.37613}
+  - id: house-12
+    asset: stilt_house
+    offset: {x: -21, y: 59}
+    yaw: -19.592281
+    height: 5.4
+    entrance: {x: -18.988052, y: 53.347385}
+  paths:
+  - name: Kampung / longhouse
+    points:
+    - {x: 3176.4897, y: 997.5498}
+    - {x: 3176.4897, y: 1007.5498}
+    - {x: 3176.4897, y: 1020.5498}
+    halfWidth: 2.5
+    surfaceHeights: []
+  - name: Kampung / house-01
+    points:
+    - {x: 3167.7656, y: 1009.3805}
+    - {x: 3165.98, y: 1007.3181}
+    - {x: 3163.482, y: 1006.2216}
+    halfWidth: 1.8
+    surfaceHeights: []
+  - name: Kampung / house-02
+    points:
+    - {x: 3186.6514, y: 997.5498}
+    - {x: 3186.0513, y: 1001.27576}
+    - {x: 3186.6514, y: 1005.00165}
+    halfWidth: 1.8
+    surfaceHeights: []
+  - name: Kampung / house-03
+    points:
+    - {x: 3152.4731, y: 1030.1185}
+    - {x: 3149.111, y: 1026.8937}
+    - {x: 3145.0364, y: 1024.6346}
+    halfWidth: 1.8
+    surfaceHeights: []
+  - name: Kampung / house-04
+    points:
+    - {x: 3202.247, y: 997.5498}
+    - {x: 3201.647, y: 1010.42847}
+    - {x: 3202.247, y: 1023.3072}
+    halfWidth: 1.8
+    surfaceHeights: []
+  - name: Kampung / house-05
+    points:
+    - {x: 3137.3733, y: 997.5498}
+    - {x: 3136.7732, y: 1001.4614}
+    - {x: 3137.3733, y: 1005.3731}
+    halfWidth: 1.8
+    surfaceHeights: []
+  - name: Kampung / house-06
+    points:
+    - {x: 3134.281, y: 997.5498}
+    - {x: 3134.881, y: 991.83405}
+    - {x: 3134.281, y: 986.1183}
+    halfWidth: 1.8
+    surfaceHeights: []
+  - name: Kampung / house-07
+    points:
+    - {x: 3154.645, y: 982.40894}
+    - {x: 3159.7715, y: 976.0659}
+    - {x: 3163.9116, y: 969.0393}
+    halfWidth: 1.8
+    surfaceHeights: []
+  - name: Kampung / house-08
+    points:
+    - {x: 3197.1199, y: 975.7906}
+    - {x: 3193.9402, y: 971.9492}
+    - {x: 3189.935, y: 968.9787}
+    halfWidth: 1.8
+    surfaceHeights: []
+  - name: Kampung / house-09
+    points:
+    - {x: 3200.1045, y: 972.6424}
+    - {x: 3204.6604, y: 977.7887}
+    - {x: 3210.042, y: 982.06415}
+    halfWidth: 1.8
+    surfaceHeights: []
+  - name: Kampung / house-10
+    points:
+    - {x: 3224.5713, y: 997.5498}
+    - {x: 3223.9712, y: 1001.55664}
+    - {x: 3224.5713, y: 1005.5634}
+    halfWidth: 1.8
+    surfaceHeights: []
+  - name: Kampung / house-11
+    points:
+    - {x: 3215.6663, y: 997.5498}
+    - {x: 3215.0662, y: 1021.23785}
+    - {x: 3215.6663, y: 1044.9259}
+    halfWidth: 1.8
+    surfaceHeights: []
+  - name: Kampung / house-12
+    points:
+    - {x: 3144.319, y: 1041.1761}
+    - {x: 3150.5542, y: 1046.5195}
+    - {x: 3157.5017, y: 1050.8972}
+    halfWidth: 1.8
+    surfaceHeights: []
+  - name: Kampung / boat dock ramp
+    points:
+    - {x: 3260.4897, y: 997.5498}
+    - {x: 3272.4897, y: 991.5498}
+    - {x: 3286.4897, y: 983.5498}
+    - {x: 3302.4897, y: 973.5498}
+    halfWidth: 2
+    surfaceHeights:
+    - 42.080536
+    - 41
+    - 38.5
+    - 36.4
+  platforms:
+  - id: kampung-market
+    boundary:
+    - {x: 3169.4897, y: 991.5498}
+    - {x: 3168.4897, y: 1000.5498}
+    - {x: 3172.4897, y: 1004.5498}
+    - {x: 3182.4897, y: 1004.5498}
+    - {x: 3185.4897, y: 999.5498}
+    - {x: 3183.4897, y: 991.5498}
+    surface: 42.0819
+  - id: kampung-dock
+    boundary:
+    - {x: 3298.4897, y: 967.5498}
+    - {x: 3298.4897, y: 978.5498}
+    - {x: 3306.4897, y: 978.5498}
+    - {x: 3306.4897, y: 967.5498}
+    surface: 36.4
+  - id: kampung-porch-longhouse
+    boundary:
+    - {x: 3179.4897, y: 1018.5498}
+    - {x: 3179.4897, y: 1022.5498}
+    - {x: 3173.4897, y: 1022.5498}
+    - {x: 3173.4897, y: 1018.5498}
+    surface: 42.082474
+  - id: kampung-porch-house-01
+    boundary:
+    - {x: 3166.81, y: 1007.6084}
+    - {x: 3163.482, y: 1009.82715}
+    - {x: 3160.1538, y: 1004.83484}
+    - {x: 3163.482, y: 1002.6161}
+    surface: 42.082355
+  - id: kampung-porch-house-02
+    boundary:
+    - {x: 3186.8127, y: 1001.3997}
+    - {x: 3190.0383, y: 1003.7652}
+    - {x: 3186.49, y: 1008.6036}
+    - {x: 3183.2644, y: 1006.2381}
+    surface: 42.081898
+  - id: kampung-porch-house-03
+    boundary:
+    - {x: 3148.5095, y: 1025.6029}
+    - {x: 3145.4783, y: 1028.213}
+    - {x: 3141.5632, y: 1023.6664}
+    - {x: 3144.5945, y: 1021.0563}
+    surface: 42.083218
+  - id: kampung-porch-house-04
+    boundary:
+    - {x: 3202.954, y: 1019.77167}
+    - {x: 3205.7827, y: 1022.60004}
+    - {x: 3201.54, y: 1026.8427}
+    - {x: 3198.7114, y: 1024.0143}
+    surface: 42.082058
+  - id: kampung-porch-house-05
+    boundary:
+    - {x: 3139.9229, y: 1007.9226}
+    - {x: 3136.0005, y: 1008.70703}
+    - {x: 3134.8237, y: 1002.8236}
+    - {x: 3138.746, y: 1002.0392}
+    surface: 42.08284
+  - id: kampung-porch-house-06
+    boundary:
+    - {x: 3135.4272, y: 989.5368}
+    - {x: 3131.5664, y: 988.49115}
+    - {x: 3133.1348, y: 982.69977}
+    - {x: 3136.9956, y: 983.7454}
+    surface: 42.08239
+  - id: kampung-porch-house-07
+    boundary:
+    - {x: 3161.974, y: 972.0801}
+    - {x: 3160.3594, y: 968.4204}
+    - {x: 3165.849, y: 965.99854}
+    - {x: 3167.4639, y: 969.6582}
+    surface: 42.081455
+  - id: kampung-porch-house-08
+    boundary:
+    - {x: 3186.3691, y: 969.5109}
+    - {x: 3188.0723, y: 965.89166}
+    - {x: 3193.501, y: 968.4465}
+    - {x: 3191.7979, y: 972.06573}
+    surface: 42.081036
+  - id: kampung-porch-house-09
+    boundary:
+    - {x: 3206.969, y: 980.1784}
+    - {x: 3210.6008, y: 978.50214}
+    - {x: 3213.115, y: 983.9499}
+    - {x: 3209.4832, y: 985.62616}
+    surface: 42.080994
+  - id: kampung-porch-house-10
+    boundary:
+    - {x: 3223.0916, y: 1002.27545}
+    - {x: 3227.0374, y: 1002.93304}
+    - {x: 3226.051, y: 1008.8514}
+    - {x: 3222.1052, y: 1008.1938}
+    surface: 42.08126
+  - id: kampung-porch-house-11
+    boundary:
+    - {x: 3216.7039, y: 1041.4729}
+    - {x: 3219.2527, y: 1044.5554}
+    - {x: 3214.6287, y: 1048.3789}
+    - {x: 3212.0798, y: 1045.2964}
+    surface: 42.08234
+  - id: kampung-porch-house-12
+    boundary:
+    - {x: 3160.9988, y: 1050.019}
+    - {x: 3159.6575, y: 1053.7874}
+    - {x: 3154.0046, y: 1051.7754}
+    - {x: 3155.346, y: 1048.0071}
+    surface: 42.083714
+  channels: []
+  seed: 5102026
+  grassDensity: 0.85

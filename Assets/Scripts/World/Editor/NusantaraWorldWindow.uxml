@@ -1,0 +1,19 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements">
+    <ui:Style src="NusantaraWorldWindow.uss" />
+    <ui:ScrollView class="world-panel">
+        <ui:Label text="NUSANTARA QUEST" class="world-title" />
+        <ui:Label text="World foundation · Regions 1–6" class="world-subtitle" />
+        <ui:Label text="Reference geography uses the supplied regional sketch and Bujang Senang concept. Open NusantaraQuest_World, then use Tools → Nusantara → Preview to visit its locations. Playtesting is left to you." class="world-note" />
+        <uie:ObjectField name="definition" label="World definition" />
+        <ui:Button name="setup" text="Create / select foundation assets" />
+        <ui:Button name="checkConfig" text="Check configuration and reference readiness" />
+        <ui:Button name="checks" text="Run foundation checks" />
+        <ui:Label text="Walkability" class="world-heading" />
+        <uie:ObjectField name="area" label="Validation area" />
+        <ui:Label text="Assign a WorldWalkabilityArea on loaded ground, with ground/obstacle layers, entry and required destinations. Checks slopes, steps, missing ground, character clearance and sampled route connectivity. Scene markers show the first 1,000 issues." class="world-note" />
+        <ui:Button name="validate" text="Validate loaded walking area" />
+        <ui:Button name="cancel" text="Cancel validation" />
+        <ui:Button name="report" text="Save validation report to Library" />
+        <ui:Label name="status" text="World authoring tools. Checks below run only when you choose them." class="world-status" />
+    </ui:ScrollView>
+</ui:UXML>

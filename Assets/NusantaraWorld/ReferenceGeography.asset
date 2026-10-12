@@ -1,0 +1,663 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e470df80e09914e80a769854a08d4fea, type: 3}
+  m_Name: ReferenceGeography
+  m_EditorClassIdentifier: Assembly-CSharp::Nusantara.World.WorldGeographyProfile
+  world: {fileID: 11400000, guid: 0f165cdf48bcd44f095c318ae24b3fd7, type: 2}
+  coast:
+  - {x: -6144, y: -408.08856}
+  - {x: -6035.3306, y: 2641.2397}
+  - {x: -5642.449, y: 3661.4612}
+  - {x: -5333.159, y: 4103.557}
+  - {x: -5199.412, y: 4919.7344}
+  - {x: -5057.306, y: 5293.8154}
+  - {x: -4831.6084, y: 5520.5312}
+  - {x: -1997.8448, y: 5520.5312}
+  - {x: -1730.3511, y: 5701.9043}
+  - {x: -1053.2572, y: 6109.9927}
+  - {x: -677.0939, y: 6144}
+  - {x: -66.87347, y: 6053.3135}
+  - {x: 484.83264, y: 5849.2695}
+  - {x: 978.0245, y: 5577.2104}
+  - {x: 1546.449, y: 5214.465}
+  - {x: 1947.6898, y: 4863.055}
+  - {x: 2340.5715, y: 4840.384}
+  - {x: 2599.706, y: 4874.391}
+  - {x: 2892.2776, y: 4488.974}
+  - {x: 3209.9265, y: 4012.8708}
+  - {x: 3552.653, y: 3548.1033}
+  - {x: 4062.5632, y: 3174.0222}
+  - {x: 4472.163, y: 2833.9482}
+  - {x: 4722.939, y: 2244.487}
+  - {x: 5057.306, y: 1700.369}
+  - {x: 5316.441, y: 1337.6237}
+  - {x: 5642.449, y: 895.52765}
+  - {x: 6144, y: 136.02953}
+  - {x: 5960.098, y: -453.43173}
+  - {x: 5542.1387, y: -1042.893}
+  - {x: 5057.306, y: -1598.3469}
+  - {x: 5149.2573, y: -1938.4207}
+  - {x: 5124.1797, y: -2471.203}
+  - {x: 3836.8652, y: -3548.1033}
+  - {x: 3368.751, y: -3820.1624}
+  - {x: 2967.5103, y: -4148.9004}
+  - {x: 2633.1428, y: -4602.332}
+  - {x: 2424.1633, y: -4783.7046}
+  - {x: 1713.6327, y: -5010.421}
+  - {x: 1295.6735, y: -5350.4946}
+  - {x: 794.12244, y: -5690.5684}
+  - {x: -125.38776, y: -5962.6274}
+  - {x: -877.7143, y: -6144}
+  - {x: -1178.6449, y: -6144}
+  - {x: -1404.3429, y: -6030.642}
+  - {x: -1705.2734, y: -5611.218}
+  - {x: -1989.4857, y: -5135.1143}
+  - {x: -2139.951, y: -4863.055}
+  - {x: -2800.3264, y: -4874.391}
+  - {x: -3418.906, y: -4817.7124}
+  - {x: -3937.1755, y: -4670.3467}
+  - {x: -4455.445, y: -4488.974}
+  - {x: -4873.4043, y: -4488.974}
+  - {x: -5182.694, y: -4341.609}
+  - {x: -5416.751, y: -4058.214}
+  - {x: -5583.9346, y: -3661.4612}
+  - {x: -5667.5264, y: -3140.0146}
+  - {x: -5751.118, y: -2935.9705}
+  - {x: -5734.4, y: -2743.262}
+  - {x: -5583.9346, y: -2471.203}
+  - {x: -5634.09, y: -2187.808}
+  - {x: -5742.7593, y: -1700.369}
+  - {x: -5893.2246, y: -838.8487}
+  - {x: -5926.661, y: -589.46124}
+  waterways:
+  - name: Sungai Bujang main river
+    points:
+    - {x: 3385.4695, y: 2811.2769}
+    - {x: 3218.2856, y: 2301.166}
+    - {x: 3385.4695, y: 1881.7417}
+    - {x: 3134.6938, y: 1394.3026}
+    - {x: 3343.6736, y: 884.1919}
+    - {x: 2967.5103, y: 600.79706}
+    - {x: 2800.3264, y: 192.70848}
+    halfWidth: 48
+    surface: 35
+  - name: Delta western channel
+    points:
+    - {x: 3134.6938, y: 1394.3026}
+    - {x: 2758.5305, y: 1167.5867}
+    - {x: 2674.9387, y: 827.51294}
+    - {x: 2465.9592, y: 566.7897}
+    - {x: 2173.3877, y: 340.0738}
+    halfWidth: 27
+    surface: 35
+  - name: Delta eastern channel
+    points:
+    - {x: 3343.6736, y: 884.1919}
+    - {x: 3385.4695, y: 374.08118}
+    - {x: 3719.8367, y: 113.35793}
+    - {x: 4012.4082, y: -589.46124}
+    - {x: 4346.7754, y: -1156.251}
+    - {x: 4513.959, y: -1893.0775}
+    - {x: 4304.9795, y: -2516.5461}
+    halfWidth: 31
+    surface: 35
+  - name: Swamp branch
+    points:
+    - {x: 3385.4695, y: 374.08118}
+    - {x: 3928.8164, y: 317.40222}
+    - {x: 4221.3877, y: -56.678967}
+    - {x: 4054.204, y: -532.7823}
+    halfWidth: 22
+    surface: 35
+  - name: Delta island channel
+    points:
+    - {x: 2967.5103, y: 600.79706}
+    - {x: 3134.6938, y: 374.08118}
+    - {x: 3343.6736, y: 181.3727}
+    halfWidth: 24
+    surface: 35
+  - name: Sacred waterfall pool
+    points:
+    - {x: 3385.4695, y: 2811.2769}
+    halfWidth: 105
+    surface: 35
+  - name: Sarang river basin
+    points:
+    - {x: 4555.755, y: -1915.749}
+    halfWidth: 135
+    surface: 35
+  - name: Gua Sunyi hidden pool
+    points:
+    - {x: 4355.135, y: 2097.1218}
+    halfWidth: 20
+    surface: 35
+  - name: Region 1 freshwater basin
+    points:
+    - {x: -835.9184, y: 827.51294}
+    - {x: -702.17145, y: 952.20667}
+    - {x: -543.3469, y: 997.5498}
+    halfWidth: 185
+    surface: 35
+  - name: Region 1 southern lake
+    points:
+    - {x: -1103.4122, y: -22.671587}
+    - {x: -961.30615, y: -79.350555}
+    halfWidth: 95
+    surface: 35
+  routes:
+  - name: Region 1 to western forest
+    points:
+    - {x: 125.38776, y: 997.5498}
+    - {x: -626.9388, y: 1677.6974}
+    - {x: -1797.2245, y: 1791.0553}
+    - {x: -3051.102, y: 2357.845}
+    - {x: -3928.8164, y: 2357.845}
+    halfWidth: 10
+    surfaceHeights: []
+  - name: Region 1 to ancient forest
+    points:
+    - {x: 125.38776, y: 997.5498}
+    - {x: -376.16327, y: -362.7454}
+    - {x: -1253.8776, y: -1042.893}
+    - {x: -1880.8163, y: -2629.904}
+    - {x: -2967.5103, y: -2969.9778}
+    halfWidth: 10
+    surfaceHeights: []
+  - name: Region 1 to stone foothills
+    points:
+    - {x: 125.38776, y: 997.5498}
+    - {x: 543.3469, y: -249.38745}
+    - {x: 585.1429, y: -1553.0037}
+    - {x: 1212.0817, y: -2686.583}
+    - {x: 1462.8572, y: -3480.0886}
+    halfWidth: 10
+    surfaceHeights: []
+  - name: Region 1 to northern kingdom
+    points:
+    - {x: 125.38776, y: 997.5498}
+    - {x: 208.9796, y: 2244.487}
+    - {x: 292.57144, y: 3094.6716}
+    - {x: 459.7551, y: 4681.6826}
+    halfWidth: 10
+    surfaceHeights: []
+  - name: Region 1 to Kampung Sungai
+    points:
+    - {x: 125.38776, y: 997.5498}
+    - {x: 1128.4897, y: 1110.9077}
+    - {x: 2006.2041, y: 1054.2288}
+    - {x: 2633.1428, y: 997.5498}
+    - {x: 3176.4897, y: 997.5498}
+    halfWidth: 10
+    surfaceHeights: []
+  - name: Village to Hutan Rimba
+    points:
+    - {x: 3176.4897, y: 997.5498}
+    - {x: 2883.9185, y: 1394.3026}
+    - {x: 2549.551, y: 1791.0553}
+    - {x: 2549.551, y: 2244.487}
+    halfWidth: 10
+    surfaceHeights: []
+  - name: Forest to waterfall
+    points:
+    - {x: 2549.551, y: 2244.487}
+    - {x: 2883.9185, y: 2641.2397}
+    - {x: 3201.5674, y: 2811.2769}
+    halfWidth: 10
+    surfaceHeights: []
+  - name: Waterfall to hidden cave
+    points:
+    - {x: 3201.5674, y: 2811.2769}
+    - {x: 3636.2449, y: 2641.2397}
+    - {x: 4137.796, y: 2357.845}
+    - {x: 4304.9795, y: 2187.808}
+    - {x: 4304.9795, y: 2017.7712}
+    halfWidth: 10
+    surfaceHeights: []
+  - name: Village to delta
+    points:
+    - {x: 3176.4897, y: 997.5498}
+    - {x: 2800.3264, y: 736.82654}
+    - {x: 2633.1428, y: 374.08118}
+    halfWidth: 10
+    surfaceHeights: []
+  - name: Village to swamp
+    points:
+    - {x: 3176.4897, y: 997.5498}
+    - {x: 3552.653, y: 600.79706}
+    - {x: 3719.8367, y: -249.38745}
+    halfWidth: 10
+    surfaceHeights: []
+  - name: Village to ruins
+    points:
+    - {x: 3176.4897, y: 997.5498}
+    - {x: 3970.6123, y: 997.5498}
+    - {x: 4388.5713, y: 770.8339}
+    - {x: 4806.531, y: 544.1181}
+    halfWidth: 10
+    surfaceHeights: []
+  - name: Ruins to cave
+    points:
+    - {x: 4806.531, y: 544.1181}
+    - {x: 4597.551, y: 1280.9447}
+    - {x: 4304.9795, y: 1847.7344}
+    - {x: 4304.9795, y: 2017.7712}
+    halfWidth: 10
+    surfaceHeights: []
+  - name: Ruins to Pulau Buaya
+    points:
+    - {x: 4806.531, y: 544.1181}
+    - {x: 4806.531, y: -362.7454}
+    - {x: 4722.939, y: -1042.893}
+    halfWidth: 10
+    surfaceHeights: []
+  - name: Swamp to elite territory
+    points:
+    - {x: 3719.8367, y: -249.38745}
+    - {x: 4137.796, y: -872.8561}
+    - {x: 4722.939, y: -1042.893}
+    halfWidth: 10
+    surfaceHeights: []
+  - name: Elite territory to boss arena
+    points:
+    - {x: 4722.939, y: -1042.893}
+    - {x: 4890.1226, y: -1439.6458}
+    - {x: 4806.531, y: -1893.0775}
+    halfWidth: 10
+    surfaceHeights: []
+  - name: Region 4 eastern connection
+    points:
+    - {x: 1462.8572, y: -3480.0886}
+    - {x: 2633.1428, y: -2913.2988}
+    - {x: 3385.4695, y: -2459.8672}
+    - {x: 4137.796, y: -2119.7935}
+    - {x: 4806.531, y: -1893.0775}
+    halfWidth: 10
+    surfaceHeights: []
+  - name: Kampung / longhouse
+    points:
+    - {x: 3176.4897, y: 997.5498}
+    - {x: 3176.4897, y: 1007.5498}
+    - {x: 3176.4897, y: 1020.5498}
+    halfWidth: 2.5
+    surfaceHeights: []
+  - name: Kampung / house-01
+    points:
+    - {x: 3167.7656, y: 1009.3805}
+    - {x: 3165.98, y: 1007.3181}
+    - {x: 3163.482, y: 1006.2216}
+    halfWidth: 1.8
+    surfaceHeights: []
+  - name: Kampung / house-02
+    points:
+    - {x: 3186.6514, y: 997.5498}
+    - {x: 3186.0513, y: 1001.27576}
+    - {x: 3186.6514, y: 1005.00165}
+    halfWidth: 1.8
+    surfaceHeights: []
+  - name: Kampung / house-03
+    points:
+    - {x: 3152.4731, y: 1030.1185}
+    - {x: 3149.111, y: 1026.8937}
+    - {x: 3145.0364, y: 1024.6346}
+    halfWidth: 1.8
+    surfaceHeights: []
+  - name: Kampung / house-04
+    points:
+    - {x: 3202.247, y: 997.5498}
+    - {x: 3201.647, y: 1010.42847}
+    - {x: 3202.247, y: 1023.3072}
+    halfWidth: 1.8
+    surfaceHeights: []
+  - name: Kampung / house-05
+    points:
+    - {x: 3137.3733, y: 997.5498}
+    - {x: 3136.7732, y: 1001.4614}
+    - {x: 3137.3733, y: 1005.3731}
+    halfWidth: 1.8
+    surfaceHeights: []
+  - name: Kampung / house-06
+    points:
+    - {x: 3134.281, y: 997.5498}
+    - {x: 3134.881, y: 991.83405}
+    - {x: 3134.281, y: 986.1183}
+    halfWidth: 1.8
+    surfaceHeights: []
+  - name: Kampung / house-07
+    points:
+    - {x: 3154.645, y: 982.40894}
+    - {x: 3159.7715, y: 976.0659}
+    - {x: 3163.9116, y: 969.0393}
+    halfWidth: 1.8
+    surfaceHeights: []
+  - name: Kampung / house-08
+    points:
+    - {x: 3197.1199, y: 975.7906}
+    - {x: 3193.9402, y: 971.9492}
+    - {x: 3189.935, y: 968.9787}
+    halfWidth: 1.8
+    surfaceHeights: []
+  - name: Kampung / house-09
+    points:
+    - {x: 3200.1045, y: 972.6424}
+    - {x: 3204.6604, y: 977.7887}
+    - {x: 3210.042, y: 982.06415}
+    halfWidth: 1.8
+    surfaceHeights: []
+  - name: Kampung / house-10
+    points:
+    - {x: 3224.5713, y: 997.5498}
+    - {x: 3223.9712, y: 1001.55664}
+    - {x: 3224.5713, y: 1005.5634}
+    halfWidth: 1.8
+    surfaceHeights: []
+  - name: Kampung / house-11
+    points:
+    - {x: 3215.6663, y: 997.5498}
+    - {x: 3215.0662, y: 1021.23785}
+    - {x: 3215.6663, y: 1044.9259}
+    halfWidth: 1.8
+    surfaceHeights: []
+  - name: Kampung / house-12
+    points:
+    - {x: 3144.319, y: 1041.1761}
+    - {x: 3150.5542, y: 1046.5195}
+    - {x: 3157.5017, y: 1050.8972}
+    halfWidth: 1.8
+    surfaceHeights: []
+  - name: Kampung / boat dock ramp
+    points:
+    - {x: 3260.4897, y: 997.5498}
+    - {x: 3272.4897, y: 991.5498}
+    - {x: 3286.4897, y: 983.5498}
+    - {x: 3302.4897, y: 973.5498}
+    halfWidth: 2
+    surfaceHeights:
+    - 42.080536
+    - 41
+    - 38.5
+    - 36.4
+  terrainIntervals: 32
+  distantIntervals: 8
+  treesPerChunk: 48
+  groundLevel: 42
+  scenicIslands:
+  - id: region5-scenic-island-00
+    center: {x: 3339.314, y: 2651.456}
+    radius: 18
+    waterLevel: 35
+  - id: region5-scenic-island-01
+    center: {x: 3301.4353, y: 2549.6187}
+    radius: 18
+    waterLevel: 35
+  - id: region5-scenic-island-02
+    center: {x: 3272.022, y: 2457.6052}
+    radius: 18
+    waterLevel: 35
+  - id: region5-scenic-island-03
+    center: {x: 3231.7507, y: 2349.9788}
+    radius: 18
+    waterLevel: 35
+  - id: region5-scenic-island-04
+    center: {x: 3240.6511, y: 2260.2656}
+    radius: 18
+    waterLevel: 35
+  - id: region5-scenic-island-05
+    center: {x: 3263.8547, y: 2173.8293}
+    radius: 18
+    waterLevel: 35
+  - id: region5-scenic-island-06
+    center: {x: 3296.6362, y: 2083.456}
+    radius: 18
+    waterLevel: 35
+  - id: region5-scenic-island-07
+    center: {x: 3334.5344, y: 2011.4493}
+    radius: 18
+    waterLevel: 35
+  - id: region5-scenic-island-08
+    center: {x: 3363.269, y: 1919.7245}
+    radius: 18
+    waterLevel: 35
+  - id: region5-scenic-island-09
+    center: {x: 3358.9375, y: 1837.0767}
+    radius: 18
+    waterLevel: 35
+  - id: region5-scenic-island-10
+    center: {x: 3310.2039, y: 1738.1149}
+    radius: 18
+    waterLevel: 35
+  - id: region5-scenic-island-11
+    center: {x: 3266.226, y: 1637.982}
+    radius: 18
+    waterLevel: 35
+  - id: region5-scenic-island-12
+    center: {x: 3206.5093, y: 1546.7971}
+    radius: 18
+    waterLevel: 35
+  - id: region5-scenic-island-13
+    center: {x: 3156.0005, y: 1439.6719}
+    radius: 18
+    waterLevel: 35
+  - id: region5-scenic-island-14
+    center: {x: 3157.621, y: 1340.001}
+    radius: 18
+    waterLevel: 35
+  - id: region5-scenic-island-15
+    center: {x: 3190.543, y: 1242.9557}
+    radius: 18
+    waterLevel: 35
+  - id: region5-scenic-island-16
+    center: {x: 3226.7976, y: 794.1716}
+    radius: 18
+    waterLevel: 35
+  - id: region5-scenic-island-17
+    center: {x: 3152.951, y: 735.325}
+    radius: 18
+    waterLevel: 35
+  - id: region5-scenic-island-18
+    center: {x: 3080.535, y: 683.0874}
+    radius: 18
+    waterLevel: 35
+  - id: region5-scenic-island-19
+    center: {x: 3006.0476, y: 629.8646}
+    radius: 18
+    waterLevel: 35
+  - id: region5-scenic-island-20
+    center: {x: 2949.4539, y: 553.7991}
+    radius: 18
+    waterLevel: 35
+  - id: region5-scenic-island-21
+    center: {x: 2913.3367, y: 471.45645}
+    radius: 18
+    waterLevel: 35
+  - id: region5-scenic-island-22
+    center: {x: 2883.4702, y: 392.41815}
+    radius: 18
+    waterLevel: 35
+  - id: region5-scenic-island-23
+    center: {x: 2843.4358, y: 308.53}
+    radius: 18
+    waterLevel: 35
+  walkingPlatforms:
+  - id: kampung-market
+    boundary:
+    - {x: 3169.4897, y: 991.5498}
+    - {x: 3168.4897, y: 1000.5498}
+    - {x: 3172.4897, y: 1004.5498}
+    - {x: 3182.4897, y: 1004.5498}
+    - {x: 3185.4897, y: 999.5498}
+    - {x: 3183.4897, y: 991.5498}
+    surface: 42.0819
+  - id: kampung-dock
+    boundary:
+    - {x: 3298.4897, y: 967.5498}
+    - {x: 3298.4897, y: 978.5498}
+    - {x: 3306.4897, y: 978.5498}
+    - {x: 3306.4897, y: 967.5498}
+    surface: 36.4
+  - id: kampung-porch-longhouse
+    boundary:
+    - {x: 3179.4897, y: 1018.5498}
+    - {x: 3179.4897, y: 1022.5498}
+    - {x: 3173.4897, y: 1022.5498}
+    - {x: 3173.4897, y: 1018.5498}
+    surface: 42.082474
+  - id: kampung-porch-house-01
+    boundary:
+    - {x: 3166.81, y: 1007.6084}
+    - {x: 3163.482, y: 1009.82715}
+    - {x: 3160.1538, y: 1004.83484}
+    - {x: 3163.482, y: 1002.6161}
+    surface: 42.082355
+  - id: kampung-porch-house-02
+    boundary:
+    - {x: 3186.8127, y: 1001.3997}
+    - {x: 3190.0383, y: 1003.7652}
+    - {x: 3186.49, y: 1008.6036}
+    - {x: 3183.2644, y: 1006.2381}
+    surface: 42.081898
+  - id: kampung-porch-house-03
+    boundary:
+    - {x: 3148.5095, y: 1025.6029}
+    - {x: 3145.4783, y: 1028.213}
+    - {x: 3141.5632, y: 1023.6664}
+    - {x: 3144.5945, y: 1021.0563}
+    surface: 42.083218
+  - id: kampung-porch-house-04
+    boundary:
+    - {x: 3202.954, y: 1019.77167}
+    - {x: 3205.7827, y: 1022.60004}
+    - {x: 3201.54, y: 1026.8427}
+    - {x: 3198.7114, y: 1024.0143}
+    surface: 42.082058
+  - id: kampung-porch-house-05
+    boundary:
+    - {x: 3139.9229, y: 1007.9226}
+    - {x: 3136.0005, y: 1008.70703}
+    - {x: 3134.8237, y: 1002.8236}
+    - {x: 3138.746, y: 1002.0392}
+    surface: 42.08284
+  - id: kampung-porch-house-06
+    boundary:
+    - {x: 3135.4272, y: 989.5368}
+    - {x: 3131.5664, y: 988.49115}
+    - {x: 3133.1348, y: 982.69977}
+    - {x: 3136.9956, y: 983.7454}
+    surface: 42.08239
+  - id: kampung-porch-house-07
+    boundary:
+    - {x: 3161.974, y: 972.0801}
+    - {x: 3160.3594, y: 968.4204}
+    - {x: 3165.849, y: 965.99854}
+    - {x: 3167.4639, y: 969.6582}
+    surface: 42.081455
+  - id: kampung-porch-house-08
+    boundary:
+    - {x: 3186.3691, y: 969.5109}
+    - {x: 3188.0723, y: 965.89166}
+    - {x: 3193.501, y: 968.4465}
+    - {x: 3191.7979, y: 972.06573}
+    surface: 42.081036
+  - id: kampung-porch-house-09
+    boundary:
+    - {x: 3206.969, y: 980.1784}
+    - {x: 3210.6008, y: 978.50214}
+    - {x: 3213.115, y: 983.9499}
+    - {x: 3209.4832, y: 985.62616}
+    surface: 42.080994
+  - id: kampung-porch-house-10
+    boundary:
+    - {x: 3223.0916, y: 1002.27545}
+    - {x: 3227.0374, y: 1002.93304}
+    - {x: 3226.051, y: 1008.8514}
+    - {x: 3222.1052, y: 1008.1938}
+    surface: 42.08126
+  - id: kampung-porch-house-11
+    boundary:
+    - {x: 3216.7039, y: 1041.4729}
+    - {x: 3219.2527, y: 1044.5554}
+    - {x: 3214.6287, y: 1048.3789}
+    - {x: 3212.0798, y: 1045.2964}
+    surface: 42.08234
+  - id: kampung-porch-house-12
+    boundary:
+    - {x: 3160.9988, y: 1050.019}
+    - {x: 3159.6575, y: 1053.7874}
+    - {x: 3154.0046, y: 1051.7754}
+    - {x: 3155.346, y: 1048.0071}
+    surface: 42.083714
+  buildingFoundations:
+  - id: kampung-longhouse
+    center: {x: 3176.4897, y: 1028.5498}
+    radius: 10.488973
+    blend: 24
+    height: 39.738926
+  - id: kampung-house-01
+    center: {x: 3158.4897, y: 1009.5498}
+    radius: 5.750382
+    blend: 24
+    height: 40.582382
+  - id: kampung-house-02
+    center: {x: 3191.4897, y: 1008.5498}
+    radius: 5.750382
+    blend: 24
+    height: 40.581745
+  - id: kampung-house-03
+    center: {x: 3140.4897, y: 1028.5498}
+    radius: 5.970993
+    blend: 24
+    height: 40.49503
+  - id: kampung-house-04
+    center: {x: 3206.4897, y: 1027.5498}
+    radius: 6.191604
+    blend: 24
+    height: 40.405437
+  - id: kampung-house-05
+    center: {x: 3131.4897, y: 1006.5498}
+    radius: 6.4122143
+    blend: 24
+    height: 40.318104
+  - id: kampung-house-06
+    center: {x: 3128.4897, y: 984.5498}
+    radius: 5.970993
+    blend: 24
+    height: 40.49406
+  - id: kampung-house-07
+    center: {x: 3161.4897, y: 963.5498}
+    radius: 6.191604
+    blend: 24
+    height: 40.40473
+  - id: kampung-house-08
+    center: {x: 3192.4897, y: 963.5498}
+    radius: 6.4122143
+    blend: 24
+    height: 40.315998
+  - id: kampung-house-09
+    center: {x: 3215.4897, y: 979.5498}
+    radius: 5.970993
+    blend: 24
+    height: 40.49246
+  - id: kampung-house-10
+    center: {x: 3230.4897, y: 1006.5498}
+    radius: 6.191604
+    blend: 24
+    height: 40.40454
+  - id: kampung-house-11
+    center: {x: 3219.4897, y: 1049.5498}
+    radius: 6.4122143
+    blend: 24
+    height: 40.317497
+  - id: kampung-house-12
+    center: {x: 3155.4897, y: 1056.5498}
+    radius: 5.970993
+    blend: 24
+    height: 40.49553
+  region5ReliefStrength: 0

@@ -1,0 +1,18 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements">
+  <ui:Style src="VegetationPainter.uss" />
+  <ui:ScrollView class="paint-panel">
+    <ui:Label text="Tree props &amp; living grass" class="title" />
+    <ui:Label text="Paint in Scene view. Tree trunks use your model; leaves use a shared VFX canopy." class="description" />
+    <editor:ObjectField name="palette" label="Palette" />
+    <ui:EnumField name="mode" label="Paint" />
+    <ui:Slider name="radius" label="Brush radius (m)" low-value="1" high-value="30" show-input-field="true" />
+    <ui:Slider name="density" label="Density" low-value="0.05" high-value="1" show-input-field="true" />
+    <ui:Toggle name="paint" label="Enable painting" />
+    <ui:Toggle name="erase" label="Erase mode" />
+    <ui:Label text="Drag: paint · Shift + drag: erase · Ctrl/Cmd + Z: Undo · Alt: orbit camera" class="description" />
+    <ui:Label text="Edit the palette asset for tree heights, grass heights and spacing. Red brush areas exclude water, paths, platforms and land outside Map 5." class="description" />
+    <ui:Button name="frame" text="Frame Kampung Sungai" />
+    <ui:Button name="save" text="Save painted chunks" class="save" />
+    <ui:Label name="status" class="status" />
+  </ui:ScrollView>
+</ui:UXML>

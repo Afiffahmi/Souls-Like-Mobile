@@ -1,0 +1,47 @@
+Region5Enhancement.txt
+Enhanced 305 existing Region 5 chunks; 11220 reusable details; 24 unreachable scenic islands; removed 2 old giant skull placements and 0 outside-region props. Unique IDs: 35. Backup: Library/Nusantara/Region5Backup/20261012-115109.
+
+Region5Collision.txt
+Saved 4554 simple essential colliders in 305 Region 5 chunks and updated navigation. Scenic islands and small plants have no colliders. Backup: Library/Nusantara/Region5CollisionBackup/20261012-121044.
+
+Region5Validation.txt
+Region 5 validation completed: 305 chunks; 8005 route samples; 1 giant crocodile; 35 unique IDs; 24 scenic islands; 276 canopy VFX batches; 11230 enhancement objects; 0 route failures; 0 seam failures; 0 recorded issues.
+2 m route sampling checks floor, slope, capsule clearance and adjacent heights. It does not replace controller/device playtesting.
+
+FoundationChecks.txt
+26 foundation checks passed.
+Negative world coordinates use floor division
+Exact chunk boundary belongs to next chunk
+World limits reject out-of-bounds chunks
+Neighbouring gameplay chunks preload before entry
+Visual ring loads beyond gameplay
+Far ring uses distant terrain
+Unload hysteresis retains boundary chunks
+Chunks beyond retention radius unload
+Visual detail has its own hysteresis band
+Movement prediction preloads ahead and clamps lookahead
+Candidate planning stays local and inside the grid
+Adjacent terrain edges share exact height samples
+Adjacent terrain edge normals match
+Terrain topology faces upward
+Non-power-of-two chunk sizes share the same world lattice
+Persistent state survives a serialized unload/reload round trip
+Unchanged state does not schedule another save
+Unsupported saves are rejected without erasing memory state
+Save files are scoped to their world ID
+Atomic save replacement retains the previous backup
+Collected object writes state before being destroyed
+Flat ground and connected walking routes pass physics validation
+Full-width obstacle disconnects required destination
+25-degree terrain fails the 15-degree slope limit
+River gap fails connectivity without assuming jumping or swimming
+Abrupt 0.8 m step fails walking connectivity
+
+StreamingChecks.txt
+6 Addressables streaming checks passed: essential-first loading, bounded concurrency, distant unload, persistent revisit, shutdown cleanup, cancellation cleanup.
+
+Other-region preservation
+{
+  "checked_files": 14166,
+  "changed_other_region_files": []
+}

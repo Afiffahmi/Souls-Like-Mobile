@@ -1,0 +1,73 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: KampungGround
+  m_Shader: {fileID: 4800000, guid: 13bf666f20b174a498da11aa6a319de1, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 1
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _Bank:
+        m_Texture: {fileID: 2800000, guid: d6f49ba4c92344042987b91a1b8b0cbd, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _BankNormal:
+        m_Texture: {fileID: 2800000, guid: dab207931764a4c78bc6dbb60dd5f089, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _BankRough:
+        m_Texture: {fileID: 2800000, guid: 5432535ee43b84cea8e99517035a356c, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Forest:
+        m_Texture: {fileID: 2800000, guid: 433357d9cccff48c9b3060b9ee55ea10, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _ForestNormal:
+        m_Texture: {fileID: 2800000, guid: 9a5b33760153c47209bba37633939120, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _ForestRough:
+        m_Texture: {fileID: 2800000, guid: 7ca557f5074b74c209a4cede6d9eefe3, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Mud:
+        m_Texture: {fileID: 2800000, guid: 2a74d90e2fabd4c7d8dfe852e7dcae7f, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MudNormal:
+        m_Texture: {fileID: 2800000, guid: 3b573ba24282d4d158e0b37374b07994, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MudRough:
+        m_Texture: {fileID: 2800000, guid: 55d70da714fd74bd1b61a87918d63a67, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Original:
+        m_Texture: {fileID: 2800000, guid: d9913853468de420aa8698334bd9473b, type: 2}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _Tile: 3
+    m_Colors:
+    - _OriginalColor: {r: 0.28, g: 0.38, b: 0.2, a: 1}
+    - _Tint: {r: 1, g: 1, b: 1, a: 1}
+  m_BuildTextureStacks: []
+  m_AllowLocking: 1
