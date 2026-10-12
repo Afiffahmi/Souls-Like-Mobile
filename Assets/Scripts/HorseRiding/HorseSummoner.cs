@@ -18,7 +18,7 @@ namespace SoulsLike.Riding
         public TMP_Text buttonLabel;
         [Header("Summoning")]
         [Min(1)] public float spawnDistance=3.5f;
-        [Min(.1f)] public float transitionSeconds=.7f;
+        [Min(.1f)] public float transitionSeconds=1.65f;
         public LayerMask groundAndObstacles=~0;
         public Material summonMaterial;
         public HorseController ActiveHorse {get;private set;}
@@ -27,7 +27,7 @@ namespace SoulsLike.Riding
         private string feedback;
         private float feedbackUntil;
         private Coroutine transition;
-        private Transform revealPivot;
+        private ShieldDustTransfer dustTransfer;
 
         private void Awake()
         {
@@ -90,23 +90,22 @@ namespace SoulsLike.Riding
             var motor=horse.GetComponent<CharacterController>();
             horse.enabled=false; if(motor)motor.enabled=false;
             horse.transform.SetParent(null,true);
-            var visual=CreateRevealPivot(horse);
-            revealPivot=visual;
-            if(visual)visual.localScale=Vector3.one*.02f;
             horse.gameObject.SetActive(true); ActiveHorse=horse;
-            HorseSummonEffect.Show(position,gem ? gem.color : Color.white,summonMaterial,transitionSeconds,false);
-            float elapsed=0;
-            while(elapsed<transitionSeconds && horse)
+            var shield=ShieldDustTransfer.FindShield(transform,position);
+            dustTransfer=ShieldDustTransfer.Begin(horse.transform,shield,gem ? gem.color : new Color(.7f,.78f,.88f),true,transitionSeconds);
+            if(!dustTransfer)
             {
-                float t=Mathf.SmoothStep(0,1,elapsed/Mathf.Max(.1f,transitionSeconds));
-                if(visual)visual.localScale=Vector3.one*Mathf.Lerp(.02f,1,t);
-                if(aura)aura.Visibility=t;
-                elapsed+=Time.deltaTime;yield return null;
+                Destroy(horse.gameObject);ActiveHorse=null;feedback="Shield Path Blocked";feedbackUntil=Time.unscaledTime+2;
             }
-            if(horse)
+            else
             {
-                if(visual)visual.localScale=Vector3.one; if(aura)aura.Visibility=1;
-                if(motor)motor.enabled=true; horse.enabled=true;if(interaction)interaction.enabled=true;
+                while(dustTransfer && !dustTransfer.Finished && horse)yield return null;
+                dustTransfer=null;
+                if(horse)
+                {
+                    if(aura)aura.Visibility=1;
+                    if(motor)motor.enabled=true;horse.enabled=true;if(interaction)interaction.enabled=true;
+                }
             }
             IsTransitioning=false;transition=null;RefreshButton();
         }
@@ -117,36 +116,27 @@ namespace SoulsLike.Riding
             var aura=horse.GetComponent<HorseTailAura>();
             var interaction=horse.GetComponent<HorseInteractionSystem>(); if(interaction)interaction.enabled=false;
             horse.enabled=false;
-            foreach(var collider in horse.GetComponentsInChildren<Collider>())collider.enabled=false;
-            var visual=revealPivot ? revealPivot : CreateRevealPivot(horse);
-            HorseSummonEffect.Show(horse.transform.position,aura ? aura.ElementColor : Color.white,summonMaterial,transitionSeconds,true);
-            float elapsed=0;
-            while(elapsed<transitionSeconds && horse)
+            var colliders=horse.GetComponentsInChildren<Collider>();
+            var colliderStates=colliders.Select(c=>c.enabled).ToArray();
+            foreach(var collider in colliders)collider.enabled=false;
+            if(aura)aura.Visibility=0;
+            var shield=ShieldDustTransfer.FindShield(transform,horse.transform.position);
+            dustTransfer=ShieldDustTransfer.Begin(horse.transform,shield,gems && gems.Equipped ? gems.Equipped.color : aura ? aura.ElementColor : Color.white,false,transitionSeconds);
+            if(!dustTransfer)
             {
-                float t=Mathf.SmoothStep(0,1,elapsed/Mathf.Max(.1f,transitionSeconds));
-                if(visual)visual.localScale=Vector3.one*Mathf.Lerp(1,.02f,t);if(aura)aura.Visibility=1-t;
-                elapsed+=Time.deltaTime;yield return null;
+                ActiveHorse=horse;horse.enabled=true;if(aura)aura.Visibility=1;
+                for(int i=0;i<colliders.Length;i++)if(colliders[i])colliders[i].enabled=colliderStates[i];
+                if(interaction)interaction.enabled=true;
+                feedback="Shield Path Blocked";feedbackUntil=Time.unscaledTime+2;
             }
-            if(horse)Destroy(horse.gameObject);
-            revealPivot=null;
+            else
+            {
+                while(dustTransfer && !dustTransfer.Finished && horse)yield return null;
+                dustTransfer=null;
+                if(horse)Destroy(horse.gameObject);
+            }
             dismissingHorse=null;
             IsTransitioning=false;transition=null;RefreshButton();
-        }
-        private static Transform CreateRevealPivot(HorseController horse)
-        {
-            // Even disabled CharacterControllers validate their scaled dimensions
-            // on activation. Never shrink the horse root or its physics capsule.
-            var animator=horse.animationController ? horse.animationController.animator : null;
-            if(!animator || animator.transform==horse.transform || !animator.transform.IsChildOf(horse.transform))return null;
-            Transform model=animator.transform;
-            while(model.parent!=horse.transform)model=model.parent;
-            if(model.GetComponentInChildren<CharacterController>(true))return null;
-            var pivot=new GameObject("Horse Reveal Visuals").transform;
-            pivot.SetParent(horse.transform,false);
-            // Keep the Animator and its bone hierarchy together, preserving all
-            // animation binding paths and the authored model/saddle transforms.
-            model.SetParent(pivot,true);
-            return pivot;
         }
         private bool TrySpawnPoint(HorseController source,out Vector3 position,out Quaternion rotation)
         {
@@ -192,7 +182,7 @@ namespace SoulsLike.Riding
             // A dismissed horse can still be in its transition coroutine.
             if(dismissingHorse)Destroy(dismissingHorse.gameObject);
             dismissingHorse=null;
-            revealPivot=null;
+            if(dustTransfer)dustTransfer.Cancel();dustTransfer=null;
         }
         private HorseController dismissingHorse;
         private void OnDestroy()
@@ -202,3 +192,5 @@ namespace SoulsLike.Riding
         }
     }
 }
+
+

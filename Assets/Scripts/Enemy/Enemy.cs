@@ -113,6 +113,7 @@ public class Enemy : MonoBehaviour
         }
 
         OnDeath?.Invoke();
+        ElementalGems.ShieldDustTransfer.AbsorbEnemy(this);
     }
 
     private void OnValidate()
@@ -121,3 +122,4 @@ public class Enemy : MonoBehaviour
         currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
     }
 }
+

@@ -10,6 +10,8 @@ public sealed class PlayerShieldAnimation : MonoBehaviour
     [SerializeField] private AnimationClip deployAnimation;
     [Min(0.01f)] [SerializeField] private float playbackSpeed = 1f;
 
+    private float dustOpenUntil;
+    public void OpenForDust(float seconds) => dustOpenUntil = Mathf.Max(dustOpenUntil, Time.time + Mathf.Max(0, seconds));
     private float playbackTime;
     private bool wasActive;
     private float sampledTime = -1f;
@@ -27,7 +29,7 @@ public sealed class PlayerShieldAnimation : MonoBehaviour
     private void LateUpdate()
     {
         bool active = player != null && player.isActiveAndEnabled &&
-            player.anim != null && player.anim.isActiveAndEnabled && player.IsParrying;
+            player.anim != null && player.anim.isActiveAndEnabled && (player.IsParrying || Time.time < dustOpenUntil);
         float deltaTime = player != null && player.anim != null &&
             player.anim.updateMode == AnimatorUpdateMode.UnscaledTime
             ? Time.unscaledDeltaTime : Time.deltaTime;
@@ -65,3 +67,4 @@ public sealed class PlayerShieldAnimation : MonoBehaviour
         sampledTime = playbackTime;
     }
 }
+
