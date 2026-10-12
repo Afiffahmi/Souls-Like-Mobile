@@ -42,6 +42,7 @@ namespace Nusantara.World
         public int PendingLoadCount => pending;
         public WorldStateStore State { get; private set; }
         public event Action<Vector2Int> CollisionReady;
+        public event Action NavigationGeometryChanged;
         public event Action<string> LoadFailed;
 
         readonly Dictionary<Vector2Int, WorldChunkRecord> catalog = new Dictionary<Vector2Int, WorldChunkRecord>();
@@ -245,7 +246,7 @@ namespace Nusantara.World
                     }
                     part.ready = true;
                     part.holder.SetActive(true);
-                    if (part.kind == PartKind.Essential) CollisionReady?.Invoke(resident.record.coordinate);
+                    if (part.kind == PartKind.Essential) { CollisionReady?.Invoke(resident.record.coordinate); NavigationGeometryChanged?.Invoke(); }
                 }
                 catch (Exception error) { ReleaseHandle(operation); Fail(part, error.Message); }
             };
@@ -281,6 +282,7 @@ namespace Nusantara.World
         void ReleasePart(Part part, Vector2Int coordinate)
         {
             if (!part.requested || part.cancelled) return;
+            if (part.kind == PartKind.Essential && part.ready) NavigationGeometryChanged?.Invoke();
             Capture(part, coordinate);
             part.cancelled = true;
             part.ready = false;

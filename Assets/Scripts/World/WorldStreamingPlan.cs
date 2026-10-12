@@ -24,6 +24,19 @@ namespace Nusantara.World
             if (!world.Contains(chunk)) return ChunkTier.Unloaded;
             var desired = DesiredTier(world, chunk, player, velocity);
             int distance = Distance(chunk, world.WorldToChunk(player));
+            if (world.authoredChunkLayout)
+            {
+                Vector3 origin = world.ChunkOrigin(chunk);
+                float dx = Mathf.Max(origin.x - player.x, 0, player.x - origin.x - world.chunkSize);
+                float dz = Mathf.Max(origin.z - player.z, 0, player.z - origin.z - world.chunkSize);
+                float gap = Mathf.Max(dx, dz);
+                const float buffer = 16;
+                if (desired < ChunkTier.Visual && previous >= ChunkTier.Visual && gap <= world.visualRadius * world.chunkSize + buffer)
+                    return ChunkTier.Visual;
+                if (desired == ChunkTier.Unloaded && previous != ChunkTier.Unloaded && gap <= world.distantRadius * world.chunkSize + buffer)
+                    return ChunkTier.Distant;
+                return desired;
+            }
             // Separate retention bands prevent both outer unload thrashing and detail churn.
             if (desired == ChunkTier.Unloaded && previous != ChunkTier.Unloaded && distance <= world.unloadRadius)
                 return ChunkTier.Distant;
@@ -46,3 +59,5 @@ namespace Nusantara.World
         }
     }
 }
+
+

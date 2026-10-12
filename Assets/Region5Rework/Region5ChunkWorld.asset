@@ -1,0 +1,286 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 53bb5907a961e4824b789774cf170f94, type: 3}
+  m_Name: Region5ChunkWorld
+  m_EditorClassIdentifier: Assembly-CSharp::Nusantara.World.WorldDefinition
+  worldId: region5-authored-128
+  seed: 5012026
+  layoutApproved: 0
+  authoredChunkLayout: 1
+  chunkSize: 128
+  gridSize: {x: 6, y: 6}
+  origin: {x: 2816, y: 512}
+  playerStart: {x: 2900.3, y: 44.293, z: 1155}
+  playerStartConfirmed: 1
+  gameplayRadius: 1
+  visualRadius: 1
+  distantRadius: 2
+  unloadRadius: 3
+  preloadSeconds: 2
+  maxLookAheadMetres: 32
+  maxConcurrentLoads: 1
+  planningInterval: 0.2
+  retryDelaySeconds: 10
+  maxWalkableSlope: 15
+  maxStepHeight: 0.2
+  seamTolerance: 0.005
+  agentRadius: 0.5
+  agentHeight: 2
+  regions:
+  - id: 1
+    name: Region 1
+    boss: 
+    detailedEnvironment: 1
+    boundary: []
+  - id: 2
+    name: Region 2
+    boss: 
+    detailedEnvironment: 1
+    boundary: []
+  - id: 3
+    name: Region 3
+    boss: 
+    detailedEnvironment: 1
+    boundary: []
+  - id: 4
+    name: Region 4
+    boss: 
+    detailedEnvironment: 1
+    boundary: []
+  - id: 5
+    name: Region 5
+    boss: 
+    detailedEnvironment: 1
+    boundary: []
+  - id: 6
+    name: Region 6
+    boss: 
+    detailedEnvironment: 1
+    boundary: []
+  locations: []
+  chunks:
+  - coordinate: {x: 0, y: 0}
+    region: 5
+    essentialAddress: region5-authored/0_0/essential
+    distantAddress: region5-authored/0_0/distant
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 1, y: 0}
+    region: 5
+    essentialAddress: region5-authored/1_0/essential
+    distantAddress: region5-authored/1_0/distant
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 2, y: 0}
+    region: 5
+    essentialAddress: region5-authored/2_0/essential
+    distantAddress: region5-authored/2_0/distant
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 3, y: 0}
+    region: 5
+    essentialAddress: region5-authored/3_0/essential
+    distantAddress: region5-authored/3_0/distant
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 4, y: 0}
+    region: 5
+    essentialAddress: region5-authored/4_0/essential
+    distantAddress: region5-authored/4_0/distant
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 5, y: 0}
+    region: 5
+    essentialAddress: region5-authored/5_0/essential
+    distantAddress: region5-authored/5_0/distant
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 0, y: 1}
+    region: 5
+    essentialAddress: region5-authored/0_1/essential
+    distantAddress: region5-authored/0_1/distant
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 1, y: 1}
+    region: 5
+    essentialAddress: region5-authored/1_1/essential
+    distantAddress: region5-authored/1_1/distant
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 2, y: 1}
+    region: 5
+    essentialAddress: region5-authored/2_1/essential
+    distantAddress: region5-authored/2_1/distant
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 3, y: 1}
+    region: 5
+    essentialAddress: region5-authored/3_1/essential
+    distantAddress: region5-authored/3_1/distant
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 4, y: 1}
+    region: 5
+    essentialAddress: region5-authored/4_1/essential
+    distantAddress: region5-authored/4_1/distant
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 5, y: 1}
+    region: 5
+    essentialAddress: region5-authored/5_1/essential
+    distantAddress: region5-authored/5_1/distant
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 0, y: 2}
+    region: 5
+    essentialAddress: region5-authored/0_2/essential
+    distantAddress: region5-authored/0_2/distant
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 1, y: 2}
+    region: 5
+    essentialAddress: region5-authored/1_2/essential
+    distantAddress: region5-authored/1_2/distant
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 2, y: 2}
+    region: 5
+    essentialAddress: region5-authored/2_2/essential
+    distantAddress: region5-authored/2_2/distant
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 3, y: 2}
+    region: 5
+    essentialAddress: region5-authored/3_2/essential
+    distantAddress: region5-authored/3_2/distant
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 4, y: 2}
+    region: 5
+    essentialAddress: region5-authored/4_2/essential
+    distantAddress: region5-authored/4_2/distant
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 5, y: 2}
+    region: 5
+    essentialAddress: region5-authored/5_2/essential
+    distantAddress: region5-authored/5_2/distant
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 0, y: 3}
+    region: 5
+    essentialAddress: region5-authored/0_3/essential
+    distantAddress: region5-authored/0_3/distant
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 1, y: 3}
+    region: 5
+    essentialAddress: region5-authored/1_3/essential
+    distantAddress: region5-authored/1_3/distant
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 2, y: 3}
+    region: 5
+    essentialAddress: region5-authored/2_3/essential
+    distantAddress: region5-authored/2_3/distant
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 3, y: 3}
+    region: 5
+    essentialAddress: region5-authored/3_3/essential
+    distantAddress: region5-authored/3_3/distant
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 4, y: 3}
+    region: 5
+    essentialAddress: region5-authored/4_3/essential
+    distantAddress: region5-authored/4_3/distant
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 5, y: 3}
+    region: 5
+    essentialAddress: region5-authored/5_3/essential
+    distantAddress: region5-authored/5_3/distant
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 0, y: 4}
+    region: 5
+    essentialAddress: region5-authored/0_4/essential
+    distantAddress: region5-authored/0_4/distant
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 1, y: 4}
+    region: 5
+    essentialAddress: region5-authored/1_4/essential
+    distantAddress: region5-authored/1_4/distant
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 2, y: 4}
+    region: 5
+    essentialAddress: region5-authored/2_4/essential
+    distantAddress: region5-authored/2_4/distant
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 3, y: 4}
+    region: 5
+    essentialAddress: region5-authored/3_4/essential
+    distantAddress: region5-authored/3_4/distant
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 4, y: 4}
+    region: 5
+    essentialAddress: region5-authored/4_4/essential
+    distantAddress: region5-authored/4_4/distant
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 5, y: 4}
+    region: 5
+    essentialAddress: region5-authored/5_4/essential
+    distantAddress: region5-authored/5_4/distant
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 0, y: 5}
+    region: 5
+    essentialAddress: region5-authored/0_5/essential
+    distantAddress: region5-authored/0_5/distant
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 1, y: 5}
+    region: 5
+    essentialAddress: region5-authored/1_5/essential
+    distantAddress: region5-authored/1_5/distant
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 2, y: 5}
+    region: 5
+    essentialAddress: region5-authored/2_5/essential
+    distantAddress: region5-authored/2_5/distant
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 3, y: 5}
+    region: 5
+    essentialAddress: region5-authored/3_5/essential
+    distantAddress: region5-authored/3_5/distant
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 4, y: 5}
+    region: 5
+    essentialAddress: region5-authored/4_5/essential
+    distantAddress: region5-authored/4_5/distant
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 5, y: 5}
+    region: 5
+    essentialAddress: region5-authored/5_5/essential
+    distantAddress: region5-authored/5_5/distant
+    decorationAddresses: []
+    gameplayAddresses: []

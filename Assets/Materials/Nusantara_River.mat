@@ -8,7 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Nusantara_River
-  m_Shader: {fileID: 4800000, guid: d194397adb9fe41dbb3b48f4dd761d99, type: 3}
+  m_Shader: {fileID: 4800000, guid: 14f20b7234bf7be4ca027770cfc83557, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -24,9 +24,17 @@ Material:
     serializedVersion: 3
     m_TexEnvs: []
     m_Ints: []
-    m_Floats: []
+    m_Floats:
+    - _CrestStrength: 0.8
+    - _FoamWidth: 0.065
+    - _Gloss: 0.7
+    - _WaveHeight: 0.2
+    - _WaveScale: 0.38
+    - _WaveSpeed: 0.7
     m_Colors:
-    - _BaseColor: {r: 0.035, g: 0.34, b: 0.36, a: 1}
-    - _FoamColor: {r: 0.34, g: 0.67, b: 0.61, a: 1}
+    - _BaseColor: {r: 0.06, g: 0.73, b: 0.79, a: 1}
+    - _DeepColor: {r: 0.015, g: 0.41, b: 0.56, a: 1}
+    - _FlowDirection: {r: 0.65, g: 0.32, b: 0, a: 0}
+    - _FoamColor: {r: 0.52, g: 1, b: 0.98, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

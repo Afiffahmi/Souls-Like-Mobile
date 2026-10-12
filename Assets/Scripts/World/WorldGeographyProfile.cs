@@ -43,6 +43,8 @@ namespace Nusantara.World
     public sealed class WorldGeographyProfile : ScriptableObject
     {
         public WorldDefinition world;
+        [Tooltip("Persistent hand-painted terrain height offsets.")]
+        public WorldTerrainSculptData sculptData;
         public Vector2[] coast = Array.Empty<Vector2>();
         public WorldWaterway[] waterways = Array.Empty<WorldWaterway>();
         public WorldWalkingRoute[] routes = Array.Empty<WorldWalkingRoute>();
@@ -226,7 +228,7 @@ namespace Nusantara.World
                     if(Inside(p,platform.boundary)||LineDistance(p,platform.boundary,true)<10)y=Mathf.Min(y,platform.surface-.09f);
             }
             float coastalBlend = Mathf.SmoothStep(0, 1, Mathf.Clamp01((coastD + 50) / 210));
-            return Mathf.Lerp(-12, y, coastalBlend);
+            return Mathf.Lerp(-12, y, coastalBlend) + (sculptData != null ? sculptData.Sample(x, z) : 0);
         }
         public bool IsForbiddenWater(Vector2 p)
         {

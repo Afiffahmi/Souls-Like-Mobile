@@ -52,6 +52,7 @@ namespace Nusantara.World
         public int seed = 5012026;
         [Tooltip("Remains false until the six region boundaries and start point match the supplied references.")]
         public bool layoutApproved;
+        [HideInInspector] public bool authoredChunkLayout;
         [Min(1)] public float chunkSize = 256;
         [Tooltip("48 x 48 chunks = 12.288 km square. Configurable independently of content density.")]
         public Vector2Int gridSize = new Vector2Int(48, 48);
@@ -91,7 +92,7 @@ namespace Nusantara.World
             if (string.IsNullOrWhiteSpace(worldId)) yield return "A stable world ID is required for save data.";
             if (!float.IsFinite(chunkSize) || chunkSize <= 0 || gridSize.x <= 0 || gridSize.y <= 0)
                 yield return "Chunk size and grid dimensions must be positive.";
-            if (gameplayRadius < 0 || visualRadius <= gameplayRadius || distantRadius < visualRadius || unloadRadius <= distantRadius)
+            if (gameplayRadius < 0 || (authoredChunkLayout ? visualRadius < gameplayRadius : visualRadius <= gameplayRadius) || distantRadius < visualRadius || unloadRadius <= distantRadius)
                 yield return "Require gameplay radius < visual radius <= distant radius < unload radius.";
             if (maxConcurrentLoads < 1 || planningInterval <= 0 || retryDelaySeconds <= 0)
                 yield return "Load budget, planning interval and retry delay must be positive.";
@@ -102,8 +103,8 @@ namespace Nusantara.World
             {
                 if (region == null || region.id < 1 || region.id > 6 || !ids.Add(region.id))
                 { yield return "Region IDs must be unique and within 1–6."; continue; }
-                if (region.detailedEnvironment && region.id != 5) yield return "Only Region 5 may have detailed environment content.";
-                if (requireLayout && (region.boundary == null || region.boundary.Length < 3))
+                if (!authoredChunkLayout && region.detailedEnvironment && region.id != 5) yield return "Only Region 5 may have detailed environment content.";
+                if (requireLayout && !authoredChunkLayout && (region.boundary == null || region.boundary.Length < 3))
                     yield return $"Region {region.id} is awaiting a reference boundary.";
             }
             if (ids.Count != 6) yield return "Exactly six region definitions are required; Regions 7 and 8 are excluded.";
@@ -115,18 +116,20 @@ namespace Nusantara.World
                 if (!ids.Contains(chunk.region)) yield return $"Chunk {chunk.coordinate} references an unknown region.";
                 if (string.IsNullOrWhiteSpace(chunk.essentialAddress)) yield return $"Chunk {chunk.coordinate} has no essential content address.";
                 if (string.IsNullOrWhiteSpace(chunk.distantAddress)) yield return $"Chunk {chunk.coordinate} has no distant terrain address.";
-                if (chunk.region != 5 && (chunk.decorationAddresses.Length > 0 || chunk.gameplayAddresses.Length > 0))
+                if (!authoredChunkLayout && chunk.region != 5 && (chunk.decorationAddresses.Length > 0 || chunk.gameplayAddresses.Length > 0))
                     yield return $"Region {chunk.region} must remain terrain-only.";
             }
             if (requireLayout)
             {
-                if (!layoutApproved) yield return "Reference layout has not been approved. Streaming is intentionally gated.";
+                if (!authoredChunkLayout && !layoutApproved) yield return "Reference layout has not been approved. Streaming is intentionally gated.";
                 if (!playerStartConfirmed || !Contains(WorldToChunk(playerStart))) yield return "A confirmed player start inside the world is required.";
                 bool startInRegionOne = false;
                 foreach (var chunk in chunks)
-                    if (chunk != null && chunk.coordinate == WorldToChunk(playerStart) && chunk.region == 1) startInRegionOne = true;
-                if (!startInRegionOne) yield return "The starting chunk must exist in Region 1.";
+                    if (chunk != null && chunk.coordinate == WorldToChunk(playerStart) && (authoredChunkLayout || chunk.region == 1)) startInRegionOne = true;
+                if (!startInRegionOne) yield return authoredChunkLayout ? "The starting chunk must exist in the authored grid." : "The starting chunk must exist in Region 1.";
             }
         }
     }
 }
+
+
