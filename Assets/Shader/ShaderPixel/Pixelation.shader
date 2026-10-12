@@ -3,59 +3,67 @@ Shader "Hidden/NewImageEffectShader"
     Properties
     {
         _MainTex ("Texture", 2D) = "white" {}
-        _pixels("Resolution", int) = 512
-        _pw("Pixel Width", float) = 64
-        _ph("Pixel Height", float) = 64
+        _PixelSize ("Pixel Size (Source Pixels)", Range(1, 8)) = 3
+        _DetailPreservation ("Detail Preservation", Range(0, 1)) = 0.25
+        _CelStrength ("Soft Cel Shading", Range(0, 1)) = 0.45
+        _ShadeLevels ("Lighting Bands", Range(3, 12)) = 6
     }
     SubShader
     {
-        // No culling or depth
         Cull Off ZWrite Off ZTest Always
 
         Pass
         {
             CGPROGRAM
-            #pragma vertex vert
+            #pragma vertex vert_img
             #pragma fragment frag
 
             #include "UnityCG.cginc"
 
-            struct appdata
-            {
-                float4 vertex : POSITION;
-                float2 uv : TEXCOORD0;
-            };
-
-            struct v2f
-            {
-                float2 uv : TEXCOORD0;
-                float4 vertex : SV_POSITION;
-            };
-
-            v2f vert (appdata v)
-            {
-                v2f o;
-                o.vertex = UnityObjectToClipPos(v.vertex);
-                o.uv = v.uv;
-                return o;
-            }
-
-            float _pixels;
-            float _pw;
-            float _ph;
-            float _dx;
-            float _dy;
             sampler2D _MainTex;
+            float4 _MainTex_TexelSize;
+            float _PixelSize;
+            half _DetailPreservation;
+            half _CelStrength;
+            float _ShadeLevels;
 
-            fixed4 frag (v2f i) : SV_Target
+            half4 frag (v2f_img i) : SV_Target
             {
-                _dx = _pw * (1 / _pixels);
-                _dy = _ph * (1 / _pixels);
-                float2 coord = float2(_dx * floor(i.uv.x / _dx), _dy * floor(i.uv.y / _dy));
-                fixed4 col = tex2D(_MainTex, coord);
-                return col;
+                // Size cells in source pixels so they stay square on every aspect ratio.
+                float2 sourceSize = max(_MainTex_TexelSize.zw, float2(1.0, 1.0));
+                float pixelSize = floor(clamp(_PixelSize, 1.0, 8.0) + 0.5);
+                float2 cellStart = floor(i.uv * sourceSize / pixelSize) * pixelSize;
+                float2 cellEnd = min(cellStart + pixelSize, sourceSize);
+                float2 halfTexel = 0.5 / sourceSize;
+                // Center the final partial cell too, without sampling beyond the image.
+                float2 sampleUV = clamp((cellStart + cellEnd) * 0.5 / sourceSize,
+                    halfTexel, 1.0 - halfTexel);
+
+                half4 original = tex2D(_MainTex, i.uv);
+                half3 pixelated = tex2D(_MainTex, sampleUV).rgb;
+                // Keep some native detail in thin geometry and distant silhouettes.
+                half3 color = lerp(pixelated, original.rgb, saturate(_DetailPreservation));
+
+                // Shape brightness rather than individual RGB channels to preserve hues.
+                // Perceptual spacing gives dark surfaces more useful shading bands.
+                float luminance = max(dot(color, float3(0.2126, 0.7152, 0.0722)), 0.0);
+                float levels = max(floor(_ShadeLevels + 0.5), 3.0);
+                #if defined(UNITY_COLORSPACE_GAMMA)
+                    float shade = luminance * levels;
+                #else
+                    float shade = sqrt(luminance) * levels;
+                #endif
+                float band = (floor(shade) + smoothstep(0.2, 0.8, frac(shade))) / levels;
+                #if defined(UNITY_COLORSPACE_GAMMA)
+                    float celLuminance = band;
+                #else
+                    float celLuminance = band * band;
+                #endif
+                color *= lerp(1.0, celLuminance / max(luminance, 0.0001), saturate(_CelStrength));
+                return half4(color, original.a);
             }
             ENDCG
         }
     }
+    Fallback Off
 }
