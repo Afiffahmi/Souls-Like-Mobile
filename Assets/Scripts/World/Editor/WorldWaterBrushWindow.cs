@@ -13,7 +13,8 @@ namespace Nusantara.World.Editor
         [SerializeField] WorldPaintedWater water;
         [SerializeField] float radius = 12;
         [SerializeField] bool erase;
-        bool painting, picking, stroke, hasLast;
+        bool painting, picking, stroke, hasLast, meshPending;
+        double nextMeshBuild;
         int control, undoGroup;
         Vector3 last;
         ObjectField area;
@@ -28,7 +29,7 @@ namespace Nusantara.World.Editor
         }
         public void CreateGUI()
         {
-            var root=rootVisualElement;
+            var root=rootVisualElement;root.Clear();
             root.Add(new HelpBox("Draw your own ponds, lakes and rivers. The brush creates moving water automatically.",HelpBoxMessageType.Info));
             root.Add(new Button(NewArea){text="1. New Water Area"});
             area=new ObjectField("Water area"){objectType=typeof(WorldPaintedWater),allowSceneObjects=true,value=water};
@@ -79,18 +80,25 @@ namespace Nusantara.World.Editor
             foreach(var tool in Resources.FindObjectsOfTypeAll<WorldAINoWalkBrushWindow>())tool.DisablePainting();
         }
         public void DisablePainting(){EndStroke();painting=false;picking=false;brush?.SetValueWithoutNotify(false);SceneView.RepaintAll();}
-        void OnEnable(){OnSelectionChange();SceneView.duringSceneGui+=SceneGUI;Undo.undoRedoPerformed+=OnUndo;EditorApplication.playModeStateChanged+=OnPlay;}
+        void OnEnable(){EditorApplication.update+=FlushPendingMesh;OnSelectionChange();SceneView.duringSceneGui+=SceneGUI;Undo.undoRedoPerformed+=OnUndo;EditorApplication.playModeStateChanged+=OnPlay;}
         void OnSelectionChange()
         {
             var selected=Selection.activeGameObject!=null?Selection.activeGameObject.GetComponent<WorldPaintedWater>():null;
             if(selected==null||selected==water)return;
             EndStroke();water=selected;area?.SetValueWithoutNotify(water);SyncLevel();
         }
-        void OnDisable(){DisablePainting();SceneView.duringSceneGui-=SceneGUI;Undo.undoRedoPerformed-=OnUndo;EditorApplication.playModeStateChanged-=OnPlay;}
+        void OnDisable(){DisablePainting();EditorApplication.update-=FlushPendingMesh;SceneView.duringSceneGui-=SceneGUI;Undo.undoRedoPerformed-=OnUndo;EditorApplication.playModeStateChanged-=OnPlay;}
         void OnPlay(PlayModeStateChange state)=>DisablePainting();
         void OnUndo(){EndStroke();foreach(var body in Object.FindObjectsByType<WorldPaintedWater>())body.Rebuild();SyncLevel();SceneView.RepaintAll();}
+        void FlushPendingMesh()
+        {
+            if(!meshPending||water==null||EditorApplication.timeSinceStartup<nextMeshBuild)return;
+            water.Rebuild(false);meshPending=false;nextMeshBuild=EditorApplication.timeSinceStartup+.1;SceneView.RepaintAll();
+        }
         void EndStroke()
         {
+            if(water!=null&&meshPending){water.Rebuild(false);meshPending=false;}
+            if(stroke&&water!=null){water.FinishEditing();EditorUtility.SetDirty(water);}
             if(stroke)Undo.CollapseUndoOperations(undoGroup);
             if(control!=0&&GUIUtility.hotControl==control)GUIUtility.hotControl=0;
             control=0;stroke=false;hasLast=false;
@@ -130,11 +138,11 @@ namespace Nusantara.World.Editor
             float spacing=Mathf.Max(.5f,radius*.3f);
             if(!hasLast||Vector3.Distance(point,last)>=spacing)
             {
-                bool changed=false;
                 int count=hasLast?Mathf.Min(128,Mathf.CeilToInt(Vector3.Distance(point,last)/spacing)):1;
-                for(int i=1;i<=count;i++)changed|=water.Paint(hasLast?Vector3.Lerp(last,point,(float)i/count):point,radius,erasing,false);
-                if(changed){water.Rebuild();EditorUtility.SetDirty(water);EditorSceneManager.MarkSceneDirty(water.gameObject.scene);}
-                last=point;hasLast=true;status.text=water.cells.Count>=WorldPaintedWater.CellLimit?"Area limit reached. Create another water area to extend it.":"Water shape updated. Save Water and Scene when finished.";
+                var points=new Vector3[count];for(int i=0;i<count;i++)points[i]=hasLast?Vector3.Lerp(last,point,(float)(i+1)/count):point;
+                if(water.PaintStroke(points,radius,erasing,false))
+                {meshPending=true;FlushPendingMesh();EditorUtility.SetDirty(water);EditorSceneManager.MarkSceneDirty(water.gameObject.scene);}
+                last=point;hasLast=true;status.text=$"Painted area: {water.CellCount:N0} m². Save Water and Scene when finished.";
             }
             e.Use();view.Repaint();
         }
