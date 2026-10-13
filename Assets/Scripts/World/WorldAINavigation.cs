@@ -16,6 +16,7 @@ namespace Nusantara.World
         WorldChunkStreamer streamer;
         bool rebuild;
         float nextBuild;
+        Vector3 lastBuildCenter;
         public bool IsBuilding => building != null && !building.isDone;
         public bool HasWalkingGround => walkingGround != null;
         void OnEnable()
@@ -48,9 +49,13 @@ namespace Nusantara.World
         public void RequestRebuild() { rebuild = true; nextBuild = Time.unscaledTime + .75f; }
         void Update()
         {
-            if (!Application.isPlaying || !rebuild || IsBuilding || Time.unscaledTime < nextBuild) return;
+            if (!Application.isPlaying) return;
+            if (world != null && world.regionalGroundPlanes && streamer != null && streamer.player != null && !rebuild && !IsBuilding
+                && Vector3.Distance(streamer.player.position,lastBuildCenter)>world.chunkSize*.5f) RequestRebuild();
+            if (!rebuild || IsBuilding || Time.unscaledTime < nextBuild) return;
             if (streamer != null && streamer.PendingLoadCount > 0) return;
             rebuild = false;
+            if (streamer != null && streamer.player != null) lastBuildCenter=streamer.player.position;
             var sources = CollectGround(out var bounds);
             building = NavMeshBuilder.UpdateNavMeshDataAsync(runtimeData, Settings(), sources, bounds);
         }
@@ -83,9 +88,11 @@ namespace Nusantara.World
                 if (hasBounds) bounds.Encapsulate(collider.bounds); else { bounds = collider.bounds; hasBounds = true; }
             }
             bounds.Expand(new Vector3(8, 40, 8));
+            if (Application.isPlaying && world != null && world.regionalGroundPlanes && streamer != null && streamer.player != null)
+                bounds=new Bounds(streamer.player.position,new Vector3(world.chunkSize*5,100,world.chunkSize*5));
             var sources = new List<NavMeshBuildSource>();
             if (!hasBounds) return sources;
-            NavMeshBuilder.CollectSources((Transform)null, ~0, NavMeshCollectGeometry.PhysicsColliders, 0, markups, sources);
+            NavMeshBuilder.CollectSources(bounds, ~0, NavMeshCollectGeometry.PhysicsColliders, 0, markups, sources);
             sources.RemoveAll(s => s.component != null && s.component.gameObject.scene != gameObject.scene);
             sources.Sort((a,b) => (a.component != null ? a.component.GetEntityId().GetHashCode() : 0).CompareTo(b.component != null ? b.component.GetEntityId().GetHashCode() : 0));
             return sources;

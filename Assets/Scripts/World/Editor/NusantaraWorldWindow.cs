@@ -21,6 +21,7 @@ namespace Nusantara.World.Editor
         public static void Open() => GetWindow<NusantaraWorldWindow>("Nusantara World");
         public void CreateGUI()
         {
+            rootVisualElement.Clear();
             var tree = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(Folder + "NusantaraWorldWindow.uxml");
             if (tree == null) return;
             tree.CloneTree(rootVisualElement);
@@ -30,6 +31,27 @@ namespace Nusantara.World.Editor
             areaField = rootVisualElement.Q<ObjectField>("area");
             areaField.objectType = typeof(WorldWalkabilityArea); areaField.allowSceneObjects = true;
             status = rootVisualElement.Q<Label>("status");
+            void Navigate(Func<string> action)
+            {try{status.text=action();}catch(Exception error){status.text=error.Message;}}
+            rootVisualElement.Q<Button>("show-world").clicked+=()=>Navigate(WorldSceneBookmarks.ShowWholeWorld);
+            var navigation=rootVisualElement.Q<VisualElement>("region-navigation");
+            var definition=definitionField.value as WorldDefinition;
+            var gridToggle=rootVisualElement.Q<Toggle>("region-grid");gridToggle.SetValueWithoutNotify(WorldRegionAuthoringGrid.Enabled);
+            gridToggle.RegisterValueChangedCallback(e=>WorldRegionAuthoringGrid.Enabled=e.newValue);
+            if(definition!=null)
+            {
+                int cells=definition.regions.Sum(r=>r.chunkGridSize.x*r.chunkGridSize.y);
+                rootVisualElement.Q<Label>("region-size-summary").text=$"{definition.regions.Length} independent regions · {cells} cells total. Each cell covers {definition.chunkSize:0} m × {definition.chunkSize:0} m.";
+            }
+            if(definition!=null)foreach(var region in definition.regions.OrderBy(r=>r.id))
+            {
+                int id=region.id;
+                var button=new Button(()=>Navigate(()=>WorldSceneBookmarks.ShowRegionForEditing(id))){name="edit-region-"+id,text=$"Edit Region {id} · {region.chunkGridSize.x}×{region.chunkGridSize.y} · {region.boss}"};
+                button.AddToClassList("world-region-button");navigation.Add(button);
+            }
+            rootVisualElement.Q<Button>("terrain-brush").clicked+=WorldTerrainBrushWindow.Open;
+            rootVisualElement.Q<Button>("vegetation-brush").clicked+=VegetationPainterWindow.Open;
+            rootVisualElement.Q<Button>("water-brush").clicked+=WorldWaterBrushWindow.Open;
             rootVisualElement.Q<Button>("setup").clicked += () =>
             {
                 string result = WorldFoundationSetup.Create();
@@ -39,7 +61,7 @@ namespace Nusantara.World.Editor
             rootVisualElement.Q<Button>("checkConfig").clicked += () =>
             {
                 var world = definitionField.value as WorldDefinition;
-                status.text = world == null ? "Assign a world definition." : string.Join("\n", world.ConfigurationErrors(true).DefaultIfEmpty("Configuration and reference readiness passed."));
+                status.text = world == null ? "Assign a world definition." : string.Join("\n", world.ConfigurationErrors(true).DefaultIfEmpty("World configuration passed."));
             };
             rootVisualElement.Q<Button>("checks").clicked += () =>
             {
@@ -55,6 +77,7 @@ namespace Nusantara.World.Editor
                 File.WriteAllText("Library/Nusantara/WalkabilityReport.json", JsonUtility.ToJson(report, true));
                 status.text = "Saved Library/Nusantara/WalkabilityReport.json. Finished: " + report.finished;
             };
+            SceneView.duringSceneGui -= DrawIssues;
             SceneView.duringSceneGui += DrawIssues;
         }
         void StartValidation()

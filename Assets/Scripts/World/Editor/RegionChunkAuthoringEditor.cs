@@ -41,6 +41,9 @@ namespace Nusantara.World.Editor
         [MenuItem("Tools/Nusantara/Save Region Chunk Changes")]
         public static void SaveOpenWorld()
         {
+            var world = AssetDatabase.LoadAssetAtPath<WorldDefinition>(WorldFoundationSetup.DefinitionPath);
+            if (world != null && world.brushAuthoredTerrain && UnityEngine.SceneManagement.SceneManager.GetActiveScene().path == WorldReferenceBuilder.ScenePath)
+            { Debug.Log(WorldSceneBookmarks.SaveLoadedBrushChunks()); return; }
             var a = UnityEngine.Object.FindAnyObjectByType<RegionChunkAuthoring>();
             if (a == null) throw new InvalidOperationException("Open the Region 5 rework scene first.");
             Debug.Log(SaveChunks(a));

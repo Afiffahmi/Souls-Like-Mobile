@@ -142,7 +142,7 @@ namespace Nusantara.World.Editor
             if (e.type == EventType.Layout) HandleUtility.AddDefaultControl(id);
             var ray = HandleUtility.GUIPointToWorldRay(e.mousePosition);
             var hits = Physics.RaycastAll(ray, 100000, ~0, QueryTriggerInteraction.Ignore);
-            var valid = hits.Where(h => h.collider.gameObject.scene == scene && h.normal.y > .35f && WorldAINavigation.IsGround(h.collider))
+            var valid = hits.Where(h => h.collider.gameObject.scene == scene && !SceneVisibilityManager.instance.IsHidden(h.collider.gameObject) && h.normal.y > .35f && WorldAINavigation.IsGround(h.collider))
                 .OrderBy(h => h.distance).ToArray();
             if (valid.Length == 0) { hasLast = false; return; }
             var hit = valid[0]; bool erasing = erase || e.shift;

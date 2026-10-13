@@ -28,6 +28,7 @@ namespace Nusantara.World
             Suspend();
             if (hasSafePosition) streamer.player.position = safePosition;
         }
+        public void PrepareForTeleport() { hasSafePosition = false; }
         void Suspend()
         {
             if (suspended) return;

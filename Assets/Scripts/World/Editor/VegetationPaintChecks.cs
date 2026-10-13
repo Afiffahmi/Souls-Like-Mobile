@@ -13,7 +13,7 @@ namespace Nusantara.World.Editor
         public static string Run()
         {
             var palette=VegetationPaintAssets.Prepare();var profile=AssetDatabase.LoadAssetAtPath<WorldGeographyProfile>(WorldReferenceBuilder.ProfilePath);
-            var data=ScriptableObject.CreateInstance<VegetationPaintData>();data.coordinate=profile.world.WorldToChunk(profile.world.locations[0].position);
+            var data=ScriptableObject.CreateInstance<VegetationPaintData>();data.coordinate=profile.world.WorldToChunk(profile.world.locations.Length>0?profile.world.locations[0].position:profile.world.playerStart);
             Vector3 origin=profile.world.ChunkOrigin(data.coordinate);
             for(int i=0;i<2;i++)data.stamps.Add(new VegetationStamp{kind=VegetationPaintKind.Tree,position=origin+new Vector3(20+i*20,42,20),scale=(8+i*4)/22f,yaw=i*35});
             for(int i=0;i<32;i++)data.stamps.Add(new VegetationStamp{kind=VegetationPaintKind.Grass,position=origin+new Vector3(20+i*.6f,42,23),scale=.35f,yaw=i*13});
@@ -28,7 +28,16 @@ namespace Nusantara.World.Editor
                 Check(palette.grassPrefab.GetComponent<MeshFilter>().sharedMesh.vertexCount==70,"actual curved grass mesh");
                 VegetationPaintAssets.BuildVisuals(root,data,palette,false);
                 Check(root.transform.Cast<Transform>().Count(t=>t.name=="Painted tree prop")==2,"editable tree prefab props");
-                var canopy=root.GetComponentInChildren<WorldCanopyVfx>();Check(canopy!=null&&canopy.crowns.Length==2,"batched VFX crowns");
+                var canopy=root.GetComponentInChildren<WorldCanopyVfx>();
+                if(palette.treePrefab.transform.Find("Pixel leaf crown")!=null)
+                {
+                    Check(root.GetComponentsInChildren<MeshRenderer>(true).Count(r=>r.name=="Pixel leaf crown")==2,"integrated leafy crowns");
+                    Check(canopy==null,"no duplicate particle canopy on pixel trees");
+                    // Retain coverage for custom bare-tree palettes and canopy serialization.
+                    VegetationPaintAssets.Canopy(root,new System.Collections.Generic.List<Vector3>{new Vector3(20,50,20),new Vector3(40,50,20)},new System.Collections.Generic.List<float>{2,3},palette.leafMaterial,521);
+                    canopy=root.GetComponentInChildren<WorldCanopyVfx>();
+                }
+                Check(canopy!=null&&canopy.crowns.Length==2,"optional batched VFX crowns");
                 Check(canopy.GetComponent<ParticleSystem>().particleCount>0&&canopy.GetComponent<ParticleSystem>().particleCount<=384,"bounded canopy particles");
                 Check(root.GetComponentsInChildren<Collider>().Length==0,"decoration has no late streaming collision");
                 var grasses=root.GetComponentsInChildren<MeshFilter>().Where(f=>f.name.StartsWith("Painted grass")).ToArray();
@@ -38,7 +47,7 @@ namespace Nusantara.World.Editor
                 Check(ui.Q<Button>("save")!=null&&ui.Q<Slider>("radius")!=null&&ui.Q<Toggle>("paint")!=null,"Editor paint controls");
                 foreach(var island in profile.scenicIslands)Check(!VegetationPainterWindow.Allowed(profile,new Vector3(island.center.x,42,island.center.y),Vector3.up,VegetationPaintKind.Tree),"scenic island exclusion");
                 Check(!VegetationPainterWindow.Allowed(profile,new Vector3(-100000,42,-100000),Vector3.up,VegetationPaintKind.Grass),"outside region exclusion");
-                Check(!VegetationPainterWindow.Allowed(profile,profile.world.locations[0].position,Vector3.up,VegetationPaintKind.Tree),"market path exclusion");
+                if(!profile.world.brushAuthoredTerrain)Check(!VegetationPainterWindow.Allowed(profile,profile.world.locations[0].position,Vector3.up,VegetationPaintKind.Tree),"market path exclusion");
                 // Persist only the canopy object here; temporary grass meshes are checked above.
                 var vfxObject=canopy.gameObject;vfxObject.transform.SetParent(null,true);PrefabUtility.SaveAsPrefabAsset(vfxObject,saved);
                 var restored=AssetDatabase.LoadAssetAtPath<GameObject>(saved).GetComponent<WorldCanopyVfx>();

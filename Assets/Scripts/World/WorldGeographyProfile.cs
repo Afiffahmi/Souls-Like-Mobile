@@ -164,6 +164,7 @@ namespace Nusantara.World
         }
         public float BaseHeight(Vector2 p)
         {
+            if (world.brushAuthoredTerrain) return groundLevel;
             // Broad continuous functions avoid height discontinuities at regional boundaries.
             var north = ReferencePoint(940, 145); var south = ReferencePoint(1060, 865);
             float n = Mathf.Exp(-(p - north).sqrMagnitude / 2100000f);
@@ -175,6 +176,7 @@ namespace Nusantara.World
             world.origin.y + (1100 - y) / 1084f * world.gridSize.y * world.chunkSize);
         public float Height(float x, float z)
         {
+            if (world.brushAuthoredTerrain) return groundLevel + (sculptData != null ? sculptData.Sample(x, z) : 0);
             Vector2 p = new Vector2(x, z);
             float coastD = CoastDistance(p);
             float baseY = BaseHeight(p);
@@ -232,6 +234,7 @@ namespace Nusantara.World
         }
         public bool IsForbiddenWater(Vector2 p)
         {
+            if (world.brushAuthoredTerrain) return false;
             foreach (var island in scenicIslands)
                 if ((p - island.center).sqrMagnitude < (island.radius + 3) * (island.radius + 3)) return true;
             if (CoastDistance(p) < 65) return true;

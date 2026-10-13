@@ -36,6 +36,9 @@ namespace Nusantara.World.Editor
         public static void Start()
         {
             if (running || EditorApplication.isPlayingOrWillChangePlaymode) return;
+            var definition = AssetDatabase.LoadAssetAtPath<WorldDefinition>(WorldFoundationSetup.DefinitionPath);
+            if (definition != null && definition.brushAuthoredTerrain)
+                throw new InvalidOperationException("This world is brush authored. Use the Terrain, Water and Vegetation brushes to create its content.");
             if (SceneManager.GetActiveScene().path != ScenePath) throw new InvalidOperationException("Open the copied NusantaraQuest_World scene first.");
             if (AssetDatabase.IsValidFolder(Root + "/Chunks")) throw new InvalidOperationException("Generated chunks already exist. Edit the existing chunk prefabs; this command never overwrites authored chunks.");
             world = AssetDatabase.LoadAssetAtPath<WorldDefinition>(WorldFoundationSetup.DefinitionPath);

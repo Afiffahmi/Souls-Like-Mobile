@@ -67,7 +67,11 @@ public class ShaderHandler : MonoBehaviour
 
         // Respect authored light cookies. The optional canopy modulates direct light,
         // so it crosses objects and terrain together and never darkens overlay text.
-        bool useCanopy = originalCookie == null && effectMaterial.passCount > 1 &&
+        // The world atmosphere owns travelling clouds. Keep camera grading and
+        // crisp shadows, without installing a second repeating cloud cookie.
+        var worldClouds = sun.GetComponent<Nusantara.World.WorldCloudShadows>();
+        bool useCanopy = (worldClouds == null || !worldClouds.isActiveAndEnabled) &&
+            originalCookie == null && effectMaterial.passCount > 1 &&
             effectMaterial.GetFloat(CanopyStrength) > 0.001f;
         if (useCanopy)
         {

@@ -8,6 +8,7 @@ namespace Nusantara.World
     [Serializable] public sealed class VegetationStamp
     {
         public VegetationPaintKind kind;
+        public VegetationBrushStyle brushStyle;
         public Vector3 position;
         public float yaw;
         public float scale = 1;

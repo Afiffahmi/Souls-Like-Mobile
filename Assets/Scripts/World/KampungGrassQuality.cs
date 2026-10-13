@@ -1,14 +1,17 @@
 using UnityEngine;
 namespace Nusantara.World
 {
-    [RequireComponent(typeof(Renderer))]
+    [ExecuteAlways, RequireComponent(typeof(Renderer))]
     public sealed class KampungGrassQuality:MonoBehaviour
     {
         void OnEnable()
         {
-            var block=new MaterialPropertyBlock();int q=QualitySettings.GetQualityLevel();
-            block.SetFloat("_Density",q<=1?.45f:q<=3?.7f:1);
-            block.SetFloat("_FadeEnd",q<=1?48:76);GetComponent<Renderer>().SetPropertyBlock(block);
+            var renderer=GetComponent<Renderer>();
+            var block=new MaterialPropertyBlock();renderer.GetPropertyBlock(block);
+            int q=QualitySettings.GetQualityLevel();
+            block.SetFloat("_Density",q<=1?.55f:q<=3?.8f:1);
+            block.SetFloat("_FadeStart",q<=1?30:42);
+            block.SetFloat("_FadeEnd",q<=1?48:76);renderer.SetPropertyBlock(block);
         }
     }
 }

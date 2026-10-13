@@ -107,7 +107,7 @@ namespace Nusantara.World.Editor
             var ray=HandleUtility.GUIPointToWorldRay(e.mousePosition);
             if(picking)
             {
-                var hits=Physics.RaycastAll(ray,100000,~0,QueryTriggerInteraction.Ignore).Where(h=>h.collider.gameObject.scene==water.gameObject.scene&&WorldAINavigation.IsGround(h.collider)).OrderBy(h=>h.distance).ToArray();
+                var hits=Physics.RaycastAll(ray,100000,~0,QueryTriggerInteraction.Ignore).Where(h=>h.collider.gameObject.scene==water.gameObject.scene&&!SceneVisibilityManager.instance.IsHidden(h.collider.gameObject)&&WorldAINavigation.IsGround(h.collider)).OrderBy(h=>h.distance).ToArray();
                 if(hits.Length>0&&e.type==EventType.MouseDown&&e.button==0)
                 {
                     Undo.RecordObject(water.transform,"Pick water level");var p=water.transform.position;p.y=hits[0].point.y-.3f;water.transform.position=p;

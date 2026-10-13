@@ -22,8 +22,14 @@ namespace Nusantara.World.Editor
             Undo.undoRedoPerformed += AfterUndo;
             EditorApplication.playModeStateChanged += BeforePlay;
         }
-        public static string Folder(Vector2Int coordinate) => $"{WorldReferenceBuilder.Root}/Chunks/{coordinate.x:D2}_{coordinate.y:D2}";
-        public static void InvalidateCache() { groundMeshes.Clear(); groundVertices.Clear(); }
+        public static string Folder(Vector2Int coordinate) => Folder(AssetDatabase.LoadAssetAtPath<WorldDefinition>(WorldFoundationSetup.DefinitionPath), coordinate);
+        public static string Folder(WorldDefinition world, Vector2Int coordinate)
+        {
+            var record = world != null ? Array.Find(world.chunks, c => c != null && c.coordinate == coordinate) : null;
+            return !string.IsNullOrEmpty(record?.assetFolder) ? record.assetFolder
+                : $"{(world != null ? world.chunkAssetRoot : WorldReferenceBuilder.Root)}/Chunks/{coordinate.x:D2}_{coordinate.y:D2}";
+        }
+        public static void InvalidateCache() { groundMeshes.Clear(); groundVertices.Clear(); WorldRegionalGroundAssets.InvalidateCache(); }
         public static WorldTerrainSculptData Prepare(WorldGeographyProfile profile)
         {
             if (EditorApplication.isPlayingOrWillChangePlaymode) throw new InvalidOperationException("Terrain painting requires Edit mode.");
@@ -49,7 +55,16 @@ namespace Nusantara.World.Editor
             coordinate = default;
             if (mesh == null) return false;
             string path = AssetDatabase.GetAssetPath(mesh).Replace('\\', '/');
-            string prefix = WorldReferenceBuilder.Root + "/Chunks/";
+            var world = AssetDatabase.LoadAssetAtPath<WorldDefinition>(WorldFoundationSetup.DefinitionPath);
+            if (world != null && world.regionalGroundPlanes) return WorldRegionalGroundAssets.TryCoordinate(world, mesh, out coordinate);
+            if (world != null && world.brushAuthoredTerrain)
+            {
+                foreach (var record in world.chunks)
+                    if (path == Folder(world, record.coordinate) + "/Terrain.asset")
+                    { coordinate = record.coordinate; return true; }
+                return false;
+            }
+            string prefix = (world != null ? world.chunkAssetRoot : WorldReferenceBuilder.Root) + "/Chunks/";
             if (!path.StartsWith(prefix, StringComparison.Ordinal) || !path.EndsWith("/Terrain.asset", StringComparison.Ordinal)) return false;
             string name = path.Substring(prefix.Length, path.Length - prefix.Length - "/Terrain.asset".Length);
             var parts = name.Split('_');
@@ -60,11 +75,12 @@ namespace Nusantara.World.Editor
         public static float SampleGround(WorldGeographyProfile profile, float x, float z)
         {
             var world = profile.world;
+            if (world.regionalGroundPlanes) return WorldRegionalGroundAssets.Sample(profile, x, z);
             var coordinate = world.WorldToChunk(new Vector3(x, 0, z));
             if (!world.Contains(coordinate)) return profile.Height(x, z);
             if (!groundMeshes.TryGetValue(coordinate, out var mesh))
             {
-                mesh = AssetDatabase.LoadAssetAtPath<Mesh>(Folder(coordinate) + "/Terrain.asset");
+                mesh = AssetDatabase.LoadAssetAtPath<Mesh>(Folder(world, coordinate) + "/Terrain.asset");
                 groundMeshes[coordinate] = mesh;
             }
             if (mesh == null) return profile.Height(x, z);
@@ -106,6 +122,8 @@ namespace Nusantara.World.Editor
             if (profile == null || profile.world == null || profile.sculptData == null) throw new InvalidOperationException("Set up the brush first.");
             sessionProfile = profile;
             var world = profile.world;
+            if (world.regionalGroundPlanes)
+            { WorldRegionalGroundAssets.ApplyDelta(profile, bounds, delta, recordedMeshes, changedChunks); sessionChanged.UnionWith(changedChunks); return; }
             int minX = Mathf.Max(0, Mathf.FloorToInt((bounds.xMin - .51f - world.origin.x) / world.chunkSize));
             int maxX = Mathf.Min(world.gridSize.x - 1, Mathf.FloorToInt((bounds.xMax + .51f - world.origin.x) / world.chunkSize));
             int minZ = Mathf.Max(0, Mathf.FloorToInt((bounds.yMin - .51f - world.origin.y) / world.chunkSize));
@@ -116,7 +134,7 @@ namespace Nusantara.World.Editor
                 var coordinate = new Vector2Int(x, z); bool chunkChanged = false;
                 foreach (string file in new[] { "Terrain.asset", "DistantTerrain.asset" })
                 {
-                    var mesh = AssetDatabase.LoadAssetAtPath<Mesh>(Folder(coordinate) + "/" + file);
+                    var mesh = AssetDatabase.LoadAssetAtPath<Mesh>(Folder(world, coordinate) + "/" + file);
                     if (ApplyMeshDelta(mesh, world.ChunkOrigin(coordinate), delta, () =>
                     {
                         if (recordedMeshes.Add(mesh)) Undo.RegisterCompleteObjectUndo(mesh, "Sculpt terrain");
@@ -149,9 +167,10 @@ namespace Nusantara.World.Editor
             foreach (var coordinate in sessionChanged)
             {
                 if (!data.pendingChunks.Contains(coordinate)) data.pendingChunks.Add(coordinate);
-                foreach (string file in new[] { "Terrain.asset", "DistantTerrain.asset" })
+                foreach (var mesh in sessionProfile.world.regionalGroundPlanes
+                    ? sessionProfile.world.regions.Where(r => r.chunkOffset.x <= coordinate.x && r.chunkOffset.y <= coordinate.y && coordinate.x < r.chunkOffset.x + r.chunkGridSize.x && coordinate.y < r.chunkOffset.y + r.chunkGridSize.y).SelectMany(r => new[] { WorldRegionalGroundAssets.Mesh(r), WorldRegionalGroundAssets.Mesh(r, true) })
+                    : new[] { "Terrain.asset", "DistantTerrain.asset" }.Select(file => AssetDatabase.LoadAssetAtPath<Mesh>(Folder(coordinate) + "/" + file)))
                 {
-                    var mesh = AssetDatabase.LoadAssetAtPath<Mesh>(Folder(coordinate) + "/" + file);
                     if (mesh != null) { EditorUtility.SetDirty(mesh); AssetDatabase.SaveAssetIfDirty(mesh); }
                 }
             }
@@ -170,6 +189,7 @@ namespace Nusantara.World.Editor
             if (EditorApplication.isPlaying) throw new InvalidOperationException("Exit Play mode before saving terrain.");
             if (profile == null || profile.world == null || profile.sculptData == null) return "Enable the brush to set up terrain painting.";
             var data = profile.sculptData; var world = profile.world;
+            if (world.regionalGroundPlanes) return WorldRegionalGroundAssets.Save(profile);
             if (data.pendingChunks.Count == 0) { AssetDatabase.SaveAssetIfDirty(data); return "Terrain is saved. Use the AI brush to rebuild walking ground after sculpting."; }
             var queue = new HashSet<Vector2Int>(data.pendingChunks);
             EditorUtility.SetDirty(data); AssetDatabase.SaveAssetIfDirty(data);
@@ -179,7 +199,7 @@ namespace Nusantara.World.Editor
             {
                 foreach (var coordinate in queue.OrderBy(c => c.y).ThenBy(c => c.x))
                 {
-                    string folder = Folder(coordinate), path = folder + "/Essential.prefab";
+                    string folder = Folder(world, coordinate), path = folder + "/Essential.prefab";
                     foreach (string file in new[] { "Terrain.asset", "DistantTerrain.asset" })
                     {
                         var mesh = AssetDatabase.LoadAssetAtPath<Mesh>(folder + "/" + file);

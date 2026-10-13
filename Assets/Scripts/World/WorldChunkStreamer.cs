@@ -29,6 +29,8 @@ namespace Nusantara.World
             public WorldChunkRecord record;
             public ChunkTier tier;
             public GameObject root;
+            public bool regionGroundReady;
+            public float collisionPreloadUntil;
             public List<Part> parts = new List<Part>();
         }
 
@@ -48,6 +50,8 @@ namespace Nusantara.World
         readonly Dictionary<Vector2Int, WorldChunkRecord> catalog = new Dictionary<Vector2Int, WorldChunkRecord>();
         readonly Dictionary<Vector2Int, Resident> residents = new Dictionary<Vector2Int, Resident>();
         readonly Dictionary<int, Transform> regionRoots = new Dictionary<int, Transform>();
+        readonly List<GameObject> ownedGrounds = new List<GameObject>();
+        readonly HashSet<int> readyGrounds = new HashSet<int>();
         readonly HashSet<Vector2Int> candidates = new HashSet<Vector2Int>();
         readonly List<Vector2Int> removals = new List<Vector2Int>();
         Vector3 previousPosition, velocity;
@@ -66,6 +70,18 @@ namespace Nusantara.World
             { Debug.LogError("The World root must have unit world scale and no rotation to preserve metre coordinates.", this); return false; }
             var errors = definition.ConfigurationErrors(true).ToArray();
             if (errors.Length > 0) { Debug.LogWarning(string.Join("\n", errors), this); return false; }
+            readyGrounds.Clear();
+            if(definition.regionalGroundPlanes)
+            {
+                foreach(var ground in FindObjectsByType<WorldRegionGround>(FindObjectsSortMode.None))
+                    if(ground.gameObject.scene==gameObject.scene)readyGrounds.Add(ground.region);
+                foreach(var region in definition.regions)
+                {
+                    if(readyGrounds.Contains(region.id))continue;
+                    var ground=Instantiate(region.groundPrefab,definition.ChunkOrigin(region.chunkOffset),Quaternion.identity,transform);
+                    ownedGrounds.Add(ground);readyGrounds.Add(region.id);
+                }
+            }
             catalog.Clear();
             foreach (var record in definition.chunks) catalog.Add(record.coordinate, record);
             State = new WorldStateStore(definition.worldId);
@@ -128,6 +144,7 @@ namespace Nusantara.World
             {
                 var resident = pair.Value;
                 resident.tier = WorldStreamingPlan.RetainedTier(definition, pair.Key, resident.tier, player.position, velocity);
+                if(resident.collisionPreloadUntil>Time.unscaledTime&&resident.tier<ChunkTier.Visual)resident.tier=ChunkTier.Visual;
                 if (resident.tier == ChunkTier.Unloaded) { removals.Add(pair.Key); continue; }
                 foreach (var part in resident.parts)
                 {
@@ -153,7 +170,7 @@ namespace Nusantara.World
                 parent.SetParent(transform, false);
                 regionRoots.Add(record.region, parent);
             }
-            var resident = new Resident { record = record, root = new GameObject($"Chunk {record.coordinate.x:D2}_{record.coordinate.y:D2}") };
+            var resident = new Resident { record = record, regionGroundReady=readyGrounds.Contains(record.region), root = new GameObject($"Chunk {record.coordinate.x:D2}_{record.coordinate.y:D2}") };
             resident.root.transform.SetParent(parent, false);
             resident.root.transform.position = definition.ChunkOrigin(record.coordinate);
             AddPart(resident, PartKind.Essential, record.essentialAddress, "essential");
@@ -170,9 +187,21 @@ namespace Nusantara.World
             kind == PartKind.Gameplay ? resident.tier == ChunkTier.Gameplay : resident.tier >= ChunkTier.Visual;
         static bool Ready(Resident resident, PartKind kind)
         {
+            if(resident.regionGroundReady && ((kind==PartKind.Essential&&string.IsNullOrEmpty(resident.record.essentialAddress))||(kind==PartKind.Distant&&string.IsNullOrEmpty(resident.record.distantAddress))))return true;
             foreach (var part in resident.parts) if (part.kind == kind && part.ready) return true;
             return false;
         }
+        public bool PreloadCollision(Vector3 position)
+        {
+            if(!Running||!catalog.TryGetValue(definition.WorldToChunk(position),out var record))return false;
+            if(!residents.TryGetValue(record.coordinate,out var resident))
+            {resident=CreateResident(record);residents.Add(record.coordinate,resident);}
+            resident.collisionPreloadUntil=Time.unscaledTime+30;
+            if(resident.tier<ChunkTier.Visual)resident.tier=ChunkTier.Visual;
+            RequestReplan();return true;
+        }
+        public void FinishCollisionPreload(Vector3 position)
+        {if(definition!=null&&residents.TryGetValue(definition.WorldToChunk(position),out var resident))resident.collisionPreloadUntil=0;}
         public bool IsCollisionReady(Vector3 position) => definition != null && residents.TryGetValue(definition.WorldToChunk(position), out var resident)
             && Ready(resident, PartKind.Essential);
 
@@ -344,6 +373,7 @@ namespace Nusantara.World
             residents.Clear();
             foreach (var root in regionRoots.Values) if (root != null) DestroyOwned(root.gameObject);
             regionRoots.Clear();
+            foreach(var ground in ownedGrounds)if(ground!=null)DestroyOwned(ground);ownedGrounds.Clear();readyGrounds.Clear();
         }
     }
 }
