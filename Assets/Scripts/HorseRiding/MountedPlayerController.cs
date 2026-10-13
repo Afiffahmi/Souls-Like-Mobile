@@ -29,7 +29,8 @@ namespace SoulsLike.Riding
         public HorseController Horse { get; private set; }
         public bool IsBusy => Phase != RiderPhase.OnFoot;
         public bool IsRiding => Phase == RiderPhase.Riding;
-        public bool CanMount => !IsBusy && isActiveAndEnabled && player && player.isActiveAndEnabled &&
+        public bool CanMount => !mountRequested && CanStartMount;
+        private bool CanStartMount => !IsBusy && isActiveAndEnabled && player && player.isActiveAndEnabled &&
             !player.IsAttacking && !player.IsParrying && !player.IsRolling && !player.IsChangingEquipment &&
             (!TryGetComponent<PlayerOverall>(out var hp) || hp.currentHealth > 0) &&
             (!TryGetComponent<ElementalGems.PlayerElementalState>(out var status) || !status.CannotAct);
@@ -46,6 +47,9 @@ namespace SoulsLike.Riding
         private Quaternion startRotation;
         private float elapsed;
         private float mountDismountSpeed = 1f;
+        private bool mountRequested;
+        private HorseController pendingHorse;
+        private float pendingMountRange;
         private HorseMotion? lastAnimation;
         private InputAction move, sprint, special;
         private readonly Dictionary<Collider,bool> colliders = new Dictionary<Collider,bool>();
@@ -68,11 +72,44 @@ namespace SoulsLike.Riding
         }
         public bool TryMount(HorseController horse, float range)
         {
-            if (Time.timeScale <= 0 || !CanMount || !horse || !playerAnimator || !horse.Animations ||
+            if (Time.timeScale <= 0 || !CanMount || !horse || !horse.dismountPoint || !playerAnimator || !horse.Animations ||
                 !horse.Animations.playerController || Vector3.Distance(transform.position, horse.transform.position) > range || !horse.TryReserve(this)) return false;
+            // Use the same request as Select Normal, keeping the on-foot Animator
+            // active until its weapon unequip animation has actually completed.
+            if (!player.TrySetCombatMode(PlayerCombatMode.Normal)) { horse.Release(this); return false; }
+            if (player.IsChangingEquipment)
+            {
+                pendingHorse = horse; pendingMountRange = range; mountRequested = true;
+                return true;
+            }
+            BeginMount(horse);
+            return true;
+        }
+        private void UpdateMountRequest()
+        {
+            if (!pendingHorse || !pendingHorse.isActiveAndEnabled || pendingHorse.IsDead || pendingHorse.Rider != this ||
+                !pendingHorse.saddlePoint || !pendingHorse.dismountPoint || !pendingHorse.Animations || !pendingHorse.Animations.playerController ||
+                !player || !player.isActiveAndEnabled || !playerAnimator || !playerAnimator.isActiveAndEnabled ||
+                Vector3.Distance(transform.position,pendingHorse.transform.position) > pendingMountRange ||
+                (TryGetComponent<PlayerOverall>(out var hp) && hp.currentHealth <= 0) ||
+                (TryGetComponent<ElementalGems.PlayerElementalState>(out var status) && status.CannotAct))
+            { CancelMountRequest(); return; }
+            if (Time.timeScale <= 0 || player.IsChangingEquipment) return;
+            if (!CanStartMount || player.CombatMode != PlayerCombatMode.Normal)
+            { CancelMountRequest(); return; }
+            var horse = pendingHorse;
+            pendingHorse = null; mountRequested = false;
+            BeginMount(horse);
+        }
+        private void CancelMountRequest()
+        {
+            if (pendingHorse) pendingHorse.Release(this);
+            pendingHorse = null; mountRequested = false;
+        }
+        private void BeginMount(HorseController horse)
+        {
             Horse = horse; set = horse.Animations; originalMode = player.CombatMode;
             originalParent = transform.parent; originalScale = transform.localScale;
-            startPosition = transform.position; startRotation = transform.rotation;
             wasPlayerEnabled = player.enabled; wasLockEnabled = lockOn && lockOn.enabled;
             wasBodyEnabled = body && body.enabled;
             if (lockOn) lockOn.enabled = false;
@@ -82,6 +119,15 @@ namespace SoulsLike.Riding
             originalUpdate = playerAnimator.updateMode; originalCulling = playerAnimator.cullingMode;
             colliders.Clear();
             foreach (var c in GetComponentsInChildren<Collider>(true)) { colliders[c] = c.enabled; c.enabled = false; }
+            // Stage the rider at the authored side-of-horse marker before the
+            // riding Animator starts. Colliders are disabled for this teleport.
+            startPosition = horse.dismountPoint.position;
+            Vector3 towardHorse = Vector3.ProjectOnPlane(horse.transform.position - startPosition, Vector3.up);
+            if (towardHorse.sqrMagnitude < .0001f)
+                towardHorse = Vector3.ProjectOnPlane(horse.transform.forward, Vector3.up);
+            startRotation = towardHorse.sqrMagnitude > .0001f
+                ? Quaternion.LookRotation(towardHorse, Vector3.up) : transform.rotation;
+            transform.SetPositionAndRotation(startPosition, startRotation);
             mountedController = set.CreateController(true);
             playerAnimator.runtimeAnimatorController = mountedController;
             playerAnimator.SetInteger("CombatMode", (int)originalMode);
@@ -90,10 +136,10 @@ namespace SoulsLike.Riding
             playerAnimator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
             Phase = RiderPhase.Mounting; elapsed = 0; detached = false; lastAnimation = null;
             mountDismountSpeed = horse.EquipmentStats.speed;
-            return true;
         }
         private void Update()
         {
+            if (mountRequested) { UpdateMountRequest(); return; }
             if (!IsBusy) return;
             if (!Horse) { AbortRide(); return; }
             // The sampled clip and attachment milestones share one scaled clock.
@@ -250,6 +296,7 @@ namespace SoulsLike.Riding
         }
         public void AbortRide()
         {
+            CancelMountRequest();
             if (!IsBusy) return;
             if (Horse && FindDismount(out var safe)) transform.position = safe;
             FinishRide();
