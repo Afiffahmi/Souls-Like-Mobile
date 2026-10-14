@@ -9,14 +9,19 @@ namespace Nusantara.World.Editor
 {
     public static class KampungAssets
     {
-        public const string Source="Assets/Models/Map/Props/Region5/KampungSources";
-        public const string Prepared=Source+"/Prepared";
+        public const string Source="Assets/Models/Map/Props/Shared/Kampung";
+        public const string Prepared="Assets/Prefabs/Map/Props/Shared/Kampung";
+        public const string Meshes=Source+"/Meshes";
+        public const string PropTextures="Assets/Textures/Map/Props/Shared/Kampung";
+        public const string PropMaterials="Assets/Materials/Map/Props/Shared/Kampung";
         public const string Textures="Assets/Textures/KampungSources";
-        static Texture2D Texture(string asset,string channel)=>AssetDatabase.LoadAssetAtPath<Texture2D>($"{Textures}/{asset}_{channel}.jpg");
+        static Texture2D Texture(string asset,string channel)=>AssetDatabase.LoadAssetAtPath<Texture2D>($"{(asset=="fern_02"||asset=="rock_moss_set_01"?PropTextures:Textures)}/{asset}_{channel}.jpg");
         public static void Create()
         {
             Region5EnvironmentAssets.EnsureFolder(Prepared);
-            foreach(string guid in AssetDatabase.FindAssets("t:Texture2D",new[]{Textures}))
+            Region5EnvironmentAssets.EnsureFolder(Meshes);
+            Region5EnvironmentAssets.EnsureFolder(PropMaterials);
+            foreach(string guid in AssetDatabase.FindAssets("t:Texture2D",new[]{Textures,PropTextures}))
             {
                 string path=AssetDatabase.GUIDToAssetPath(guid);var importer=AssetImporter.GetAtPath(path) as TextureImporter;if(importer==null)continue;
                 bool normal=path.Contains("_nor_gl");importer.textureType=normal?TextureImporterType.NormalMap:TextureImporterType.Default;
@@ -40,7 +45,7 @@ namespace Nusantara.World.Editor
         }
         public static Material Material(string name,string shader)
         {
-            string path=WorldAssetLayout.Materials+"/"+name+".mat";var material=AssetDatabase.LoadAssetAtPath<Material>(path);
+            string path=(name=="KampungMossRock"||name=="KampungFern"?PropMaterials:WorldAssetLayout.Materials)+"/"+name+".mat";var material=AssetDatabase.LoadAssetAtPath<Material>(path);
             if(material==null){var s=Shader.Find(shader);if(s==null)throw new InvalidOperationException("Missing shader "+shader);material=new Material(s){name=name,enableInstancing=true};AssetDatabase.CreateAsset(material,path);}
             return material;
         }
@@ -59,8 +64,8 @@ namespace Nusantara.World.Editor
                     for(int i=0;i<vertices.Length;i++){vertices[i]=matrix.MultiplyPoint3x4(vertices[i]);if(i<normals.Length)normals[i]=matrix.MultiplyVector(normals[i]).normalized;}
                     var bounds=new Bounds(vertices[0],Vector3.zero);foreach(var vertex in vertices)bounds.Encapsulate(vertex);
                     Vector3 offset=new Vector3(bounds.center.x,bounds.min.y,bounds.center.z);for(int i=0;i<vertices.Length;i++)vertices[i]-=offset;
-                    mesh.vertices=vertices;mesh.normals=normals;mesh.name=id;mesh.RecalculateBounds();AssetDatabase.CreateAsset(mesh,Prepared+"/"+id+".asset");
-                    var low=WorldGenerationGeometry.Simplify(mesh,name.StartsWith("rock")?12:16);AssetDatabase.CreateAsset(low,Prepared+"/"+id+"_LOD.asset");
+                    mesh.vertices=vertices;mesh.normals=normals;mesh.name=id;mesh.RecalculateBounds();AssetDatabase.CreateAsset(mesh,Meshes+"/"+id+".asset");
+                    var low=WorldGenerationGeometry.Simplify(mesh,name.StartsWith("rock")?12:16);AssetDatabase.CreateAsset(low,Meshes+"/"+id+"_LOD.asset");
                     var root=new GameObject(id);var renderers=new Renderer[2];int n=0;
                     foreach(var m in new[]{mesh,low})
                     {
