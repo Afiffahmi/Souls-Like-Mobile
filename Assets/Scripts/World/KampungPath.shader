@@ -10,8 +10,9 @@ Shader "Nusantara/Kampung Worn Path"
     {
         Tags {"RenderType"="Opaque"}
         CGPROGRAM
-        #pragma surface surf Standard fullforwardshadows
+        #pragma surface surf Nusantara fullforwardshadows
         #pragma target 3.0
+        #include "NusantaraToonBRDF.cginc"
         sampler2D _MainTex,_BumpMap,_Rough;
         struct Input {float3 worldPos;};
         void surf(Input i,inout SurfaceOutputStandard o)

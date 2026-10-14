@@ -32,6 +32,7 @@ namespace Nusantara.World.Editor
                 {
                     if(ground.gameObject.scene!=scene||SceneVisibilityManager.instance.IsHidden(ground.gameObject))continue;
                     var region=world.regions.FirstOrDefault(r=>r.id==ground.region);if(region==null)continue;
+                    if(world.regionPaint!=null&&region.id<=world.MainlandRegionCount)continue;
                     var origin=world.ChunkOrigin(region.chunkOffset);float width=region.chunkGridSize.x*world.chunkSize,depth=region.chunkGridSize.y*world.chunkSize;
                     Vector3 Surface(float x,float z)
                     {

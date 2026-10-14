@@ -31,7 +31,7 @@ namespace Nusantara.World.Editor
         {
             if(running||EditorApplication.isPlayingOrWillChangePlaymode)throw new InvalidOperationException("Validation requires idle Edit mode.");
             geography=AssetDatabase.LoadAssetAtPath<WorldGeographyProfile>(WorldReferenceBuilder.ProfilePath);world=geography.world;
-            chunks=world.chunks.Where(c=>c.region==5).ToArray();samples.Clear();allSamples.Clear();ids.Clear();issues.Clear();cursor=giants=details=canopies=routeFailures=seamFailures=0;
+            chunks=world.chunks.Where(c=>c.region==world.WetlandRegionId).ToArray();samples.Clear();allSamples.Clear();ids.Clear();issues.Clear();cursor=giants=details=canopies=routeFailures=seamFailures=0;
             foreach(var route in geography.routes)
             {
                 int index=0;
@@ -41,7 +41,7 @@ namespace Nusantara.World.Editor
                     for(int j=0;j<=count;j++)
                     {
                         Vector2 p=Vector2.Lerp(a,b,j/(float)count);var c=world.WorldToChunk(new Vector3(p.x,0,p.y));
-                        if(!geography.InsideRegion(p,5)||!chunks.Any(record=>record.coordinate==c)){index++;continue;}
+                        if(!geography.InsideRegion(p,geography.world.WetlandRegionId)||!chunks.Any(record=>record.coordinate==c)){index++;continue;}
                         var sample=new RouteSample{route=route.name,index=index++,position=p};allSamples.Add(sample);
                         if(!samples.TryGetValue(c,out var list)){list=new List<RouteSample>();samples[c]=list;}list.Add(sample);
                     }
@@ -81,7 +81,7 @@ namespace Nusantara.World.Editor
                         if(child.name.Contains("sole giant crocodile")||child.name.StartsWith("giant_crocodile_skulls"))giants++;
                         var p=new Vector2(origin.x+child.localPosition.x,origin.z+child.localPosition.z);
                         if(child.GetComponent<WorldCanopyVfx>()!=null){canopies++;continue;}
-                        if(child.childCount>0&&!geography.InsideRegion(p,5)&&child.GetComponent<WorldLandmarkIdentity>()==null)Issue("Outside region prop: "+path+" / "+child.name);
+                        if(child.childCount>0&&!geography.InsideRegion(p,geography.world.WetlandRegionId)&&child.GetComponent<WorldLandmarkIdentity>()==null)Issue("Outside region prop: "+path+" / "+child.name);
                         if(file=="Enhancement.prefab")
                         {
                             details++;
@@ -138,7 +138,7 @@ namespace Nusantara.World.Editor
             if(!ids.ContainsKey("region5-ancient-tree-grove"))Issue("Missing unique ancient tree grove.");
             foreach(var island in geography.scenicIslands)
             {
-                if(!geography.InsideRegion(island.center,5,island.radius+30))Issue("Island crosses regional boundary: "+island.id);
+                if(!geography.InsideRegion(island.center,geography.world.WetlandRegionId,island.radius+30))Issue("Island crosses regional boundary: "+island.id);
                 if(!geography.IsForbiddenWater(island.center)||geography.RouteDistance(island.center)<island.radius+32)Issue("Island access exclusion failed: "+island.id);
                 if(!ids.ContainsKey(island.id))Issue("Missing island: "+island.id);
             }
@@ -163,12 +163,12 @@ namespace Nusantara.World.Editor
         }
         static void Heatmap()
         {
-            var boundary=world.regions.First(r=>r.id==5).boundary;float minX=boundary.Min(p=>p.x),maxX=boundary.Max(p=>p.x),minZ=boundary.Min(p=>p.y),maxZ=boundary.Max(p=>p.y);
+            var boundary=world.regions.First(r=>r.id==world.WetlandRegionId).boundary;float minX=boundary.Min(p=>p.x),maxX=boundary.Max(p=>p.x),minZ=boundary.Min(p=>p.y),maxZ=boundary.Max(p=>p.y);
             const int side=160;var texture=new Texture2D(side,side,TextureFormat.RGB24,false);var pixels=new Color[side*side];
             for(int z=0;z<side;z++)for(int x=0;x<side;x++)
             {
                 Vector2 p=new Vector2(Mathf.Lerp(minX,maxX,x/(float)(side-1)),Mathf.Lerp(minZ,maxZ,z/(float)(side-1)));Color color=new Color(.07f,.1f,.12f);
-                if(geography.InsideRegion(p,5))
+                if(geography.InsideRegion(p,geography.world.WetlandRegionId))
                 {
                     float dx=geography.Height(p.x+1,p.y)-geography.Height(p.x-1,p.y),dz=geography.Height(p.x,p.y+1)-geography.Height(p.x,p.y-1);
                     float slope=Mathf.Atan(new Vector2(dx,dz).magnitude/2)*Mathf.Rad2Deg;

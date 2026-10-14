@@ -20,8 +20,9 @@ Shader "Nusantara/Kampung Living Grass"
         CGPROGRAM
         // Built-in is the project's active pipeline. Receive real tree shadows
         // and the existing drifting sunlight cookie through surface lighting.
-        #pragma surface surf Grass vertex:Wind noforwardadd exclude_path:deferred
+        #pragma surface surf Grass vertex:Wind fullforwardshadows exclude_path:deferred
         #pragma target 3.0
+        #include "NusantaraToonLighting.cginc"
         #pragma multi_compile_instancing
         fixed4 _RootColor, _TipColor, _PatchColor;
         float _PatchSize, _Wind, _WindSpeed, _ShadeSteps, _FadeStart, _FadeEnd, _Density;
@@ -58,9 +59,7 @@ Shader "Nusantara/Kampung Living Grass"
         }
         half4 LightingGrass(SurfaceOutput s, half3 lightDir, half atten)
         {
-            half wrap = saturate(dot(s.Normal,lightDir) * .45 + .55);
-            half band = floor(wrap * max(_ShadeSteps-1,1) + .5) / max(_ShadeSteps-1,1);
-            return half4(s.Albedo * _LightColor0.rgb * (.3 + .4 * band) * atten, 1);
+            return NusantaraLeafLight(s, lightDir, atten, _ShadeSteps, .35h);
         }
         void surf(Input i, inout SurfaceOutput o)
         {
@@ -73,7 +72,7 @@ Shader "Nusantara/Kampung Living Grass"
             fixed3 tips = lerp(_TipColor.rgb,_PatchColor.rgb,patch*.6);
             float height = floor(saturate(i.grass.x)*3+.5)/3;
             o.Albedo = lerp(_RootColor.rgb,tips,height);
-            o.Emission = o.Albedo * (.06 + .03 * height);
+            o.Emission = 0;
             o.Alpha = 1;
         }
         ENDCG

@@ -157,6 +157,11 @@ namespace Nusantara.World.Editor
                 if (meshes != null ? !meshes.Contains(collider.sharedMesh) : !TryCoordinate(collider.sharedMesh, out _)) continue;
                 Mesh mesh = collider.sharedMesh; collider.sharedMesh = null; collider.sharedMesh = mesh;
             }
+            foreach (var chunks in UnityEngine.Object.FindObjectsByType<WorldGroundRenderChunks>(FindObjectsSortMode.None))
+            {
+                var marker = chunks.GetComponent<WorldRegionGround>();
+                if (meshes == null || meshes.Contains(marker.ground)) chunks.Rebuild();
+            }
             Physics.SyncTransforms();
         }
         static void AfterUndo()
@@ -168,7 +173,7 @@ namespace Nusantara.World.Editor
             {
                 if (!data.pendingChunks.Contains(coordinate)) data.pendingChunks.Add(coordinate);
                 foreach (var mesh in sessionProfile.world.regionalGroundPlanes
-                    ? sessionProfile.world.regions.Where(r => r.chunkOffset.x <= coordinate.x && r.chunkOffset.y <= coordinate.y && coordinate.x < r.chunkOffset.x + r.chunkGridSize.x && coordinate.y < r.chunkOffset.y + r.chunkGridSize.y).SelectMany(r => new[] { WorldRegionalGroundAssets.Mesh(r), WorldRegionalGroundAssets.Mesh(r, true) })
+                    ? sessionProfile.world.regions.Where(r => !r.paintOnly && r.chunkOffset.x <= coordinate.x && r.chunkOffset.y <= coordinate.y && coordinate.x < r.chunkOffset.x + r.chunkGridSize.x && coordinate.y < r.chunkOffset.y + r.chunkGridSize.y).SelectMany(r => new[] { WorldRegionalGroundAssets.Mesh(r), WorldRegionalGroundAssets.Mesh(r, true) })
                     : new[] { "Terrain.asset", "DistantTerrain.asset" }.Select(file => AssetDatabase.LoadAssetAtPath<Mesh>(Folder(coordinate) + "/" + file)))
                 {
                     if (mesh != null) { EditorUtility.SetDirty(mesh); AssetDatabase.SaveAssetIfDirty(mesh); }
@@ -227,3 +232,5 @@ namespace Nusantara.World.Editor
         }
     }
 }
+
+

@@ -42,7 +42,7 @@ namespace Nusantara.World.Editor
             backup="Library/Nusantara/KampungBackup/"+DateTime.UtcNow.ToString("yyyyMMdd-HHmmss");
             VegetationPaintAssets.Backup(WorldReferenceBuilder.ProfilePath,backup);VegetationPaintAssets.Backup(WorldFoundationSetup.DefinitionPath,backup);VegetationPaintAssets.Backup(PlanPath,backup);
             LoadAssets();CreatePlan();ApplyPlan();
-            chunks=world.chunks.Where(c=>c.region==5&&Intersects(c.coordinate)).ToArray();
+            chunks=world.chunks.Where(c=>c.region==world.WetlandRegionId&&Intersects(c.coordinate)).ToArray();
             foreach(var record in chunks)
                 foreach(string path in Directory.GetFiles(Folder(record.coordinate)).Where(p=>!p.EndsWith(".meta")))VegetationPaintAssets.Backup(path,backup);
             File.WriteAllText("Library/Nusantara/KampungAffected.txt",string.Join("\n",chunks.Select(c=>Folder(c.coordinate))));
@@ -104,7 +104,7 @@ namespace Nusantara.World.Editor
         }
         static void ApplyPlan()
         {
-            if(plan.footprint.Any(p=>!geography.InsideRegion(p,5,30)))throw new InvalidOperationException("Village footprint must stay inside Map 5.");
+            if(plan.footprint.Any(p=>!geography.InsideRegion(p,geography.world.WetlandRegionId,30)))throw new InvalidOperationException("Village footprint must stay inside Map 5.");
             world.locations[0].footprint=plan.footprint;
             geography.routes=geography.routes.Where(r=>!r.name.StartsWith("Kampung / ")).Concat(plan.paths).ToArray();
             geography.walkingPlatforms=geography.walkingPlatforms.Where(p=>!p.id.StartsWith("kampung-")).Concat(plan.platforms).ToArray();

@@ -4,12 +4,34 @@ using UnityEngine.Rendering;
 
 namespace Nusantara.World
 {
+    public enum WorldWaterKind { River, Sea }
+
     [ExecuteAlways, DisallowMultipleComponent, RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
     [AddComponentMenu("Nusantara/Painted Water")]
     public sealed class WorldPaintedWater : MonoBehaviour
     {
         public const float CellSize = 1f;
         [HideInInspector] public Material waterMaterial;
+        [HideInInspector] public Material shorelineMaterial;
+        [SerializeField, HideInInspector] WorldWaterKind waterKind;
+        [SerializeField, HideInInspector] bool waterKindAssigned;
+        MaterialPropertyBlock kindProperties;
+        public WorldWaterKind Kind => waterKindAssigned ? waterKind :
+            waterMaterial && waterMaterial.HasProperty("_ShoreEnabled") && waterMaterial.GetFloat("_ShoreEnabled")>.5f ? WorldWaterKind.Sea : WorldWaterKind.River;
+        public void SetKind(WorldWaterKind kind) { waterKind=kind; waterKindAssigned=true; }
+        public void ApplyWaterKind()
+        {
+            var renderer=GetComponent<MeshRenderer>();
+            if (!renderer) return;
+            kindProperties ??= new MaterialPropertyBlock();
+            renderer.GetPropertyBlock(kindProperties);
+            float shore=Kind==WorldWaterKind.Sea && waterMaterial && waterMaterial.HasProperty("_ShoreEnabled") ? waterMaterial.GetFloat("_ShoreEnabled") : 0;
+            kindProperties.SetFloat("_ShoreEnabled",shore);
+            renderer.SetPropertyBlock(kindProperties);
+            bool wetEnabled=Kind==WorldWaterKind.Sea && cells.Count>0;
+            var wet=transform.Find("Shoreline Wet Sand");
+            if (wet && wet.gameObject.activeSelf!=wetEnabled) wet.gameObject.SetActive(wetEnabled);
+        }
         [HideInInspector] public List<Vector2Int> cells = new List<Vector2Int>();
         Mesh generated;
         HashSet<Vector2Int> occupied;
@@ -98,6 +120,7 @@ namespace Nusantara.World
             GetComponent<MeshFilter>().sharedMesh=generated;var renderer=GetComponent<MeshRenderer>();
             if(waterMaterial!=null)renderer.sharedMaterial=waterMaterial;
             renderer.shadowCastingMode=ShadowCastingMode.Off;renderer.receiveShadows=false;
+            ApplyWaterKind();
         }
     }
 }

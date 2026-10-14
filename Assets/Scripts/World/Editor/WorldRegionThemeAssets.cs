@@ -48,6 +48,7 @@ namespace Nusantara.World.Editor
         {
             if(EditorApplication.isPlayingOrWillChangePlaymode)throw new InvalidOperationException("Exit Play mode first.");
             var world=AssetDatabase.LoadAssetAtPath<WorldDefinition>(WorldFoundationSetup.DefinitionPath);var profile=AssetDatabase.LoadAssetAtPath<WorldGeographyProfile>(WorldReferenceBuilder.ProfilePath);
+            if(world.regions.Length==9)return "The nine region palettes and islands are already prepared. Use Region Brush to edit the mainland.";
             if(!world.regionalGroundPlanes)throw new InvalidOperationException("Consolidate the mainland ground first.");
             VegetationVariationAssets.Ensure();var palette=VegetationPaintAssets.Prepare();
             var list=world.regions.ToList();
@@ -125,7 +126,7 @@ namespace Nusantara.World.Editor
             }
             var mesh=new Mesh{name="Floating island rock underside"};mesh.SetVertices(vertices);mesh.SetTriangles(triangles,0);mesh.SetColors(colors);mesh.RecalculateNormals();mesh.RecalculateBounds();
             mesh=WorldRegionalGroundAssets.Store(mesh,WorldRegionalGroundAssets.RegionFolder(region.id)+"/IslandUnderside.asset");
-            var material=ColourMaterial(WorldRegionalGroundAssets.RegionFolder(region.id)+"/IslandRock.mat",groundMaterial,region.id==8?new Color(.14f,.10f,.20f):new Color(.22f,.29f,.32f),Color.black);
+            var material=ColourMaterial(WorldRegionalGroundAssets.RegionFolder(region.id)+"/IslandRock.mat",groundMaterial,region.boss=="Darkness"?new Color(.14f,.10f,.20f):new Color(.22f,.29f,.32f),Color.black);
             var go=new GameObject("Island rock underside");go.transform.SetParent(root.transform,false);go.AddComponent<MeshFilter>().sharedMesh=mesh;go.AddComponent<MeshRenderer>().sharedMaterial=material;
             // The underside is visual only. The single walkable top retains the one ground collider.
         }

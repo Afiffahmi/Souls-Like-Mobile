@@ -15,8 +15,9 @@ Shader "Nusantara/Pixel Leaf Canopy"
         Tags {"RenderType"="TransparentCutout" "Queue"="AlphaTest"}
         Cull Off
         CGPROGRAM
-        #pragma surface surf Leaves vertex:Sway addshadow noforwardadd exclude_path:deferred
+        #pragma surface surf Leaves vertex:Sway addshadow fullforwardshadows exclude_path:deferred
         #pragma target 3.0
+        #include "NusantaraToonLighting.cginc"
         #pragma multi_compile_instancing
         sampler2D _MainTex;
         fixed4 _Color, _ShadowColor;
@@ -32,16 +33,14 @@ Shader "Nusantara/Pixel Leaf Canopy"
         }
         half4 LightingLeaves(SurfaceOutput s, half3 lightDir, half atten)
         {
-            half wrap = saturate(dot(s.Normal,lightDir)*.4+.6);
-            half band = floor(wrap*max(_ShadeSteps-1,1)+.5)/max(_ShadeSteps-1,1);
-            return half4(s.Albedo*_LightColor0.rgb*(.3+.4*band)*atten,1);
+            return NusantaraLeafLight(s, lightDir, atten, _ShadeSteps, .25h);
         }
         void surf(Input i, inout SurfaceOutput o)
         {
             fixed4 leaf = tex2D(_MainTex,i.uv_MainTex);
             clip(leaf.a-_Cutoff);
             o.Albedo = lerp(_ShadowColor.rgb,_Color.rgb,i.color.r)*leaf.rgb;
-            o.Emission = o.Albedo*.12;
+            o.Emission = 0;
             o.Alpha = 1;
         }
         ENDCG

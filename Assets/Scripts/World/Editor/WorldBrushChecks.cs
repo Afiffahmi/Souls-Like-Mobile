@@ -47,7 +47,7 @@ namespace Nusantara.World.Editor
                 var essential = AssetDatabase.LoadAssetAtPath<GameObject>(folder + "/Essential.prefab");
                 materialsValid &= essential != null && essential.GetComponentsInChildren<Renderer>(true).All(r=>r.sharedMaterials.All(m=>m!=null));
             }
-            if(world.regionalGroundPlanes)foreach(var region in world.regions)
+            if(world.regionalGroundPlanes)foreach(var region in world.regions.Where(r=>!r.paintOnly))
             {
                 var marker=region.groundPrefab.GetComponent<WorldRegionGround>();var near=marker.ground;var far=marker.distantGround;
                 meshesValid &= near!=null&&far!=null&&near.vertexCount==(region.chunkGridSize.x*marker.nearIntervals+1)*(region.chunkGridSize.y*marker.nearIntervals+1)
@@ -63,7 +63,7 @@ namespace Nusantara.World.Editor
                 "Mobile full detail remains limited to the nearby 3x3 chunks");
             Check(world.chunks.Count(c => WorldStreamingPlan.DesiredTier(world, c.coordinate, player, Vector3.zero) != ChunkTier.Unloaded) <= 25
                 && world.maxConcurrentLoads == 1, "The mobile plan uses a local 5x5 terrain ring and one concurrent load");
-            Check(world.regions.All(r => VegetationPainterWindow.Allowed(profile,
+            Check(world.regions.Where(r=>!r.paintOnly).All(r => VegetationPainterWindow.Allowed(profile,
                 world.ChunkOrigin(r.chunkOffset) + new Vector3(64, 41, 64), Vector3.up, VegetationPaintKind.Tree)),
                 "Vegetation brushes work in every region");
             string result = $"{passed.Count} brush world checks passed.\n" + string.Join("\n", passed);

@@ -77,7 +77,7 @@ namespace Nusantara.World
                     if(ground.gameObject.scene==gameObject.scene)readyGrounds.Add(ground.region);
                 foreach(var region in definition.regions)
                 {
-                    if(readyGrounds.Contains(region.id))continue;
+                    if(region.paintOnly||readyGrounds.Contains(region.id))continue;
                     var ground=Instantiate(region.groundPrefab,definition.ChunkOrigin(region.chunkOffset),Quaternion.identity,transform);
                     ownedGrounds.Add(ground);readyGrounds.Add(region.id);
                 }

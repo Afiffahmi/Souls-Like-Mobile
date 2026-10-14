@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 3903106253880650918}
   - component: {fileID: 7859712563065271442}
   - component: {fileID: 2059767996930705276}
+  - component: {fileID: 1534108159448585874}
   m_Layer: 0
   m_Name: Ground
   m_TagString: Untagged
@@ -71,12 +72,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e7e07009e8e1a4927a4386fb67d125c8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Nusantara.World.WorldRegionGround
-  region: 6
+  region: 7
   cells: {x: 6, y: 6}
   nearIntervals: 32
   distantIntervals: 8
   ground: {fileID: 4300000, guid: 9b92554056de74885ab4682894788268, type: 2}
   distantGround: {fileID: 4300000, guid: 7f905131f5b4b4e988305dbab802ddcd, type: 2}
+--- !u!114 &1534108159448585874
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1874623918886019335}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84a55463fef65c1428c1db72238432c2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Nusantara.World.WorldGroundRenderChunks
+  intervalsPerTile: 16
 --- !u!1 &7527664775122587196
 GameObject:
   m_ObjectHideFlags: 0

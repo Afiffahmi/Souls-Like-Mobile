@@ -1,5 +1,6 @@
 #ifndef NUSANTARA_TURQUOISE_WATER
 #define NUSANTARA_TURQUOISE_WATER
+#include "WorldShorelineCommon.hlsl"
 float4 _BaseColor, _DeepColor, _FoamColor;
 float _WaveScale, _WaveSpeed, _WaveHeight, _CrestStrength, _FoamWidth, _Gloss;
 float4 _FlowDirection;
@@ -30,6 +31,13 @@ float3 WaterDisplacement(float3 positionWS, float3 normalWS)
 {
     float h; float2 slope, crests;
     WaterShape(positionWS.xz, WaterTime(), h, slope, crests);
+    if (_ShoreEnabled > .5)
+    {
+        float4 shore=ShoreData(positionWS.xz);
+        float shallow=(1-smoothstep(.6,5,shore.r))*shore.g;
+        float seconds=lerp(_Time.y,_NusantaraWaterEditorTime,saturate(_NusantaraWaterEditorPreview));
+        h=h*lerp(1,.08,shallow)+ShoreSurge(positionWS.xz,seconds)*shallow;
+    }
     return positionWS + float3(0, h * saturate(normalWS.y), 0);
 }
 half3 WaterColor(float3 positionWS, float3 viewDirection)
@@ -53,6 +61,13 @@ half3 WaterColor(float3 positionWS, float3 viewDirection)
     float lightRim = (crest * (.3 + .5 * broadSpec) + thinCrest * .48) * _CrestStrength * detail;
     color = lerp(color, _FoamColor.rgb, saturate(lightRim));
     color += _FoamColor.rgb * (broadSpec * .10 + glint * .22 + fresnel * .18);
+    if (_ShoreEnabled > .5)
+    {
+        float4 shore=ShoreData(positionWS.xz);
+        float shallow=(1-smoothstep(.3,3,shore.r))*shore.g;
+        color=lerp(color,_BaseColor.rgb*1.12,shallow*.50);
+        color=lerp(color,_ShoreFoamColor.rgb,ShoreFoam(positionWS));
+    }
     return color;
 }
 #endif

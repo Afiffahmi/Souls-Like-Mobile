@@ -41,6 +41,7 @@ namespace Nusantara.World.Editor
                 EndStroke(); painting = e.newValue;
                 if (painting)
                     foreach (var terrainTool in Resources.FindObjectsOfTypeAll<WorldTerrainBrushWindow>()) terrainTool.DisablePainting();
+                if (painting) foreach (var roadTool in Resources.FindObjectsOfTypeAll<WorldRoadBrushWindow>()) roadTool.DisablePainting(); if(painting)foreach(var regionTool in Resources.FindObjectsOfTypeAll<WorldRegionBrushWindow>())regionTool.DisablePainting();
                 if (painting) foreach (var waterTool in Resources.FindObjectsOfTypeAll<WorldWaterBrushWindow>()) waterTool.DisablePainting();
                 SceneView.RepaintAll();
             });

@@ -21,8 +21,9 @@ Shader "Nusantara/Kampung Blended Ground"
         Tags {"RenderType"="Opaque"}
         LOD 250
         CGPROGRAM
-        #pragma surface surf Standard fullforwardshadows
+        #pragma surface surf Nusantara fullforwardshadows
         #pragma target 3.0
+        #include "NusantaraToonBRDF.cginc"
         #pragma multi_compile_instancing
         sampler2D _Forest,_ForestNormal,_Mud,_MudNormal,_Bank,_BankNormal,_ForestRough,_MudRough,_BankRough,_Original;
         fixed4 _OriginalColor,_Tint;

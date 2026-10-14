@@ -19,7 +19,12 @@ namespace Nusantara.World.Editor
         sealed class Samples {public Mesh mesh;public Vector3[] vertices;public int width,depth;public float spacing;}
         static readonly Dictionary<int,Samples> cache=new Dictionary<int,Samples>();
         public static void InvalidateCache()=>cache.Clear();
-        public static string RegionFolder(int region)=>Root+"/Region"+region;
+        public static string RegionFolder(int region)
+        {
+            var world=AssetDatabase.LoadAssetAtPath<WorldDefinition>(WorldFoundationSetup.DefinitionPath);
+            var owner=world!=null?world.regions.FirstOrDefault(r=>r.id==region):null;
+            return owner!=null&&!string.IsNullOrEmpty(owner.groundAssetFolder)?owner.groundAssetFolder:Root+"/Region"+region;
+        }
         public static string DetailFolder(WorldDefinition world,WorldChunkRecord record)
         {
             var region=world.regions.First(r=>r.id==record.region);var local=record.coordinate-region.chunkOffset;
@@ -27,7 +32,7 @@ namespace Nusantara.World.Editor
         }
         public static Mesh Mesh(WorldRegion region,bool distant=false)=>region.groundPrefab!=null?
             (distant?region.groundPrefab.GetComponent<WorldRegionGround>().distantGround:region.groundPrefab.GetComponent<WorldRegionGround>().ground):null;
-        static WorldRegion Owner(WorldDefinition world,Vector2Int coordinate)=>world.regions.FirstOrDefault(r=>coordinate.x>=r.chunkOffset.x&&coordinate.y>=r.chunkOffset.y&&coordinate.x<r.chunkOffset.x+r.chunkGridSize.x&&coordinate.y<r.chunkOffset.y+r.chunkGridSize.y);
+        static WorldRegion Owner(WorldDefinition world,Vector2Int coordinate)=>world.regions.FirstOrDefault(r=>!r.paintOnly&&coordinate.x>=r.chunkOffset.x&&coordinate.y>=r.chunkOffset.y&&coordinate.x<r.chunkOffset.x+r.chunkGridSize.x&&coordinate.y<r.chunkOffset.y+r.chunkGridSize.y);
         public static bool TryCoordinate(WorldDefinition world,Mesh mesh,out Vector2Int coordinate)
         {
             var region=world.regions.FirstOrDefault(r=>Mesh(r)==mesh);coordinate=region!=null?region.chunkOffset:default;return region!=null;
@@ -64,7 +69,7 @@ namespace Nusantara.World.Editor
         public static void ApplyDelta(WorldGeographyProfile profile,Rect bounds,Func<float,float,float> delta,ISet<Mesh> recorded,ISet<Vector2Int> changed)
         {
             var world=profile.world;
-            foreach(var region in world.regions)
+            foreach(var region in world.regions.Where(r=>!r.paintOnly))
             {
                 var origin=world.ChunkOrigin(region.chunkOffset);var rect=new Rect(origin.x,origin.z,region.chunkGridSize.x*world.chunkSize,region.chunkGridSize.y*world.chunkSize);
                 var expanded=bounds;expanded.xMin-=.51f;expanded.xMax+=.51f;expanded.yMin-=.51f;expanded.yMax+=.51f;if(!rect.Overlaps(expanded,true))continue;
@@ -124,6 +129,7 @@ namespace Nusantara.World.Editor
                 var n=Surface("Terrain",near,true);var d=Surface("Distant Ground",distant,false);var lod=root.AddComponent<LODGroup>();lod.SetLODs(new[]{new LOD(.18f,new[]{n}),new LOD(.001f,new[]{d})});lod.RecalculateBounds();
                 var marker=root.AddComponent<WorldRegionGround>();marker.region=region.id;marker.cells=region.chunkGridSize;marker.nearIntervals=nearIntervals;marker.distantIntervals=distantIntervals;marker.ground=near;marker.distantGround=distant;
                 if(region.floatingIsland)WorldRegionThemeAssets.AddIslandUnderside(root,region,near,material);
+                root.AddComponent<WorldGroundRenderChunks>();
                 return PrefabUtility.SaveAsPrefabAsset(root,RegionFolder(region.id)+"/Ground.prefab");
             }
             finally{Object.DestroyImmediate(root);}
@@ -146,7 +152,7 @@ namespace Nusantara.World.Editor
         {
             var scene=SceneManager.GetActiveScene();var parent=scene.GetRootGameObjects().FirstOrDefault(g=>g.name==SceneRoot);if(parent==null)parent=new GameObject(SceneRoot);
             foreach(Transform child in parent.transform.Cast<Transform>().ToArray())Object.DestroyImmediate(child.gameObject);
-            foreach(var region in world.regions){var instance=(GameObject)PrefabUtility.InstantiatePrefab(region.groundPrefab,parent.transform);instance.transform.position=world.ChunkOrigin(region.chunkOffset);}
+            foreach(var region in world.regions.Where(r=>!r.paintOnly)){var instance=(GameObject)PrefabUtility.InstantiatePrefab(region.groundPrefab,parent.transform);instance.transform.position=world.ChunkOrigin(region.chunkOffset);}
             EditorSceneManager.MarkSceneDirty(scene);InvalidateCache();Physics.SyncTransforms();
         }
         [MenuItem("Tools/Nusantara/Consolidate Ground into Region Planes")]
@@ -168,13 +174,13 @@ namespace Nusantara.World.Editor
             try
             {
                 // Join and validate all terrain BEFORE removing any source asset.
-                foreach(var region in world.regions)
+                foreach(var region in world.regions.Where(r=>!r.paintOnly))
                 {
                     nearMeshes[region.id]=Join(world,region,profile.terrainIntervals,c=>AssetDatabase.LoadAssetAtPath<Mesh>(oldFolders[c]+"/Terrain.asset"));
                     farMeshes[region.id]=Join(world,region,profile.distantIntervals,c=>AssetDatabase.LoadAssetAtPath<Mesh>(oldFolders[c]+"/DistantTerrain.asset"));
                 }
                 var preview=scene.GetRootGameObjects().FirstOrDefault(g=>g.name=="World preview (Editor only)");if(preview!=null)Object.DestroyImmediate(preview);
-                foreach(var region in world.regions)
+                foreach(var region in world.regions.Where(r=>!r.paintOnly))
                 {
                     string folder=RegionFolder(region.id);Region5EnvironmentAssets.EnsureFolder(folder);
                     var sample=world.chunks.First(c=>c.region==region.id);var source=AssetDatabase.LoadAssetAtPath<GameObject>(oldFolders[sample.coordinate]+"/Essential.prefab").GetComponentsInChildren<MeshRenderer>().First(r=>r.name=="Terrain").sharedMaterial;
@@ -219,3 +225,4 @@ namespace Nusantara.World.Editor
         }
     }
 }
+

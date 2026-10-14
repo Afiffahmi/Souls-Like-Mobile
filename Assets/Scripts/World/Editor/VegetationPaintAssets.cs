@@ -148,7 +148,7 @@ namespace Nusantara.World.Editor
         {
             if(EditorApplication.isPlayingOrWillChangePlaymode)throw new InvalidOperationException("Painting requires Edit mode.");
             var world=AssetDatabase.LoadAssetAtPath<WorldDefinition>(WorldFoundationSetup.DefinitionPath);
-            var record=world.chunks.First(c=>c.coordinate==data.coordinate&&(world.brushAuthoredTerrain||c.region==5));string folder=Folder(world,data.coordinate),path=folder+"/PaintedVegetation.prefab";
+            var record=world.chunks.First(c=>c.coordinate==data.coordinate&&(world.brushAuthoredTerrain||c.region==world.WetlandRegionId));string folder=Folder(world,data.coordinate),path=folder+"/PaintedVegetation.prefab";
             Region5EnvironmentAssets.EnsureFolder(folder);
             string backup="Library/Nusantara/VegetationPaintBackup/"+DateTime.UtcNow.ToString("yyyyMMdd-HHmmss-fff");
             foreach(string file in new[]{path,folder+"/Essential.prefab",folder+"/Navigation.asset",WorldFoundationSetup.DefinitionPath})Backup(file,backup);

@@ -15,8 +15,9 @@ Shader "Nusantara/Kampung Foliage"
         Tags {"Queue"="AlphaTest" "RenderType"="TransparentCutout"}
         Cull Off
         CGPROGRAM
-        #pragma surface surf Standard alphatest:_Cutoff vertex:wind addshadow
+        #pragma surface surf Nusantara alphatest:_Cutoff vertex:wind addshadow fullforwardshadows
         #pragma target 3.0
+        #include "NusantaraToonBRDF.cginc"
         #pragma multi_compile_instancing
         sampler2D _MainTex,_BumpMap,_AlphaTex;fixed4 _Color;float _Wind,_UseVertexColor;
         struct Input{float2 uv_MainTex;float2 uv_BumpMap;float4 color:COLOR;};

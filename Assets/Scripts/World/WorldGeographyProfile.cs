@@ -59,10 +59,10 @@ namespace Nusantara.World
         [Range(0, 40)] public float region5ReliefStrength;
         public float Region5Relief(Vector2 p, float strength)
         {
-            if (strength <= 0 || !InsideRegion(p, 5)) return 0;
+            if (strength <= 0 || !InsideRegion(p, world.WetlandRegionId)) return 0;
             float boundary = 0;
             foreach (var region in world.regions)
-                if (region.id == 5) boundary = Mathf.SmoothStep(0, 1, Mathf.Clamp01(LineDistance(p, region.boundary, true) / 200));
+                if (region.id == world.WetlandRegionId) boundary = Mathf.SmoothStep(0, 1, Mathf.Clamp01(LineDistance(p, region.boundary, true) / 200));
             float paths = Mathf.SmoothStep(0, 1, Mathf.Clamp01((RouteDistance(p) - 45) / 180));
             float rivers = Mathf.SmoothStep(0, 1, Mathf.Clamp01((WaterDistance(p, out _) - 70) / 160));
             float clearing = 1;
@@ -95,6 +95,11 @@ namespace Nusantara.World
         }
         public int Region(Vector2 p)
         {
+            if (world.regionPaint != null)
+            {
+                int painted = world.regionPaint.RegionAt(p);
+                if (painted >= 1 && painted <= world.MainlandRegionCount) return painted;
+            }
             foreach (var region in world.regions) if (Inside(p, region.boundary)) return region.id;
             int nearest = 1; float distance = float.MaxValue;
             foreach (var region in world.regions)
@@ -108,6 +113,7 @@ namespace Nusantara.World
         // Content placement must use polygon containment, never that fallback assignment.
         public bool InsideRegion(Vector2 p, int id, float inset = 0)
         {
+            if (world.regionPaint != null && id >= 1 && id <= world.MainlandRegionCount) return world.regionPaint.Inside(p, id, inset);
             foreach (var region in world.regions)
                 if (region.id == id)
                     return Inside(p, region.boundary) && (inset <= 0 || LineDistance(p, region.boundary, true) >= inset);

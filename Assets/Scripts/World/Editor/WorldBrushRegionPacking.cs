@@ -19,6 +19,8 @@ namespace Nusantara.World.Editor
             if (EditorApplication.isPlayingOrWillChangePlaymode) throw new InvalidOperationException("Exit Play mode first.");
             var scene = SceneManager.GetActiveScene();
             var world = AssetDatabase.LoadAssetAtPath<WorldDefinition>(WorldFoundationSetup.DefinitionPath);
+            if (world != null && world.regionPaint != null)
+                throw new InvalidOperationException("This mainland uses painted region shapes. Use Tools > Nusantara > Region Brush (1-6) to change their size and borders.");
             if (scene.path != WorldReferenceBuilder.ScenePath || world == null || !world.brushAuthoredTerrain)
                 throw new InvalidOperationException("Open the combined NusantaraQuest_World first.");
             foreach (var tool in Resources.FindObjectsOfTypeAll<WorldTerrainBrushWindow>()) tool.DisablePainting();

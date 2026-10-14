@@ -26,9 +26,9 @@ namespace Nusantara.World.Editor
         public static void BrushRegionFive() => RegionCenter(5);
         [MenuItem("Tools/Nusantara/Preview/Brush Region 6")]
         public static void BrushRegionSix() => RegionCenter(6);
-        [MenuItem("Tools/Nusantara/Preview/Brush Region 7 - Ulek Mayang Island")]
+        [MenuItem("Tools/Nusantara/Preview/Brush Region 7 - Raja Bersiong")]
         public static void BrushRegionSeven() => RegionCenter(7);
-        [MenuItem("Tools/Nusantara/Preview/Brush Region 8 - Darkness Island")]
+        [MenuItem("Tools/Nusantara/Preview/Brush Region 8 - Ulek Mayang Island")]
         public static void BrushRegionEight() => RegionCenter(8);
         public static string SaveLoadedBrushChunks()
         {
@@ -43,6 +43,10 @@ namespace Nusantara.World.Editor
             AssetDatabase.SaveAssets(); EditorSceneManager.SaveScene(scene);
             return $"Saved {count} modified loaded chunk prefabs and the scene. Save sculpted terrain through Terrain Brush.";
         }
+        [MenuItem("Tools/Nusantara/Preview/Brush Region 9 - Darkness Island")]
+        public static void BrushRegionNine() => RegionCenter(9);
+        [MenuItem("Tools/Nusantara/Edit Region 9")]
+        public static void EditRegionNineMenu()=>ShowRegionForEditing(9);
         static void RegionCenter(int id) => ShowRegionForEditing(id);
         [MenuItem("Tools/Nusantara/Preview/Show Whole World")]
         public static void WholeWorldMenu() => Debug.Log(ShowWholeWorld());
@@ -67,6 +71,14 @@ namespace Nusantara.World.Editor
         public static string ShowRegionForEditing(int id)
         {
             var world=AuthoringWorld();var region=world.regions.First(r=>r.id==id);
+            if(world.regionPaint!=null&&id<=world.MainlandRegionCount)
+            {
+                if(!WorldRegionPaintAssets.RegionBounds(world.regionPaint,id,out var paintedBounds,out var paintedPoint))
+                    return $"Region {id} has no painted area. Open Region Brush to paint it.";
+                ShowWholeWorld();
+                SceneView.lastActiveSceneView?.LookAt(new Vector3(paintedBounds.center.x,42,paintedBounds.center.y),Quaternion.Euler(65,0,0),Mathf.Max(paintedBounds.width,paintedBounds.height)*.6f,false,true);
+                return $"Framed the painted area of Region {id}. Mainland stays visible for painting across borders.";
+            }
             var p=world.ChunkOrigin(region.chunkOffset)+new Vector3(region.chunkGridSize.x*world.chunkSize/2,0,region.chunkGridSize.y*world.chunkSize/2);
             var profile=AssetDatabase.LoadAssetAtPath<WorldGeographyProfile>(WorldReferenceBuilder.ProfilePath);
             p.y=WorldTerrainSculptAssets.SampleGround(profile,p.x,p.z);
@@ -140,7 +152,7 @@ namespace Nusantara.World.Editor
             SetRegionVisibility(world,0);
             var grounds=Object.FindObjectsByType<WorldRegionGround>().Where(g=>g.gameObject.scene==SceneManager.GetActiveScene()).ToArray();
             if(grounds.Length>0){FrameGrounds(grounds);Selection.activeGameObject=grounds[0].transform.parent.gameObject;}
-            return loaded?$"Showing all {world.regions.Length} regions and their saved props. Regions 1–6 share the mainland; 7–8 are separate floating islands.":"Showing all ground planes. Save Region Chunk Changes before switching the modified prop preview.";
+            return loaded?$"Showing all {world.regions.Length} regions and their saved props. Regions 1–7 share the mainland; 8–9 are separate floating islands.":"Showing all ground planes. Save Region Chunk Changes before switching the modified prop preview.";
         }
         static void FrameGrounds(WorldRegionGround[] grounds)
         {
@@ -170,7 +182,7 @@ namespace Nusantara.World.Editor
         static void Landmark(int index)
         {
             var w=AssetDatabase.LoadAssetAtPath<WorldDefinition>(WorldFoundationSetup.DefinitionPath);
-            if (w.brushAuthoredTerrain) { RegionCenter(5); return; }
+            if (w.brushAuthoredTerrain) { RegionCenter(w.WetlandRegionId); return; }
             if(index==4)
             {
                 var profile=AssetDatabase.LoadAssetAtPath<WorldGeographyProfile>(WorldReferenceBuilder.ProfilePath);

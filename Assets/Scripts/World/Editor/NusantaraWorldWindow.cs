@@ -41,15 +41,16 @@ namespace Nusantara.World.Editor
             if(definition!=null)
             {
                 int cells=definition.regions.Sum(r=>r.chunkGridSize.x*r.chunkGridSize.y);
-                rootVisualElement.Q<Label>("region-size-summary").text=$"{definition.regions.Length} independent regions · {cells} cells total. Each cell covers {definition.chunkSize:0} m × {definition.chunkSize:0} m.";
+                rootVisualElement.Q<Label>("region-size-summary").text=$"{definition.regions.Length} regions · {cells} cells total. Each cell covers {definition.chunkSize:0} m × {definition.chunkSize:0} m.";
             }
             if(definition!=null)foreach(var region in definition.regions.OrderBy(r=>r.id))
             {
                 int id=region.id;
-                var button=new Button(()=>Navigate(()=>WorldSceneBookmarks.ShowRegionForEditing(id))){name="edit-region-"+id,text=$"Edit Region {id} · {region.chunkGridSize.x}×{region.chunkGridSize.y} · {region.boss}"};
+                var button=new Button(()=>Navigate(()=>WorldSceneBookmarks.ShowRegionForEditing(id))){name="edit-region-"+id,text=definition.regionPaint!=null&&!region.floatingIsland?$"Edit Region {id} · {region.name}":$"Edit Region {id} · {region.chunkGridSize.x}×{region.chunkGridSize.y} · {region.name}"};
                 button.AddToClassList("world-region-button");navigation.Add(button);
             }
             rootVisualElement.Q<Button>("terrain-brush").clicked+=WorldTerrainBrushWindow.Open;
+            rootVisualElement.Q<Button>("road-brush").clicked+=WorldRoadBrushWindow.Open;
             rootVisualElement.Q<Button>("vegetation-brush").clicked+=VegetationPainterWindow.Open;
             rootVisualElement.Q<Button>("water-brush").clicked+=WorldWaterBrushWindow.Open;
             rootVisualElement.Q<Button>("setup").clicked += () =>

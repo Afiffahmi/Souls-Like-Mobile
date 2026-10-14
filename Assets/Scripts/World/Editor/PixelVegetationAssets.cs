@@ -107,7 +107,7 @@ namespace Nusantara.World.Editor
             if (existing == null) { AssetDatabase.CreateAsset(texture, path); return texture; }
             EditorUtility.CopySerialized(texture, existing); Object.DestroyImmediate(texture); EditorUtility.SetDirty(existing); return existing;
         }
-        static Texture2D LeafClusters()
+        public static Texture2D LeafClusters()
         {
             // Small, point-filtered cutouts give the crown a broken leafy edge,
             // with actual gaps through to the branches rather than transparent blending.
@@ -116,18 +116,21 @@ namespace Nusantara.World.Editor
                 name = "Pixel leaf clusters", filterMode = FilterMode.Point, wrapMode = TextureWrapMode.Clamp
             };
             var pixels = new Color32[size*size]; var random = new System.Random(1407);
-            for (int leaf = 0; leaf < 18; leaf++)
+            // Separate angular leaflets with air between them; overlapping ellipses
+            // made the old card a nearly solid disk.
+            for (int leaf = 0; leaf < 26; leaf++)
             {
-                float angle = leaf * 2.39996f, radius = leaf == 0 ? 0 : 5 + (float)random.NextDouble()*17;
-                float cx = 31 + Mathf.Cos(angle)*radius, cy = 31 + Mathf.Sin(angle)*radius;
-                float rx = 7 + (float)random.NextDouble()*5, ry = 4 + (float)random.NextDouble()*3;
-                byte shade = (byte)(190 + random.Next(65));
-                for (int y = 0; y < size; y++) for (int x = 0; x < size; x++)
+                float angle=leaf*2.39996f, reach=5+(float)random.NextDouble()*21;
+                float cx=31+Mathf.Cos(angle)*reach, cy=31+Mathf.Sin(angle)*reach;
+                float rx=3+(float)random.NextDouble()*4, ry=2+(float)random.NextDouble()*2;
+                byte shade=(byte)(175+random.Next(81));
+                for(int y=0;y<size;y++)for(int x=0;x<size;x++)
                 {
-                    float dx = x-cx, dy = y-cy;
-                    float a = (dx*Mathf.Cos(angle)+dy*Mathf.Sin(angle))/rx;
-                    float b = (-dx*Mathf.Sin(angle)+dy*Mathf.Cos(angle))/ry;
-                    if (a*a+b*b < 1) pixels[y*size+x] = new Color32(shade,shade,shade,255);
+                    float dx=x-cx,dy=y-cy;
+                    float a=(dx*Mathf.Cos(angle)+dy*Mathf.Sin(angle))/rx;
+                    float b=(-dx*Mathf.Sin(angle)+dy*Mathf.Cos(angle))/ry;
+                    if(Mathf.Abs(a)+Mathf.Abs(b)<1.2f)
+                        pixels[y*size+x]=new Color32(shade,shade,shade,255);
                 }
             }
             texture.SetPixels32(pixels); texture.Apply(false, false); return texture;
@@ -138,27 +141,32 @@ namespace Nusantara.World.Editor
             var uv = new List<Vector2>(); var colors = new List<Color>(); var triangles = new List<int>();
             var random = new System.Random(5261);
             Vector3[] centers = {
-                new Vector3(0,18.2f,0), new Vector3(-4.2f,16.8f,-1), new Vector3(3.8f,16.4f,1),
-                new Vector3(-1,16,-4.5f), new Vector3(1.5f,17,4.3f), new Vector3(-3.8f,15.1f,3.6f),
-                new Vector3(4.2f,15.2f,-3.4f), new Vector3(-.8f,14.8f,1), new Vector3(2.2f,18.1f,-2)
+                new Vector3(.3f,19.6f,0), new Vector3(-1.6f,17.5f,-.8f), new Vector3(1.8f,17.1f,.6f),
+                new Vector3(-.8f,15.3f,-2.8f), new Vector3(1.1f,15.9f,2.7f), new Vector3(-3.2f,13.1f,1.8f),
+                new Vector3(3.2f,13.6f,-1.4f), new Vector3(-.7f,12.1f,-.3f), new Vector3(1.8f,12.7f,2)
             };
             if(shape==1)centers=new[]{new Vector3(0,9,0),new Vector3(.2f,11,0),new Vector3(-.2f,13,.2f),new Vector3(.1f,15,-.1f),new Vector3(0,17,0),new Vector3(.1f,19,0),new Vector3(0,21,0),new Vector3(0,22,0)};
             if(shape==2)centers=new[]{new Vector3(-4,14,0),new Vector3(-5,16,1),new Vector3(-2,18,-1),new Vector3(4,14,-1),new Vector3(5,17,1),new Vector3(2,19,0),new Vector3(0,15,3)};
             foreach (var center in centers)
             {
-                float lobeSize = shape==1?Mathf.Max(.75f,(24-center.y)*.25f):2.8f+(float)random.NextDouble()*.9f;
+                float lobeSize = shape==1?Mathf.Max(.75f,(24-center.y)*.25f):
+                    shape==0?Mathf.Lerp(2.7f,1.25f,Mathf.InverseLerp(12,20,center.y)):
+                    2.3f+(float)random.NextDouble()*.8f;
                 for (int leaf = 0; leaf < leavesPerLobe; leaf++)
                 {
                     float y = 1-2*(leaf+.5f)/leavesPerLobe, angle = leaf*2.39996f;
                     var radial = new Vector3(Mathf.Cos(angle)*Mathf.Sqrt(1-y*y), y, Mathf.Sin(angle)*Mathf.Sqrt(1-y*y));
-                    var point = center+Vector3.Scale(radial,new Vector3(lobeSize,lobeSize*.8f,lobeSize));
+                    // Uneven depth and asymmetric lobes avoid a row of smooth green balls.
+                    float reach=.64f+(float)random.NextDouble()*.54f;
+                    float ripple=1+.13f*Mathf.Sin(angle*3.1f+center.x)+.10f*Mathf.Cos(angle*5.3f+center.z);
+                    var point=center+Vector3.Scale(radial,new Vector3(lobeSize*reach*ripple,lobeSize*reach*.92f,lobeSize*reach));
                     var orientation = Quaternion.LookRotation(radial)*Quaternion.Euler(0,0,(float)random.NextDouble()*360);
-                    float size = 1.8f+(float)random.NextDouble()*.9f;
+                    float size = 2.1f+(float)random.NextDouble()*1.1f;
                     var right = orientation*Vector3.right*size*.5f; var up = orientation*Vector3.up*size*.5f;
                     int n = vertices.Count;
                     vertices.AddRange(new[] { point-right-up, point+right-up, point+right+up, point-right+up });
-                    // Cloud-shaped lighting instead of each flat card flashing independently.
-                    var normal = (radial*.45f+Vector3.up*.8f).normalized;
+                    // Lobe normals retain volume while allowing side light from torches.
+                    var normal = (radial*.85f+Vector3.up*.18f).normalized;
                     normals.AddRange(new[] { normal,normal,normal,normal });
                     float light = Mathf.Clamp01(.12f+(point.y-13)/11+(float)random.NextDouble()*.18f);
                     var color = new Color(light,light,light,.65f+(float)random.NextDouble()*.35f);

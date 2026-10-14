@@ -47,7 +47,7 @@ namespace Nusantara.World.Editor
             geography=AssetDatabase.LoadAssetAtPath<WorldGeographyProfile>(WorldReferenceBuilder.ProfilePath);
             world=geography.world;
             if(world==null||world.chunks.Length==0)throw new InvalidOperationException("Existing generated chunks are required.");
-            chunks=world.chunks.Where(c=>c.region==5).OrderBy(c=>c.coordinate.y).ThenBy(c=>c.coordinate.x).ToArray();
+            chunks=world.chunks.Where(c=>c.region==world.WetlandRegionId).OrderBy(c=>c.coordinate.y).ThenBy(c=>c.coordinate.x).ToArray();
             backup="Library/Nusantara/Region5Backup/"+DateTime.UtcNow.ToString("yyyyMMdd-HHmmss");Directory.CreateDirectory(backup);
             Backup(WorldFoundationSetup.DefinitionPath);Backup(WorldReferenceBuilder.ProfilePath);
             Region5EnvironmentAssets.Create();LoadPrefabs();CreateProfile();
@@ -101,7 +101,7 @@ namespace Nusantara.World.Editor
                     Vector2 p=water.points.Length==1?water.points[0]+new Vector2(Mathf.Cos(sample*1.7f),Mathf.Sin(sample*1.7f))*water.halfWidth*.55f:Vector2.Lerp(water.points[k],water.points[k+1],t);
                     float radius=water.halfWidth>100?24+Random(random,0,10):Mathf.Min(18,water.halfWidth*.38f);
                     p+=new Vector2(Random(random,-8,8),Random(random,-8,8));
-                    if(!geography.InsideRegion(p,5,radius+biomeProfile.boundaryInset)||geography.WaterDistance(p,out float y)>-radius-6||geography.RouteDistance(p)<radius+32)continue;
+                    if(!geography.InsideRegion(p,geography.world.WetlandRegionId,radius+biomeProfile.boundaryInset)||geography.WaterDistance(p,out float y)>-radius-6||geography.RouteDistance(p)<radius+32)continue;
                     if(!chunks.Any(c=>c.coordinate==world.WorldToChunk(new Vector3(p.x,0,p.y))))continue;
                     if(list.Any(i=>Vector2.Distance(i.center,p)<i.radius+radius+30))continue;
                     if(world.locations.Any(l=>Vector2.Distance(new Vector2(l.position.x,l.position.z),p)<l.clearRadius+radius+20))continue;
@@ -163,7 +163,7 @@ namespace Nusantara.World.Editor
                 {
                     Vector2 p=new Vector2(origin.x+child.localPosition.x,origin.z+child.localPosition.z);
                     if(child.name.StartsWith("giant_crocodile_skulls")){Object.DestroyImmediate(child.gameObject);removedSkulls++;changed=true;continue;}
-                    if(!geography.InsideRegion(p,5)){Object.DestroyImmediate(child.gameObject);pruned++;changed=true;continue;}
+                    if(!geography.InsideRegion(p,geography.world.WetlandRegionId)){Object.DestroyImmediate(child.gameObject);pruned++;changed=true;continue;}
                     if(!child.name.StartsWith("boat")&&!child.name.StartsWith("lily_pad")&&!child.name.StartsWith("dock")&&child.GetComponent<ParticleSystem>()==null)
                     {float delta=Ground(p)-GroundFrom(p,oldTerrainVertices);if(Mathf.Abs(delta)>.001f){child.localPosition+=Vector3.up*delta;changed=true;}}
                     if(child.name.Contains("house")||child.name.StartsWith("dock"))buildings.Add(p);
@@ -238,7 +238,7 @@ namespace Nusantara.World.Editor
         static bool Owns(Vector2 p)=>world.WorldToChunk(new Vector3(p.x,0,p.y))==coordinate;
         static bool Allowed(Vector2 p,float radius=4,float pathClearance=18,bool clearings=true)
         {
-            if(!Owns(p)||!geography.InsideRegion(p,5,biomeProfile.boundaryInset+radius)||geography.CoastDistance(p)<radius+80||geography.WaterDistance(p,out _)<42+radius||geography.RouteDistance(p)<pathClearance+radius)return false;
+            if(!Owns(p)||!geography.InsideRegion(p,geography.world.WetlandRegionId,biomeProfile.boundaryInset+radius)||geography.CoastDistance(p)<radius+80||geography.WaterDistance(p,out _)<42+radius||geography.RouteDistance(p)<pathClearance+radius)return false;
             if(clearings&&world.locations.Any(l=>Vector2.Distance(p,new Vector2(l.position.x,l.position.z))<l.clearRadius+15))return false;
             if(buildings.Any(b=>Vector2.Distance(b,p)<20+radius))return false;
             return !placements.Any(b=>Vector2.Distance(b,p)<radius+3);
@@ -349,7 +349,7 @@ namespace Nusantara.World.Editor
                     // Cave furniture stays against the walls, away from the central walking corridor.
                     for(int side=-1;side<=1;side+=2)for(int i=-2;i<=2;i++)
                     {
-                        Vector2 p=center+new Vector2(side*10,i*17);if(!geography.InsideRegion(p,5,10))continue;
+                        Vector2 p=center+new Vector2(side*10,i*17);if(!geography.InsideRegion(p,geography.world.WetlandRegionId,10))continue;
                         Place("cave_crystals",p,geography.BaseHeight(center)+.1f,i*27,.8f,parent,"Gua Sunyi - glowing crystals");
                     }
                 }
@@ -361,7 +361,7 @@ namespace Nusantara.World.Editor
                 if(index==8)
                 {
                     Vector2 p=center+new Vector2(0,-120);
-                    if(Owns(p)&&geography.InsideRegion(p,5,45)&&!geography.IsForbiddenWater(p))
+                    if(Owns(p)&&geography.InsideRegion(p,geography.world.WetlandRegionId,45)&&!geography.IsForbiddenWater(p))
                     {
                         var skull=Place("giant_crocodile_skulls",p,Ground(p),0,1.5f,parent,"Bujang Senang - sole giant crocodile landmark");
                         skull.AddComponent<WorldLandmarkIdentity>().stableId="region5-main-crocodile";Register("region5-main-crocodile");
@@ -412,7 +412,7 @@ namespace Nusantara.World.Editor
             geography=AssetDatabase.LoadAssetAtPath<WorldGeographyProfile>(WorldReferenceBuilder.ProfilePath);world=geography.world;
             backup="Library/Nusantara/Region5BridgeBackup/"+DateTime.UtcNow.ToString("yyyyMMdd-HHmmss");
             int pieces=0,affected=0;
-            foreach(var chunk in world.chunks.Where(c=>c.region==5))
+            foreach(var chunk in world.chunks.Where(c=>c.region==world.WetlandRegionId))
             {
                 coordinate=chunk.coordinate;origin=world.ChunkOrigin(coordinate);string folder=Folder(coordinate);
                 string path=folder+"/Rails.asset";var mesh=AssetDatabase.LoadAssetAtPath<Mesh>(path);if(mesh==null)continue;
@@ -452,7 +452,7 @@ namespace Nusantara.World.Editor
                 Vector2 center=new Vector2(location.position.x,location.position.z);
                 for(int i=-5;i<=5;i++)
                 {
-                    Vector2 p=center+new Vector2(i*27,110+(i%3)*2);if(!geography.InsideRegion(p,5,45))continue;
+                    Vector2 p=center+new Vector2(i*27,110+(i%3)*2);if(!geography.InsideRegion(p,geography.world.WetlandRegionId,45))continue;
                     var rock=Place("moss_rock",p,35,i*19,1,dressing.transform,"Waterfall mossy rock face "+i);
                     rock.transform.localScale=new Vector3(8.5f,22+Mathf.Abs(i)*1.3f,6);
                     if(i%2==0)Place("hanging_vines",p+new Vector2(-7,-16),70,i*15,5,dressing.transform,"Waterfall hanging roots");
@@ -479,7 +479,7 @@ namespace Nusantara.World.Editor
             if(material==null)
             {material=new Material(Shader.Find(WorldAssetLayout.LitShader)){name="Sarang arena stone",enableInstancing=true};WorldAssetLayout.SetColor(material,new Color(.72f,.74f,.66f));WorldAssetLayout.SetTexture(material,AssetDatabase.LoadAssetAtPath<Texture>(WorldAssetLayout.UtilityTexturePath("GroundGrain.asset")));AssetDatabase.CreateAsset(material,materialPath);}
             int affected=0;
-            foreach(var chunk in world.chunks.Where(c=>c.region==5))
+            foreach(var chunk in world.chunks.Where(c=>c.region==world.WetlandRegionId))
             {
                 coordinate=chunk.coordinate;origin=world.ChunkOrigin(coordinate);
                 if(center.x+82<origin.x||center.x-82>origin.x+world.chunkSize||center.y+82<origin.z||center.y-82>origin.z+world.chunkSize)continue;

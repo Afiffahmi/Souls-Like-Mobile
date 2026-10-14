@@ -11,7 +11,7 @@ namespace Nusantara.World
     public sealed class WorldRegionPortal : MonoBehaviour
     {
         public WorldDefinition world;
-        [Range(1,8)] public int destinationRegion;
+        [Range(1,9)] public int destinationRegion;
         public Vector3 destination;
         public string label="Travel";
         [Tooltip("Progression can enable this when the Region 1 access is unlocked.")]

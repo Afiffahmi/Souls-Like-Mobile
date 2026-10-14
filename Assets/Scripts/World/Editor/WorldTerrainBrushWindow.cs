@@ -88,6 +88,7 @@ namespace Nusantara.World.Editor
                 if (enabled != painting)
                 {
                     EndStroke();
+                    if (enabled) foreach (var roadTool in Resources.FindObjectsOfTypeAll<WorldRoadBrushWindow>()) roadTool.DisablePainting(); if(enabled)foreach(var regionTool in Resources.FindObjectsOfTypeAll<WorldRegionBrushWindow>())regionTool.DisablePainting();
                     if (enabled) foreach (var aiTool in Resources.FindObjectsOfTypeAll<WorldAINoWalkBrushWindow>()) aiTool.DisablePainting();
                     if (enabled) foreach (var waterTool in Resources.FindObjectsOfTypeAll<WorldWaterBrushWindow>()) waterTool.DisablePainting();
                     try { if (enabled) WorldTerrainSculptAssets.Prepare(profile); painting = enabled; }

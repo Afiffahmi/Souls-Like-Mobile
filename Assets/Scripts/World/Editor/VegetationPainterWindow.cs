@@ -84,7 +84,7 @@ namespace Nusantara.World.Editor
             };
             var brush=rootVisualElement.Q<Slider>("radius");brush.value=radius;brush.RegisterValueChangedCallback(e=>radius=e.newValue);
             var amount=rootVisualElement.Q<Slider>("density");amount.value=density;amount.RegisterValueChangedCallback(e=>density=e.newValue);
-            rootVisualElement.Q<Toggle>("paint").RegisterValueChangedCallback(e=>{painting=e.newValue;SceneView.RepaintAll();});
+            rootVisualElement.Q<Toggle>("paint").RegisterValueChangedCallback(e=>{painting=e.newValue;if(painting)foreach(var roadTool in Resources.FindObjectsOfTypeAll<WorldRoadBrushWindow>())roadTool.DisablePainting();if(painting)foreach(var regionTool in Resources.FindObjectsOfTypeAll<WorldRegionBrushWindow>())regionTool.DisablePainting();SceneView.RepaintAll();});
             rootVisualElement.Q<Toggle>("erase").RegisterValueChangedCallback(e=>erasing=e.newValue);
             rootVisualElement.Q<Button>("save").clicked+=Save;
             rootVisualElement.Q<Button>("frame").clicked+=()=>
@@ -123,6 +123,7 @@ namespace Nusantara.World.Editor
             foreach(var field in new[]{("root-colour","_RootColor"),("tip-colour","_TipColor"),("patch-colour","_PatchColor")})
                 if(material.HasProperty(field.Item2))rootVisualElement.Q<ColorField>(field.Item1).SetValueWithoutNotify(material.GetColor(field.Item2));
         }
+        public void DisablePainting(){EndStroke();painting=false;rootVisualElement.Q<Toggle>("paint")?.SetValueWithoutNotify(false);SceneView.RepaintAll();}
         void SetStatus(string message){if(status!=null)status.text=message;}
         void LoadExisting()
         {
@@ -211,7 +212,7 @@ namespace Nusantara.World.Editor
                 return profile.world.chunks.Any(c => c.coordinate == coordinate)
                     && Vector3.Angle(normal, Vector3.up) < (mode == VegetationPaintKind.Tree ? 25 : 40);
             }
-            if(!profile.InsideRegion(xz,5,mode==VegetationPaintKind.Tree?5:1)||profile.IsForbiddenWater(xz))return false;
+            if(!profile.InsideRegion(xz,profile.world.WetlandRegionId,mode==VegetationPaintKind.Tree?5:1)||profile.IsForbiddenWater(xz))return false;
             if(profile.WaterDistance(xz,out float surface)<20||p.y<surface+.5f||profile.RouteDistance(xz)<(mode==VegetationPaintKind.Tree?4:1.5f))return false;
             if(profile.walkingPlatforms.Any(platform=>WorldGeographyProfile.Inside(xz,platform.boundary)))return false;
             return Vector3.Angle(normal,Vector3.up)<(mode==VegetationPaintKind.Tree?25:40);
@@ -266,7 +267,7 @@ namespace Nusantara.World.Editor
                 Vector3 p=center+new Vector3(Mathf.Cos(angle)*distance,100,Mathf.Sin(angle)*distance);
                 if(!Ground(new Ray(p,Vector3.down),out var ground)||!Allowed(geography,ground.point,ground.normal,kind)||!Clear(ground.point,kind==VegetationPaintKind.Tree?1.5f:.25f))continue;
                 var coordinate=geography.world.WorldToChunk(ground.point);
-                if(!geography.world.chunks.Any(c=>c.coordinate==coordinate&&(geography.world.brushAuthoredTerrain||c.region==5)))continue;
+                if(!geography.world.chunks.Any(c=>c.coordinate==coordinate&&(geography.world.brushAuthoredTerrain||c.region==geography.world.WetlandRegionId)))continue;
                 if(patches.Values.Any(data=>data.stamps.Any(s=>s.kind==kind&&new Vector2(s.position.x-ground.point.x,s.position.z-ground.point.z).sqrMagnitude<spacing*spacing)))continue;
                 var data=Patch(coordinate);if(data.stamps.Count>=20000){SetStatus("Chunk paint budget reached. Erase or reduce density.");continue;}
                 if(changed.Add(data))Undo.RecordObject(data,"Paint vegetation");

@@ -1,0 +1,274 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 50e1b50fe84138a42a721945cbf9e655, type: 3}
+  m_Name: NusantaraSurfaces
+  m_EditorClassIdentifier: Assembly-CSharp::Nusantara.World.WorldSurfacePalette
+  styles:
+  - region: 0
+    assetId: 
+    name: Travel road - packed earth
+    color: {r: 0.6156863, g: 0.5019608, b: 0.34901962, a: 1}
+    variation: 0.14
+    patternSize: 3
+    texture: {fileID: 0}
+  - region: 0
+    assetId: custom-57fbd903659f42c7adab7a4bb302ffb7
+    name: Sand - coast and riverbank
+    color: {r: 0.78431374, g: 0.7058824, b: 0.52156866, a: 1}
+    variation: 0.1
+    patternSize: 23.6
+    texture: {fileID: 0}
+  - region: 0
+    assetId: custom-eb90e2a931ff4925822313ebc616549e
+    name: Soil - forest floor
+    color: {r: 0.4745098, g: 0.3254902, b: 0.21960784, a: 1}
+    variation: 0.23
+    patternSize: 3
+    texture: {fileID: 0}
+  - region: 0
+    assetId: 
+    name: Mud - Bujang Senang wetlands
+    color: {r: 0.29803923, g: 0.28235295, b: 0.2, a: 1}
+    variation: 0.18
+    patternSize: 4
+    texture: {fileID: 0}
+  - region: 0
+    assetId: 
+    name: Gravel - mountain trail
+    color: {r: 0.52156866, g: 0.5019608, b: 0.47058824, a: 1}
+    variation: 0.35
+    patternSize: 1.5
+    texture: {fileID: 0}
+  - region: 0
+    assetId: 
+    name: Moss - ancient forest
+    color: {r: 0.32156864, g: 0.39215687, b: 0.21960784, a: 1}
+    variation: 0.28
+    patternSize: 4
+    texture: {fileID: 0}
+  - region: 0
+    assetId: 
+    name: Stone - ruins and courtyards
+    color: {r: 0.57254905, g: 0.5764706, b: 0.5411765, a: 1}
+    variation: 0.17
+    patternSize: 5
+    texture: {fileID: 0}
+  - region: 0
+    assetId: 
+    name: Volcanic ash - scorched earth
+    color: {r: 0.28235295, g: 0.2627451, b: 0.28235295, a: 1}
+    variation: 0.25
+    patternSize: 2
+    texture: {fileID: 0}
+  - region: 0
+    assetId: 
+    name: Red earth - Johor trail
+    color: {r: 0.6117647, g: 0.34509805, b: 0.23921569, a: 1}
+    variation: 0.22
+    patternSize: 3
+    texture: {fileID: 0}
+  - region: 0
+    assetId: 
+    name: Dark soil - corrupted land
+    color: {r: 0.2627451, g: 0.20784314, b: 0.30980393, a: 1}
+    variation: 0.23
+    patternSize: 4
+    texture: {fileID: 0}
+  - region: 2
+    assetId: nusantara-road-r2-TravelRoad
+    name: "Water \u2014 Travel road"
+    color: {r: 1, g: 1, b: 1, a: 1}
+    variation: 0.04
+    patternSize: 8
+    texture: {fileID: 2800000, guid: a05bcab2e7bb79a44a2ce251471ef39c, type: 3}
+  - region: 2
+    assetId: nusantara-road-r2-NaturalTrail
+    name: "Water \u2014 Natural trail"
+    color: {r: 1, g: 1, b: 1, a: 1}
+    variation: 0.04
+    patternSize: 0.8
+    texture: {fileID: 2800000, guid: 0cd88436c79d19245a8bfced7c52eddd, type: 3}
+  - region: 2
+    assetId: nusantara-road-r2-StonePath
+    name: "Water \u2014 Stone path"
+    color: {r: 1, g: 1, b: 1, a: 1}
+    variation: 0.04
+    patternSize: 2
+    texture: {fileID: 2800000, guid: 390ecdbfbfcfd63478836bc6e46499a9, type: 3}
+  - region: 3
+    assetId: nusantara-road-r3-TravelRoad
+    name: "Fire \u2014 Travel road"
+    color: {r: 1, g: 1, b: 1, a: 1}
+    variation: 0.04
+    patternSize: 2
+    texture: {fileID: 2800000, guid: 84ee07fdb1e2e6047ad4785eb1995567, type: 3}
+  - region: 3
+    assetId: nusantara-road-r3-NaturalTrail
+    name: "Fire \u2014 Natural trail"
+    color: {r: 1, g: 1, b: 1, a: 1}
+    variation: 0.04
+    patternSize: 0.8
+    texture: {fileID: 2800000, guid: 4d4535713fd82064c841e7d666238e36, type: 3}
+  - region: 3
+    assetId: nusantara-road-r3-StonePath
+    name: "Fire \u2014 Stone path"
+    color: {r: 1, g: 1, b: 1, a: 1}
+    variation: 0.04
+    patternSize: 2
+    texture: {fileID: 2800000, guid: 86f0e540e64f0884ab95670ca787edbb, type: 3}
+  - region: 4
+    assetId: nusantara-road-r4-TravelRoad
+    name: "Nature \u2014 Travel road"
+    color: {r: 1, g: 1, b: 1, a: 1}
+    variation: 0.04
+    patternSize: 2
+    texture: {fileID: 2800000, guid: 3a649ed41c8d1c349a5f1599a0543ae2, type: 3}
+  - region: 4
+    assetId: nusantara-road-r4-NaturalTrail
+    name: "Nature \u2014 Natural trail"
+    color: {r: 1, g: 1, b: 1, a: 1}
+    variation: 0.04
+    patternSize: 0.8
+    texture: {fileID: 2800000, guid: 43f5f40b1baab824391d70628fb4d0b3, type: 3}
+  - region: 4
+    assetId: nusantara-road-r4-StonePath
+    name: "Nature \u2014 Stone path"
+    color: {r: 1, g: 1, b: 1, a: 1}
+    variation: 0.04
+    patternSize: 2
+    texture: {fileID: 2800000, guid: b6d8caa031e0cc1478c58f0f57e86843, type: 3}
+  - region: 5
+    assetId: nusantara-road-r5-TravelRoad
+    name: "Earth \u2014 Travel road"
+    color: {r: 1, g: 1, b: 1, a: 1}
+    variation: 0.04
+    patternSize: 8
+    texture: {fileID: 2800000, guid: 79fc344286093e44f8cea385e264d451, type: 3}
+  - region: 5
+    assetId: nusantara-road-r5-NaturalTrail
+    name: "Earth \u2014 Natural trail"
+    color: {r: 1, g: 1, b: 1, a: 1}
+    variation: 0.04
+    patternSize: 0.8
+    texture: {fileID: 2800000, guid: b4fa75725227e9843b62784389093f9a, type: 3}
+  - region: 5
+    assetId: nusantara-road-r5-StonePath
+    name: "Earth \u2014 Stone path"
+    color: {r: 1, g: 1, b: 1, a: 1}
+    variation: 0.04
+    patternSize: 2
+    texture: {fileID: 2800000, guid: 8163db6048c93c744b8c3e3f387fb013, type: 3}
+  - region: 6
+    assetId: nusantara-road-r6-TravelRoad
+    name: "Nature + Water \u2014 Travel road"
+    color: {r: 1, g: 1, b: 1, a: 1}
+    variation: 0.04
+    patternSize: 8
+    texture: {fileID: 2800000, guid: c29a92993f984b245901aead50f923d5, type: 3}
+  - region: 6
+    assetId: nusantara-road-r6-NaturalTrail
+    name: "Nature + Water \u2014 Natural trail"
+    color: {r: 1, g: 1, b: 1, a: 1}
+    variation: 0.04
+    patternSize: 0.8
+    texture: {fileID: 2800000, guid: 1d1140513563e5c498ec68b16ad8143f, type: 3}
+  - region: 6
+    assetId: nusantara-road-r6-StonePath
+    name: "Nature + Water \u2014 Stone path"
+    color: {r: 1, g: 1, b: 1, a: 1}
+    variation: 0.04
+    patternSize: 2
+    texture: {fileID: 2800000, guid: a4544b017a8e5ea49a4f12208d40fc72, type: 3}
+  - region: 7
+    assetId: nusantara-road-r7-TravelRoad
+    name: "Lightning \u2014 Travel road"
+    color: {r: 1, g: 1, b: 1, a: 1}
+    variation: 0.04
+    patternSize: 2
+    texture: {fileID: 2800000, guid: 587444a46d2ba04419dd5b76e7673daa, type: 3}
+  - region: 7
+    assetId: nusantara-road-r7-NaturalTrail
+    name: "Lightning \u2014 Natural trail"
+    color: {r: 1, g: 1, b: 1, a: 1}
+    variation: 0.04
+    patternSize: 0.8
+    texture: {fileID: 2800000, guid: 675c4e22a09e6d44cb2896223d697b4c, type: 3}
+  - region: 7
+    assetId: nusantara-road-r7-StonePath
+    name: "Lightning \u2014 Stone path"
+    color: {r: 1, g: 1, b: 1, a: 1}
+    variation: 0.04
+    patternSize: 2
+    texture: {fileID: 2800000, guid: f4aace6f59fca7e4da7b051f41f2b0c9, type: 3}
+  - region: 8
+    assetId: nusantara-road-r8-TravelRoad
+    name: "Wind \u2014 Travel road"
+    color: {r: 1, g: 1, b: 1, a: 1}
+    variation: 0.04
+    patternSize: 2
+    texture: {fileID: 2800000, guid: ea07ea97cce2049478bbc42f51572bbd, type: 3}
+  - region: 8
+    assetId: nusantara-road-r8-NaturalTrail
+    name: "Wind \u2014 Natural trail"
+    color: {r: 1, g: 1, b: 1, a: 1}
+    variation: 0.04
+    patternSize: 0.8
+    texture: {fileID: 2800000, guid: e0551377ae9841148a52539eba483064, type: 3}
+  - region: 8
+    assetId: nusantara-road-r8-StonePath
+    name: "Wind \u2014 Stone path"
+    color: {r: 1, g: 1, b: 1, a: 1}
+    variation: 0.04
+    patternSize: 2
+    texture: {fileID: 2800000, guid: f924b2ce42f9f56468bea642d482f19f, type: 3}
+  - region: 9
+    assetId: nusantara-road-r9-TravelRoad
+    name: "Darkness \u2014 Travel road"
+    color: {r: 1, g: 1, b: 1, a: 1}
+    variation: 0.04
+    patternSize: 2
+    texture: {fileID: 2800000, guid: 560c482a5317f484fae1e6d669300734, type: 3}
+  - region: 9
+    assetId: nusantara-road-r9-NaturalTrail
+    name: "Darkness \u2014 Natural trail"
+    color: {r: 1, g: 1, b: 1, a: 1}
+    variation: 0.04
+    patternSize: 0.8
+    texture: {fileID: 2800000, guid: 1d203e268b41d944b914fd41a6ab565c, type: 3}
+  - region: 9
+    assetId: nusantara-road-r9-StonePath
+    name: "Darkness \u2014 Stone path"
+    color: {r: 1, g: 1, b: 1, a: 1}
+    variation: 0.04
+    patternSize: 2
+    texture: {fileID: 2800000, guid: d2c62c27d7e9a17489d608354fd5affb, type: 3}
+  - region: 1
+    assetId: nusantara-road-r1-TravelRoad
+    name: "Natural start \u2014 Travel road"
+    color: {r: 1, g: 1, b: 1, a: 1}
+    variation: 0.539
+    patternSize: 8
+    texture: {fileID: 2800000, guid: 2d21334922f931e498d84fd6e6f4ee51, type: 3}
+  - region: 1
+    assetId: nusantara-road-r1-NaturalTrail
+    name: "Natural start \u2014 Natural trail"
+    color: {r: 1, g: 1, b: 1, a: 1}
+    variation: 0.04
+    patternSize: 4
+    texture: {fileID: 2800000, guid: e66f0ac7087f77c4abbaa3bf7f91363d, type: 3}
+  - region: 1
+    assetId: nusantara-road-r1-StonePath
+    name: "Natural start \u2014 Stone path"
+    color: {r: 1, g: 1, b: 1, a: 1}
+    variation: 0.04
+    patternSize: 0.5
+    texture: {fileID: 2800000, guid: ab0eaa971f82f034481c61d805dde523, type: 3}

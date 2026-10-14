@@ -22,7 +22,7 @@ namespace Nusantara.World.Editor
         public static void Start()
         {
             if(running||EditorApplication.isPlayingOrWillChangePlaymode)throw new InvalidOperationException("Use idle Edit mode.");
-            world=AssetDatabase.LoadAssetAtPath<WorldDefinition>(WorldFoundationSetup.DefinitionPath);chunks=world.chunks.Where(c=>c.region==5).ToArray();cursor=count=0;
+            world=AssetDatabase.LoadAssetAtPath<WorldDefinition>(WorldFoundationSetup.DefinitionPath);chunks=world.chunks.Where(c=>c.region==world.WetlandRegionId).ToArray();cursor=count=0;
             backup="Library/Nusantara/Region5CollisionBackup/"+DateTime.UtcNow.ToString("yyyyMMdd-HHmmss");running=true;EditorApplication.update+=Advance;Status="Building essential prop collision.";
         }
         static void Backup(string path)

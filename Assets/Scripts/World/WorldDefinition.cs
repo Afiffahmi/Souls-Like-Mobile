@@ -9,7 +9,7 @@ namespace Nusantara.World
     [Serializable]
     public sealed class WorldRegion
     {
-        [Range(1, 8)] public int id;
+        [Range(1, 9)] public int id;
         public string name;
         public string boss;
         public bool detailedEnvironment;
@@ -20,6 +20,8 @@ namespace Nusantara.World
         [Tooltip("One continuous ground surface for this region. Ground colour is on its own material.")]
         public GameObject groundPrefab;
         public bool floatingIsland;
+        public bool paintOnly;
+        [HideInInspector] public string groundAssetFolder;
         [Tooltip("Height offset for a floating island relative to the mainland ground.")]
         public float groundElevation;
         public VegetationBrushStyle treeBrush;
@@ -33,7 +35,7 @@ namespace Nusantara.World
     {
         public string id;
         public string name;
-        [Range(1, 8)] public int region = 5;
+        [Range(1, 9)] public int region = 5;
         public bool positionConfirmed;
         public Vector3 position;
         [Min(1)] public float clearRadius = 20;
@@ -46,7 +48,7 @@ namespace Nusantara.World
     {
         public Vector2Int coordinate;
         [HideInInspector] public string assetFolder;
-        [Range(1, 8)] public int region = 1;
+        [Range(1, 9)] public int region = 1;
         [Tooltip("Prefab with terrain, essential collision, water barriers and baked navigation. Local origin is the chunk's southwest corner.")]
         public string essentialAddress;
         [Tooltip("Simplified terrain, without gameplay or collision.")]
@@ -67,6 +69,8 @@ namespace Nusantara.World
         [HideInInspector] public bool authoredChunkLayout;
         [Tooltip("Flat foundation authored with brushes; procedural geography is disabled.")]
         public bool brushAuthoredTerrain;
+        [Tooltip("Painted mainland ownership. The chunk grids below remain terrain storage; use Region Brush to change regions 1–7.")]
+        public WorldRegionPaintData regionPaint;
         [HideInInspector] public bool regionalGroundPlanes;
         [HideInInspector] public string chunkAssetRoot = "Assets/NusantaraWorld/Generated";
         [Min(1)] public float chunkSize = 256;
@@ -89,6 +93,8 @@ namespace Nusantara.World
         [Min(.01f)] public float seamTolerance = .005f;
         [Min(.1f)] public float agentRadius = .5f;
         [Min(.2f)] public float agentHeight = 2;
+        public int WetlandRegionId => regions.Length == 9 ? 6 : 5;
+        public int MainlandRegionCount => regions.Length == 9 ? 7 : 6;
         public WorldRegion[] regions = Array.Empty<WorldRegion>();
         public WorldLocation[] locations = Array.Empty<WorldLocation>();
         public WorldChunkRecord[] chunks = Array.Empty<WorldChunkRecord>();
@@ -117,15 +123,15 @@ namespace Nusantara.World
             var ids = new HashSet<int>();
             foreach (var region in regions)
             {
-                if (region == null || region.id < 1 || region.id > 8 || !ids.Add(region.id))
-                { yield return "Region IDs must be unique and within 1–8."; continue; }
-                if (!authoredChunkLayout && region.detailedEnvironment && region.id != 5) yield return "Only Region 5 may have detailed environment content.";
+                if (region == null || region.id < 1 || region.id > 9 || !ids.Add(region.id))
+                { yield return "Region IDs must be unique and within 1–9."; continue; }
+                if (!authoredChunkLayout && region.detailedEnvironment && region.id != WetlandRegionId) yield return "Only Region 5 may have detailed environment content.";
                 if (requireLayout && !authoredChunkLayout && (region.boundary == null || region.boundary.Length < 3))
                     yield return $"Region {region.id} is awaiting a reference boundary.";
-                if (brushAuthoredTerrain && (region.chunkGridSize.x < 1 || region.chunkGridSize.y < 1))
+                if (brushAuthoredTerrain && !region.paintOnly && (region.chunkGridSize.x < 1 || region.chunkGridSize.y < 1))
                     yield return $"Region {region.id} requires positive chunk dimensions.";
             }
-            if (ids.Count != 6 && ids.Count != 8) yield return "Define six mainland regions, or all eight regions including the floating islands.";
+            if (ids.Count != 6 && ids.Count != 8 && ids.Count != 9) yield return "Define six legacy mainland regions, eight legacy regions, or nine regions including the natural starting area.";
             var coordinates = new HashSet<Vector2Int>();
             foreach (var chunk in chunks)
             {
@@ -141,20 +147,20 @@ namespace Nusantara.World
                 }
                 if (!regionalGroundPlanes&&string.IsNullOrWhiteSpace(chunk.essentialAddress)) yield return $"Chunk {chunk.coordinate} has no essential content address.";
                 if (!regionalGroundPlanes&&string.IsNullOrWhiteSpace(chunk.distantAddress)) yield return $"Chunk {chunk.coordinate} has no distant terrain address.";
-                if (!authoredChunkLayout && chunk.region != 5 && (chunk.decorationAddresses.Length > 0 || chunk.gameplayAddresses.Length > 0))
+                if (!authoredChunkLayout && chunk.region != WetlandRegionId && (chunk.decorationAddresses.Length > 0 || chunk.gameplayAddresses.Length > 0))
                     yield return $"Region {chunk.region} must remain terrain-only.";
             }
             if (brushAuthoredTerrain)
                 foreach (var region in regions)
                 {
-                    if (region == null) continue;
+                    if (region == null || region.paintOnly) continue;
                     int count = 0;
                     foreach (var chunk in chunks) if (chunk != null && chunk.region == region.id) count++;
                     if (count != region.chunkGridSize.x * region.chunkGridSize.y)
                         yield return $"Region {region.id} does not contain its complete {region.chunkGridSize.x}x{region.chunkGridSize.y} grid.";
                 }
             if(regionalGroundPlanes)foreach(var region in regions)
-                if(region!=null&&(region.groundPrefab==null||region.groundPrefab.GetComponent<WorldRegionGround>()==null))yield return $"Region {region.id} needs its continuous ground prefab.";
+                if(region!=null&&!region.paintOnly&&(region.groundPrefab==null||region.groundPrefab.GetComponent<WorldRegionGround>()==null))yield return $"Region {region.id} needs its continuous ground prefab.";
             if (requireLayout)
             {
                 if (!authoredChunkLayout && !layoutApproved) yield return "Reference layout has not been approved. Streaming is intentionally gated.";
