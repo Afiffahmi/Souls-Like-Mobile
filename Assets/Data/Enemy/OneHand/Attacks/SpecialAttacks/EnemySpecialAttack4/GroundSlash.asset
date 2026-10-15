@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7ac26418815417e4db8ac8afcacdf7eb, type: 3}
+  m_Name: GroundSlash
+  m_EditorClassIdentifier: Assembly-CSharp::SoulsLike.Enemies.EnemyGroundSlashAction
+  distance: 12
+  speed: 13
+  height: 2.5
+  hitHalfWidth: 0.7
+  trailLifetime: 1.5
+  launchFromSwordTip: 1
+  localOffset: {x: 0, y: 0, z: 1.2}
+  groundAndObstacles:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  useInnateElement: 0
+  elementPalette:
+  - {fileID: 11400000, guid: ba705c956669766439c287df10ec5f29, type: 2}
+  - {fileID: 11400000, guid: 6212608da8c335d4181970297fe9e31d, type: 2}
+  - {fileID: 11400000, guid: 632cfb580161996498100bbfe1af4b27, type: 2}
+  - {fileID: 11400000, guid: ec5af00be1dbcb7498075d95fecd4fbc, type: 2}
+  - {fileID: 11400000, guid: c2c86ca0377cef840837d3077173fca9, type: 2}
+  - {fileID: 11400000, guid: bffc41e94cf8c2a4d99a11459c905545, type: 2}
+  - {fileID: 11400000, guid: 8a1c714da87185d47bb359aee070c62f, type: 2}
+  - {fileID: 11400000, guid: 9fe7a519302f4684da1ea5622ab4e8df, type: 2}
+  crescentMaterial: {fileID: 2100000, guid: 134181f994ac37540827a277111535ff, type: 2}
+  trailMaterial: {fileID: 2100000, guid: 436ab35d97fac2f40950a92e4ac8d573, type: 2}
+  particleMaterial: {fileID: 2100000, guid: 47b83fb02300e6745b8b94e8f00a56d5, type: 2}
+  debrisMaterial: {fileID: 2100000, guid: dbc8509a9d90b084fa2be23dc474a937, type: 2}

@@ -9,6 +9,9 @@ namespace SoulsLike.Enemies
     public sealed class EnemySlashVisual : MonoBehaviour
     {
         readonly Dictionary<GemCrescentSlash, GemCrescentSlash> cached = new Dictionary<GemCrescentSlash, GemCrescentSlash>();
+        [Tooltip("Sword mesh transform used by sword-driven spin attacks.")]
+        public Transform sword;
+        public Vector3 swordTipLocal;
         EnemyBrain brain;
         EnemyAnimationDriver driver;
         ElementalEnemy elemental;
@@ -51,7 +54,7 @@ namespace SoulsLike.Enemies
                 reverseSweep=source.reverseSweep, startSweepAngle=source.startSweepAngle,
                 endSweepAngle=source.endSweepAngle, progression=source.progression,
                 fullCircle=source.fullCircle, thrust=source.thrust, visualScale=source.visualScale,
-                size=source.size, forwardDrift=source.forwardDrift, followPlayer=source.followPlayer
+                size=source.size, forwardDrift=brain.HasTravellingSpin?0:source.forwardDrift, followPlayer=source.followPlayer
             };
         }
         void LateUpdate()
@@ -80,14 +83,31 @@ namespace SoulsLike.Enemies
                 CapturePose(); current.gameObject.SetActive(true); current.InitializeDriven(settings);
             }
             if(current==null) return;
-            if(settings.followPlayer) CapturePose();
+            if(settings.followPlayer) CapturePose(settings.ProgressAt(frame));
+            if(brain.HasTravellingSpin)
+            {
+                // Travel is locked to the launch heading, independent of the rotating sword.
+                Vector3 center=brain.SpinSlashCenter(time);
+                origin=new Vector3(center.x,origin.y,center.z);
+            }
             current.SetAnimationFrame(settings.ProgressAt(frame),origin,facing);
         }
-        void CapturePose()
+        void CapturePose(float progress = 0)
         {
             Vector3 forward=Vector3.ProjectOnPlane(transform.forward,Vector3.up);
             facing=Quaternion.LookRotation(forward.sqrMagnitude>.0001f?forward:Vector3.forward,Vector3.up);
             origin=transform.position+facing*settings.localOffset;
+            if (attack.followSword && settings.fullCircle && sword != null)
+            {
+                Vector3 tip = sword.TransformPoint(swordTipLocal);
+                Vector3 radial = Vector3.ProjectOnPlane(tip - transform.position, Vector3.up);
+                if (radial.sqrMagnitude > .001f)
+                {
+                    float u = settings.reverseSweep ? 1 - settings.Evaluate(progress) : settings.Evaluate(progress);
+                    facing = Quaternion.LookRotation(radial) * Quaternion.Euler(0, -(u * 360 - 270), 0);
+                    origin = new Vector3(transform.position.x, tip.y, transform.position.z);
+                }
+            }
         }
         void Clear()
         {

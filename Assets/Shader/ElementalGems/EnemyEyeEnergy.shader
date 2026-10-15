@@ -12,6 +12,7 @@ Shader "ElementalGems/Enemy Eye Energy"
         Pass
         {
             Blend SrcAlpha One
+            ZTest LEqual
             ZWrite Off
             Cull Off
             HLSLPROGRAM
@@ -56,6 +57,7 @@ Shader "ElementalGems/Enemy Eye Energy"
         Pass
         {
             Blend SrcAlpha One
+            ZTest LEqual
             ZWrite Off
             Cull Off
             CGPROGRAM

@@ -76,6 +76,9 @@ namespace ElementalGems
                 slash == null || effects.ActiveSlash != slash || !slash.HasDrivenGeometry)
             { sampled = false; return; }
 
+            // Animation/NavMesh movement can occur after the last physics step.
+            // Queries must use the colliders at the positions shown this frame.
+            Physics.SyncTransforms();
             var current = manager.Capture();
             if (current.element != attack.element) attack = current.WithKnockbackMultiplier(capturedKnockbackMultiplier, capturedMinimumKnockback);
             if (previousSlash != slash) sampled = false;
@@ -113,6 +116,9 @@ namespace ElementalGems
                 var collider = contacts[i];
                 var enemy = collider.GetComponentInParent<Enemy>();
                 if (enemy == null || enemy.transform.IsChildOf(transform) || !enemy.isActiveAndEnabled || enemy.IsDead || hit.Contains(enemy)) continue;
+                // A protected contact is rejected, not a successful hit for this swing.
+                // If protection ends while the slash still overlaps, it can then connect.
+                if (enemy.IsInvulnerable) continue;
                 // A special hit belongs to its selected enemy; nearby bystanders do not consume extra hits.
                 if (player.IsSwordSpecialAttacking && enemy != player.SwordSpecialTarget) continue;
                 // Reject enemies behind the slash, even if a large collider overlaps the front box.

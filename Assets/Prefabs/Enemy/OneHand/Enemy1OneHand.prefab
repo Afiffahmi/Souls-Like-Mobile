@@ -222,6 +222,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aa336a46916cb6e4c8f1ebdf00a3a00f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SoulsLike.Enemies.EnemySlashVisual
+  sword: {fileID: 2298273104419482645}
+  swordTipLocal: {x: 0.70417017, y: 0.33674696, z: 0.039197568}
 --- !u!114 &901170000000000002
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -826,6 +828,11 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 8471537213565491657}
   m_SourcePrefab: {fileID: 100100000, guid: f5d100ece24178743a8067331c91601d, type: 3}
+--- !u!4 &2298273104419482645 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4164213433230802979, guid: f5d100ece24178743a8067331c91601d, type: 3}
+  m_PrefabInstance: {fileID: 2751516010663128118}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &2424590568745946077 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: f5d100ece24178743a8067331c91601d, type: 3}

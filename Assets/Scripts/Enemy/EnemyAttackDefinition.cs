@@ -32,10 +32,10 @@ namespace SoulsLike.Enemies
         public bool showAttackCue;
         [Tooltip("Yellow warning permits a timed parry. Red warning cannot be parried.")]
         public bool canBeParried = true;
-        [Tooltip("Zero-based animation frame that shows the warning and starts attack protection. Only damage-dealing attacks use this cue.")]
+        [Tooltip("Zero-based animation frame that shows the warning. Only damage-dealing attacks use this cue. Protection is separate: special attacks and reset-position jumps are invulnerable; normal attacks are not.")]
         [Min(0)] public float attackCueFrame = 3;
-        [Tooltip("Ignore damage, hit reactions, knockback and elemental changes from Cue Frame until this attack animation ends. A successful permitted parry still interrupts.")]
-        public bool invulnerableAfterCue;
+        // Retained for serialized assets. Protection now follows special/reset state, not the cue.
+        [HideInInspector] public bool invulnerableAfterCue;
         [Min(.1f)] public float cueDuration = .65f;
         [Min(.1f)] public float cueRadius = .75f;
         public Material cueMaterial;
@@ -92,6 +92,9 @@ namespace SoulsLike.Enemies
         public ElementalGems.GemCrescentSlash slashPrefab;
         [Tooltip("Optional elemental variants. Uses the enemy's current gem; Slash Prefab is the Normal/fallback visual.")]
         public ElementalGems.GemCrescentSlash[] elementalSlashPrefabs = new ElementalGems.GemCrescentSlash[0];
+
+        [Tooltip("Align a full-circle slash with the animated sword tip during the spin.")]
+        public bool followSword;
         [Tooltip("Placement, direction and size; start/end frames are read from Damage Timing above.")]
         public ElementalGems.GemSlashSettings slash = new ElementalGems.GemSlashSettings();
         private bool StepConfigured => available && animation != null && !animation.isLooping &&

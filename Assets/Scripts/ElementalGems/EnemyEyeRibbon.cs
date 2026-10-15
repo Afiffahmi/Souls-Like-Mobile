@@ -14,7 +14,8 @@ namespace ElementalGems
         public float Duration { get; private set; }
         public LineRenderer MainRibbon { get; private set; }
         public Renderer Core { get; private set; }
-        Transform owner, coreTransform;
+        Transform owner, coreTransform, head;
+        Vector3 headLocalForward;
         LineRenderer halo, wisp;
         Mesh coreMesh;
         readonly Vector3[] history = new Vector3[Capacity];
@@ -30,6 +31,12 @@ namespace ElementalGems
         public void Configure(Transform character, Material material, Color tint, float length, float width, float brightness, float eyeSide, float duration = .25f)
         {
             owner = character;
+            // Imported bone axes are not necessarily the character's facing direction.
+            // Store that direction in head space so the blocking plane follows head animation.
+            head = owner;
+            for (var bone = transform.parent; bone != null && bone != owner; bone = bone.parent)
+                if (bone.name.Equals("Head", System.StringComparison.OrdinalIgnoreCase)) { head = bone; break; }
+            headLocalForward = head.InverseTransformDirection(owner.forward);
             Length = Mathf.Max(.1f, length); Width = Mathf.Max(.01f, width);
             Brightness = Mathf.Max(1, brightness); Duration = Mathf.Max(.05f, duration); seed = eyeSide * 1.7f;
             halo = Line("Soft eye trail glow", material, tint, Width * 3, .2f);
@@ -87,7 +94,10 @@ namespace ElementalGems
             if (owner == null || MainRibbon == null) return;
             // Record physical positions only: moving the camera must never create a trail.
             Vector3 anchor = transform.position;
-            Vector3 viewOffset = camera != null ? (camera.transform.position - anchor).normalized * (Width * .8f) : Vector3.zero;
+            Vector3 faceForward = head.TransformDirection(headLocalForward).normalized;
+            // Stop at the face instead of letting old world-space samples emerge from the skull.
+            // A tiny inset preserves the join at the eye; depth testing handles the actual surface.
+            float faceInset = Width * .25f;
             float dt = time - previousTime;
             bool reset = !initialized || dt < 0 || dt > Duration || Vector3.Distance(anchor, previousAnchor) > Mathf.Max(Length * 2, 1);
             if (reset) { sampleCount = 0; lastMotionTime = time - Duration; }
@@ -112,12 +122,21 @@ namespace ElementalGems
             path[0] = anchor; distances[0] = 0; int count = 1;
             for (int i = sampleCount - 1; i >= 0; i--)
             {
-                Vector3 step = history[i] - path[count - 1]; float distance = step.magnitude;
-                if (distance < .0001f) continue;
+                Vector3 target = history[i];
+                float targetDepth = Vector3.Dot(target - anchor, faceForward);
+                bool entersHead = targetDepth < -faceInset;
+                if (entersHead)
+                {
+                    float previousDepth = Vector3.Dot(path[count - 1] - anchor, faceForward);
+                    float intersection = (previousDepth + faceInset) / (previousDepth - targetDepth);
+                    target = Vector3.Lerp(path[count - 1], target, intersection);
+                }
+                Vector3 step = target - path[count - 1]; float distance = step.magnitude;
+                if (distance < .0001f) { if (entersHead) break; continue; }
                 float remaining = Length - distances[count - 1];
                 path[count] = path[count - 1] + step * Mathf.Min(1, remaining / distance);
                 distances[count] = distances[count - 1] + Mathf.Min(distance, remaining); count++;
-                if (distance >= remaining) break;
+                if (entersHead || distance >= remaining) break;
             }
             float totalLength = distances[count - 1];
             float fade = Mathf.Clamp01(1 - (time - lastMotionTime) / Duration);
@@ -130,11 +149,11 @@ namespace ElementalGems
                     float distance = totalLength * i / (Segments - 1);
                     while (section < count - 1 && distances[section] < distance) section++;
                     float u = Mathf.InverseLerp(distances[section - 1], distances[section], distance);
-                    points[i] = Vector3.Lerp(path[section - 1], path[section], u) + viewOffset;
+                    points[i] = Vector3.Lerp(path[section - 1], path[section], u);
                 }
             }
             ShowTrail(visible, fade);
-            coreTransform.position = anchor + viewOffset;
+            coreTransform.position = anchor;
             if (camera != null) coreTransform.rotation = camera.transform.rotation;
             coreTransform.localScale = Vector3.one * (Width * 2.8f * (1 + .05f * Mathf.Sin(time * 5 + seed)));
             previousAnchor = anchor;

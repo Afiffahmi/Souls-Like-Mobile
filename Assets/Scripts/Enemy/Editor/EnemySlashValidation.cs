@@ -176,7 +176,15 @@ public static class EnemySlashValidation
                 player.transform.position=playerPosition+Vector3.up*20; Physics.SyncTransforms(); Sample(end+.1f);
                 Check(health.currentHealth==1000,name+" escaping range before end avoids damage");
 
-                Start(index); Sample(start+.1f); brain.Interrupt();
+                Start(index); Sample(start+.1f);
+                bool protectedAttack = brain.IsAttackProtected;
+                brain.Interrupt();
+                if (protectedAttack)
+                {
+                    Check(brain.CurrentAttack==attack && visual.ActiveSlash!=null,name+" protection rejects ordinary interruption");
+                    Check(attack.canBeParried,name+" permits a parry to break protection");
+                    brain.ReceiveSuccessfulParry();
+                }
                 Check(visual.ActiveSlash==null && brain.CurrentAttack==null && health.currentHealth==1000,name+" interruption cancels pending damage and slash");
             }
             Start(0); Sample(attack.hitStartFrame+.1f); brain.Health.ForceKill();

@@ -48,6 +48,18 @@ namespace SoulsLike.Enemies
         private float[] attackReady = Array.Empty<float>();
         private float nextSense, nextAttack, stateEntered, previousAttackTime, lastProgress, hitElapsed, standbyUntil;
         private Vector3 progressPosition;
+        private Vector3 slashLaunchPosition, slashLaunchForward;
+        public bool HasTravellingSpin => CurrentAttack != null && CurrentAttack.followSword &&
+            CurrentAttack.slash != null && CurrentAttack.slash.enabled && CurrentAttack.slash.fullCircle && CurrentAttack.slash.forwardDrift > 0;
+        public Vector3 SpinSlashCenter(float normalizedTime)
+        {
+            var attack = CurrentAttack;
+            float frames = attack.animation.length * attack.animation.frameRate;
+            float start = attack.useFrameWindow ? attack.hitStartFrame : attack.hitStart * frames;
+            float end = attack.useFrameWindow ? attack.hitEndFrame : attack.hitEnd * frames;
+            float progress = Mathf.InverseLerp(start, end, normalizedTime * frames);
+            return slashLaunchPosition + slashLaunchForward * (attack.slash.Evaluate(progress) * attack.slash.forwardDrift);
+        }
         private bool appliedHit, pendingContact, attackEntered, initialized, hitAnimationActive, hitAnimationEntered;
         private bool actionExecuted;
         private bool attackShakePlayed;
@@ -59,13 +71,17 @@ namespace SoulsLike.Enemies
         {
             get
             {
-                var attack = CurrentAttack;
-                if (!isActiveAndEnabled || state != EnemyState.Attacking || protectionBrokenByParry || attack == null ||
-                    !attack.HasDamagePayload || !attack.showAttackCue || !attack.invulnerableAfterCue || attack.animation == null) return false;
-                return animationDriver != null && animationDriver.TryGetTime(attack.stateName, out float time) &&
-                    time < 1f && time * attack.animation.length * attack.animation.frameRate >= attack.attackCueFrame;
+                if (!isActiveAndEnabled || Health == null || Health.IsDead) return false;
+                // One_hand_up_jump_B is the reset-position jump, outside the attack state.
+                if (state == EnemyState.ResetPosition) return true;
+                if (state != EnemyState.Attacking || protectionBrokenByParry) return false;
+                // Protect the whole special, including preparation and pauses between steps.
+                // Normal attack cues announce parry timing; they do not grant invulnerability.
+                return IsSpecialAttack(CurrentAttack) || IsSpecialAttack(CurrentSequence);
             }
         }
+        private static bool IsSpecialAttack(EnemyAttackDefinition attack) => attack != null &&
+            (attack.attackType == EnemyAttackType.Special || attack.trigger == EnemyAttackTrigger.HealthLossSpecial);
         private bool spawnAnimationEntered;
         private int pendingHealthSpecials, healthSpecialThresholdsCrossed, lastHealthSpecialIndex = -1;
         private bool healthSpecialReturnRequired;
@@ -98,6 +114,7 @@ namespace SoulsLike.Enemies
         {
             Health = GetComponent<Enemy>(); motor = GetComponent<EnemyNavMeshMotor>();
             animationDriver = GetComponent<EnemyAnimationDriver>(); status = GetComponent<EnemyControlStatus>();
+            if (GetComponent<EnemySlashDamage>() == null) gameObject.AddComponent<EnemySlashDamage>();
         }
         private void OnEnable() { Health.OnDamaged += OnDamaged; Health.OnDeath += OnDeath; }
         private void Start()
@@ -301,6 +318,8 @@ namespace SoulsLike.Enemies
         public bool CanHit(EnemyTarget target, EnemyAttackDefinition attack)
         {
             if (state != EnemyState.Attacking || Health.IsDead || (status != null && status.CannotAct) || !Valid(target)) return false;
+            if (EnemySlashDamage.UsesSlash(attack))
+                return TryGetComponent<EnemySlashDamage>(out var slashDamage) && slashDamage.IsTouching(target);
             if (attack.slash != null && attack.slash.enabled && attack.slash.thrust)
             {
                 // A thrust contacts the forward lance, not the broad melee selection radius.
@@ -415,6 +434,8 @@ namespace SoulsLike.Enemies
                 if (direction.sqrMagnitude > .0001f) transform.rotation = Quaternion.LookRotation(direction);
             }
             motor.BeginAttackMovement(step, Target);
+            slashLaunchPosition = motor.NavigationPosition;
+            slashLaunchForward = Vector3.ProjectOnPlane(transform.forward, Vector3.up).normalized;
             animationDriver.PlayAttack(CurrentAttack, profile.transitionDuration);
             AttackStarted?.Invoke(CurrentAttack);
         }
@@ -461,7 +482,7 @@ namespace SoulsLike.Enemies
                 CombatCameraShake.EnemyAttack(AttackPosition, attack.attackType == EnemyAttackType.Special ||
                     attack.movement == EnemyAttackMotion.Jump);
             }
-            if (attack.dealsDamage && attack.damageAtWindowEnd && !appliedHit)
+            if (attack.dealsDamage && !EnemySlashDamage.UsesSlash(attack) && attack.damageAtWindowEnd && !appliedHit)
             {
                 // Give the target the whole visible window to parry. The end
                 // resolution cannot hit a target that only arrives afterward.
@@ -481,7 +502,7 @@ namespace SoulsLike.Enemies
                     if (state != EnemyState.Attacking) return;
                 }
             }
-            else if (attack.dealsDamage && !attack.damageAtWindowEnd && !appliedHit && inWindow)
+            else if (attack.dealsDamage && !EnemySlashDamage.UsesSlash(attack) && !attack.damageAtWindowEnd && !appliedHit && inWindow)
             {
                 if (CanHit(Target, attack))
                 {

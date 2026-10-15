@@ -49,12 +49,12 @@ namespace SoulsLike.Enemies.Editor
             ribbon.UpdateGeometry(begin, null);
             for (int i = 1; i <= 6; i++)
             {
-                owner.position = start + Vector3.right * (.06f * i);
+                owner.position = start + owner.right * (.06f * i);
                 ribbon.UpdateGeometry(begin + i * .02f, null);
             }
             for (int i = 1; i <= 6; i++)
             {
-                owner.position = start + Vector3.right * .36f + Vector3.forward * (.06f * i);
+                owner.position = start + owner.right * .36f - owner.forward * (.06f * i);
                 ribbon.UpdateGeometry(begin + .12f + i * .02f, null);
             }
             Check(ribbon.MainRibbon.enabled, eye.name + " leaves a tail during movement");
@@ -80,6 +80,17 @@ namespace SoulsLike.Enemies.Editor
             Check(!ribbon.MainRibbon.enabled, eye.name + " does not streak across teleports");
             owner.position = start;
             ribbon.UpdateGeometry(begin + .84f, null);
+            // A forward-moving eye must not leave a wake through the head and out its back.
+            for (int i = 1; i <= 8; i++)
+            {
+                owner.position = start + owner.forward * (.06f * i);
+                ribbon.UpdateGeometry(begin + .84f + i * .02f, null);
+            }
+            Check(!ribbon.MainRibbon.enabled, eye.name + " stops the ribbon before it enters the head");
+            Check(Vector3.Distance(ribbon.Core.transform.position, ribbon.transform.position) < .0001f,
+                eye.name + " keeps the glow on the physical eye anchor");
+            owner.position = start;
+            ribbon.UpdateGeometry(begin + 1.2f, null);
         }
         static void Tick()
         {
