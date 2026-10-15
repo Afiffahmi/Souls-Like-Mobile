@@ -62,6 +62,10 @@ namespace SoulsLike.Enemies
         [Tooltip("Zero-based clip frame that executes the action once. Interrupted casts cannot execute afterward.")]
         [Min(0)] public float actionFrame = 10f;
         [Header("Follow-up sequence")]
+        [Tooltip("Total times to play this attack, including the first. 1 = once, 4 = four times. Zero uses the authored Follow-up Steps instead. Configure on the opening attack.")]
+        [Min(0)] public int repeatCount;
+        [InspectorName("Time Between Attacks"), Tooltip("Seconds to stand idle after an animation finishes before starting the next repeat or follow-up. Configure on the opening attack. Zero starts the next step immediately.")]
+        [Min(0)] public float repeatDelay;
         [Tooltip("Optional ordered steps after this animation finishes. No four-step limit. Each step is an Attack Definition with its own clip, damage and movement. Follow-ups cannot contain nested follow-ups.")]
         public EnemyAttackDefinition[] followUpSteps = new EnemyAttackDefinition[0];
         [Header("Damage timing")]
@@ -101,7 +105,7 @@ namespace SoulsLike.Enemies
             get
             {
                 if (!StepConfigured || weight <= 0) return false;
-                if (followUpSteps != null) foreach (var step in followUpSteps)
+                if (repeatCount == 0 && followUpSteps != null) foreach (var step in followUpSteps)
                     if (step == null || step == this || (step.available && (!step.StepConfigured || step.weight <= 0 ||
                         (step.followUpSteps != null && step.followUpSteps.Length > 0)))) return false;
                 return true;
@@ -135,6 +139,7 @@ namespace SoulsLike.Enemies
             playbackSpeed = Mathf.Max(.05f, playbackSpeed);
             windupSpeedMultiplier = Mathf.Clamp(windupSpeedMultiplier, .05f, 1f);
             movementDistance = Mathf.Max(0, movementDistance);
+            repeatCount = Mathf.Max(0, repeatCount); repeatDelay = Mathf.Max(0, repeatDelay);
             movementEndFrame = Mathf.Max(movementStartFrame + 1, movementEndFrame);
             hitStartFrame = Mathf.Max(0, hitStartFrame); hitEndFrame = Mathf.Max(hitStartFrame, hitEndFrame);
         }

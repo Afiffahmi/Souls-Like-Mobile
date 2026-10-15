@@ -28,16 +28,26 @@ namespace SoulsLike.Enemies
             int hash = Animator.StringToHash("Base Layer." + state);
             if (!Ready || !animator.HasState(0, hash)) return false;
             ResetAttackSpeed();
-            bool playing = animator.GetCurrentAnimatorStateInfo(0).fullPathHash == hash;
+            bool currentPlaying = animator.GetCurrentAnimatorStateInfo(0).fullPathHash == hash;
+            bool playing = currentPlaying;
             if (animator.IsInTransition(0)) playing = animator.GetNextAnimatorStateInfo(0).fullPathHash == hash;
-            if (restart || requested != hash || !playing) animator.CrossFadeInFixedTime(hash, blend, 0, 0);
+            // Re-entering the same state during its outgoing idle blend can retain
+            // the finished state's time. Explicitly restart so the next attack cannot skip.
+            if (restart && currentPlaying) animator.Play(hash, 0, 0);
+            else if (restart || requested != hash || !playing) animator.CrossFadeInFixedTime(hash, blend, 0, 0);
             requested = hash;
             return true;
         }
         public bool PlayAttack(EnemyAttackDefinition attack, float blend)
         {
             bool played = Play(attack.stateName, blend, true);
-            if (played) UpdateAttackSpeed(attack, 0);
+            if (played)
+            {
+                // Flush the restart before the brain can sample an outgoing copy
+                // of this same attack at normalized time >= 1.
+                animator.Update(0);
+                UpdateAttackSpeed(attack, 0);
+            }
             return played;
         }
         public void UpdateAttackSpeed(EnemyAttackDefinition attack, float normalizedTime)

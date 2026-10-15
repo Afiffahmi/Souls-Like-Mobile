@@ -26,6 +26,11 @@ public static class EnemySpecialAttack3Validation
     static Quaternion rotation;
     static float distance, interruptedAt;
     static int step, mode, healthBefore, stepHealth;
+    static float observedPauseStart;
+    static Vector3 pausePosition;
+    static int pauseHealth, observedGaps;
+    static bool pauseObserved;
+    static string callbackFailure;
     static double began;
     static bool initialized, dashCaptured, shifted;
 
@@ -57,7 +62,7 @@ public static class EnemySpecialAttack3Validation
     }
     static void Initialize()
     {
-        checks.Clear(); step = mode = 0;
+        checks.Clear(); step = mode = 0; callbackFailure = null;
         brain = UnityEngine.Object.FindObjectsByType<EnemyBrain>(FindObjectsSortMode.None)
             .First(b => b.profile != null && b.profile.name == "Enemy1OneHand");
         foreach (var other in UnityEngine.Object.FindObjectsByType<EnemyBrain>(FindObjectsSortMode.None))
@@ -76,10 +81,61 @@ public static class EnemySpecialAttack3Validation
         player.maxHealth = player.currentHealth = 1000; healthBefore = player.currentHealth;
         brain.targetOverride = target; typeof(EnemyBrain).GetProperty("Target").SetValue(brain, target);
         motor.Agent.Warp(brain.HomePosition);
-        ProbeFixedDistance();
-        ProbeStartingOutsideRange();
+        pauseObserved = false; observedGaps = 0;
         target.transform.position = brain.HomePosition + brain.transform.forward * 4.5f;
         brain.AttackStarted += OnStep; initialized = true; StartSequence();
+    }
+    static void ProbeRepeatSettings()
+    {
+        var attacks = brain.profile.attacks;
+        var copy = UnityEngine.Object.Instantiate(attacks.First(a => a != null && a.stateName == "EnemySpecialAttack3"));
+        Vector3 origin = motor.NavigationPosition;
+        Vector3 forward = brain.transform.forward;
+        int starts = 0;
+        Action<EnemyAttackDefinition> countStart = _ => starts++;
+        brain.AttackStarted += countStart;
+        brain.profile.attacks = new[] { copy };
+        typeof(EnemyBrain).GetField("attackReady", Private).SetValue(brain, new float[1]);
+        try
+        {
+            copy.repeatCount = 1; copy.repeatDelay = .25f;
+            target.transform.position = origin + forward * 4;
+            Call(brain, "BeginAttack", 0); Sample(85.05f); Call(brain, "TickAttack");
+            Check(starts == 1 && brain.CurrentSequence == null, "Repeat Count 1 plays exactly one thrust");
+
+            motor.Agent.Warp(origin); starts = 0;
+            copy.repeatCount = 2;
+            Call(brain, "BeginAttack", 0); Sample(85.05f); Call(brain, "TickAttack");
+            Check(brain.CurrentAttack == null && brain.SequencePauseRemaining > .2f && brain.SequencePauseRemaining <= .251f,
+                "A configured 0.25-second pause replaces the default one-second gap (remaining " + brain.SequencePauseRemaining + ")");
+            Call(brain, "TickAttack");
+            Check(starts == 1 && brain.CurrentAttack == null, "A repeat cannot start before the configured pause expires");
+            typeof(EnemyBrain).GetField("sequenceResumeAt", Private).SetValue(brain, Time.time - .01f);
+            Call(brain, "TickAttack"); Sample(85.05f); Call(brain, "TickAttack");
+            Check(starts == 2 && brain.CurrentSequence == null, "Repeat Count 2 plays exactly two thrusts");
+
+            motor.Agent.Warp(origin); starts = 0;
+            copy.repeatDelay = 0;
+            Call(brain, "BeginAttack", 0); Sample(85.05f); Call(brain, "TickAttack");
+            Check(starts == 2 && brain.CurrentAttack == copy && brain.SequencePauseRemaining == 0,
+                "Setting the gap to zero starts the next repeat immediately");
+            Sample(85.05f); Call(brain, "TickAttack");
+
+            motor.Agent.Warp(origin); starts = 0;
+            copy.repeatDelay = .25f;
+            Call(brain, "BeginAttack", 0); Sample(85.05f); Call(brain, "TickAttack");
+            brain.Interrupt();
+            Check(starts == 1 && Field(brain, "queuedSequenceStep") == null && brain.SequencePauseRemaining == 0,
+                "Interruption during the pause cancels the pending thrust");
+        }
+        finally
+        {
+            brain.AttackStarted -= countStart;
+            brain.profile.attacks = attacks;
+            typeof(EnemyBrain).GetField("attackReady", Private).SetValue(brain, new float[attacks.Length]);
+            Call(brain, "SetState", EnemyState.Idle); motor.Agent.Warp(origin);
+            UnityEngine.Object.Destroy(copy);
+        }
     }
     static void ProbeStartingOutsideRange()
     {
@@ -167,12 +223,28 @@ public static class EnemySpecialAttack3Validation
         if (!SessionState.GetBool(Key, false) || !EditorApplication.isPlaying) return;
         try
         {
+            if (callbackFailure != null) throw new Exception(callbackFailure);
             if (EditorApplication.timeSinceStartup - began > 55) throw new Exception("Validation timed out.");
             if (!initialized)
             { if (EditorApplication.timeSinceStartup - began >= 1) Initialize(); return; }
             if (brain.State == EnemyState.Attacking && mode < 2)
             {
                 var a = brain.CurrentAttack;
+                if (a == null)
+                {
+                    if (!pauseObserved)
+                    {
+                        pauseObserved = true;
+                        observedPauseStart = Time.time + brain.SequencePauseRemaining - brain.CurrentSequence.repeatDelay;
+                        pausePosition = motor.NavigationPosition; pauseHealth = player.currentHealth;
+                    }
+                    Vector3 drift = Vector3.ProjectOnPlane(motor.NavigationPosition - pausePosition, Vector3.up);
+                    if (drift.magnitude > .05f || motor.IsApproachingAttack ||
+                        visual.ActiveSlash != null || player.currentHealth != pauseHealth)
+                        throw new Exception("Inter-attack pause: drift=" + drift + ", approach=" + motor.IsApproachingAttack +
+                            ", VFX=" + (visual.ActiveSlash != null) + ", HP=" + player.currentHealth + "/" + pauseHealth);
+                    return;
+                }
                 if (!driver.TryGetTime(a.stateName, out float time)) return;
                 float frame = time * a.animation.length * a.animation.frameRate;
                 if (motor.IsApproachingAttack)
@@ -204,6 +276,7 @@ public static class EnemySpecialAttack3Validation
             {
                 VerifyEndpoint();
                 Check(step == 4 && player.currentHealth < healthBefore, "All four thrusts hit a player staying in their forward lanes");
+                Check(observedGaps == 6, "Both four-thrust sequences wait one second in each of their three gaps");
                 mode = 2; step = 0; StartSequence();
                 ProbePhysicalKnockback();
                 brain.Interrupt();
@@ -216,6 +289,12 @@ public static class EnemySpecialAttack3Validation
             {
                 Check(step == 1 && Vector3.Distance(motor.NavigationPosition, interruptedPosition) < .05f,
                     "An interrupted attack cannot move or launch stale follow-ups");
+                // Warp/manual-timeline probes run after the live sequence so their pending engine
+                // synchronization cannot contaminate the real-time pause measurement.
+                brain.AttackStarted -= OnStep;
+                ProbeFixedDistance();
+                ProbeStartingOutsideRange();
+                ProbeRepeatSettings();
                 Finish(true, "Live approach, fixed-distance dash, frame 32-41 elemental thrusts, red warnings, per-hit knockback and interruption verified.");
             }
         }
@@ -259,8 +338,20 @@ public static class EnemySpecialAttack3Validation
     }
     static void OnStep(EnemyAttackDefinition attack)
     {
+        try { ObserveStep(attack); }
+        catch (Exception e) { callbackFailure = e.ToString(); }
+    }
+    static void ObserveStep(EnemyAttackDefinition attack)
+    {
         if (!attack.stateName.StartsWith("EnemySpecialAttack3")) return;
         if (step > 0 && mode < 2) VerifyEndpoint();
+        if (step > 0 && mode < 2)
+        {
+            Check(pauseObserved && Time.time - observedPauseStart >= brain.CurrentSequence.repeatDelay - .01f,
+                "One-second idle pause completes before thrust " + (step + 1));
+            observedGaps++;
+        }
+        pauseObserved = false;
         step++; if (step > 4) throw new Exception("Unexpected fifth attack step.");
         dashCaptured = shifted = false; stepStart = motor.NavigationPosition;
         element.element = (ElementType)(1 + (step - 1) % 4);

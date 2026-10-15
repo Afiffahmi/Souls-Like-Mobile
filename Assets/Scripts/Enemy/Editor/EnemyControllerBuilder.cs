@@ -34,7 +34,7 @@ namespace SoulsLike.Enemies.Editor
             foreach (var attack in profile.attacks)
             {
                 AddAttack(machine, attack, used, definitions);
-                if (attack != null && attack.followUpSteps != null)
+                if (attack != null && attack.repeatCount == 0 && attack.followUpSteps != null)
                     foreach (var step in attack.followUpSteps) AddAttack(machine, step, used, definitions);
             }
             machine.defaultState = Find(machine, profile.spawnAnimation != null ? "Spawn" : "Idle");
@@ -179,7 +179,7 @@ namespace SoulsLike.Enemies.Editor
                 actionView.ApplyModifiedProperties();
             }
             EditorGUILayout.EndVertical();
-            if (attack.followUpSteps != null)
+            if (attack.repeatCount == 0 && attack.followUpSteps != null)
                 foreach (var step in attack.followUpSteps) DrawAttack(step, true);
         }
         public override void OnInspectorGUI()

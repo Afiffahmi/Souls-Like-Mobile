@@ -161,6 +161,8 @@ namespace SoulsLike.Enemies
             float frame = time * attack.animation.length * attack.animation.frameRate;
             float progress = Mathf.InverseLerp(attack.movementStartFrame, attack.movementEndFrame, frame);
             if (attack.movement == EnemyAttackMotion.Jump) progress = Mathf.SmoothStep(0, 1, progress);
+            // The movement window owns travel. Do not reissue a completed dash during recovery or its idle gap.
+            if (progress <= attackMoveProgress) return;
             attackMoveProgress = Mathf.Max(attackMoveProgress, progress);
             if (attackCorners != null)
                 MoveAlongPath(attackCorners, attackMoveProgress * attackMoveDistance, ref attackNextCorner);

@@ -38,6 +38,7 @@ namespace SoulsLike.Enemies
         public int LastAttackIndex { get; private set; } = -1;
         public EnemyAttackDefinition CurrentSequence { get; private set; }
         public int CurrentSequenceStep { get; private set; }
+        public float SequencePauseRemaining => queuedSequenceStep != null ? Mathf.Max(0, sequenceResumeAt - Time.time) : 0;
         public event Action<EnemyState> StateChanged;
         public event Action<EnemyAttackDefinition> AttackStarted;
         private EnemyNavMeshMotor motor;
@@ -52,6 +53,8 @@ namespace SoulsLike.Enemies
         private bool attackShakePlayed;
         private bool attackCueShown, protectionBrokenByParry;
         private EnemyAttackCue attackCue;
+        private EnemyAttackDefinition queuedSequenceStep;
+        private float sequenceResumeAt;
         public bool IsAttackProtected
         {
             get
@@ -126,6 +129,7 @@ namespace SoulsLike.Enemies
             if (motor != null) motor.CancelAttackMovement();
             CurrentAttack = null;
             CurrentSequence = null; CurrentSequenceStep = 0;
+            queuedSequenceStep = null; sequenceResumeAt = 0;
             standbyUntil = 0;
             if (initialized && !Health.IsDead) state = EnemyState.Returning;
         }
@@ -321,7 +325,7 @@ namespace SoulsLike.Enemies
             if (attack == null || !attack.IsUsable ||
                 (Time.time < attackReady[index] && !(debug && debugIgnoreSpecialCooldown)) || !animationDriver.HasState(attack.stateName)) return false;
             if (!debug && attack.animationAction != null && !attack.animationAction.CanStart(this)) return false;
-            if (attack.followUpSteps != null) foreach (var step in attack.followUpSteps)
+            if (attack.repeatCount == 0 && attack.followUpSteps != null) foreach (var step in attack.followUpSteps)
                 if (step.available && !animationDriver.HasState(step.stateName)) return false;
             float hp = (float)Health.CurrentHealth / Health.MaxHealth;
             float distance = Vector3.Distance(transform.position, Target.GroundPosition);
@@ -397,6 +401,7 @@ namespace SoulsLike.Enemies
         }
         private void BeginAttackStep(EnemyAttackDefinition step)
         {
+            queuedSequenceStep = null; sequenceResumeAt = 0;
             CurrentAttack = step;
             appliedHit = pendingContact = attackEntered = false; previousAttackTime = 0;
             actionExecuted = false;
@@ -415,6 +420,13 @@ namespace SoulsLike.Enemies
         }
         private void TickAttack()
         {
+            if (queuedSequenceStep != null)
+            {
+                if (!CanPursueTarget() || (resetPositionPending && !ImmediateSpecialDebug)) { FinishAttack(); return; }
+                if (Time.time < sequenceResumeAt) return;
+                BeginAttackStep(queuedSequenceStep);
+                return;
+            }
             var attack = CurrentAttack;
             if (attack == null || (!Valid(Target) && !IsAttackProtected)) { BeginReturn(); return; }
             if (!animationDriver.TryGetTime(attack.stateName, out float time))
@@ -491,20 +503,44 @@ namespace SoulsLike.Enemies
             previousAttackTime = time;
             if (time >= 1)
             {
+                if (CurrentSequence != null && CurrentSequence.repeatCount > 0)
+                {
+                    if (CurrentSequenceStep + 1 < CurrentSequence.repeatCount && CanPursueTarget() &&
+                        (!resetPositionPending || ImmediateSpecialDebug))
+                    {
+                        CurrentSequenceStep++;
+                        QueueSequenceStep(CurrentSequence);
+                        return;
+                    }
+                    FinishAttack();
+                    return;
+                }
                 while (CurrentSequence != null && CurrentSequence.followUpSteps != null &&
                     CurrentSequenceStep < CurrentSequence.followUpSteps.Length && CanPursueTarget() && (!resetPositionPending || ImmediateSpecialDebug))
                 {
                     var next = CurrentSequence.followUpSteps[CurrentSequenceStep++];
                     if (next != null && !next.available) continue;
                     if (!SpecialDebugActive && next != null && next.animationAction != null && !next.animationAction.CanStart(this)) continue;
-                    if (next != null && next.IsUsable && animationDriver.HasState(next.stateName)) { BeginAttackStep(next); return; }
+                    if (next != null && next.IsUsable && animationDriver.HasState(next.stateName)) { QueueSequenceStep(next); return; }
                     break;
                 }
                 FinishAttack();
             }
         }
+        private void QueueSequenceStep(EnemyAttackDefinition next)
+        {
+            float delay = CurrentSequence != null ? Mathf.Max(0, CurrentSequence.repeatDelay) : 0;
+            if (delay <= 0) { BeginAttackStep(next); return; }
+            queuedSequenceStep = next; sequenceResumeAt = Time.time + delay;
+            // Stay in the sequence while idle; clear the completed step so the gap cannot hit or move.
+            CurrentAttack = null;
+            motor.CancelAttackMovement(); motor.Stop();
+            if (attackCue != null) attackCue.Hide();
+            animationDriver.Locomotion(false, profile.transitionDuration);
+        }
         private void FinishAttack()
         {
+            queuedSequenceStep = null; sequenceResumeAt = 0;
             CurrentAttack = null;
             if (!CanPursueTarget()) { BeginReturn(); return; }
             standbyUntil = Time.time + Mathf.Max(0, ImmediateSpecialDebug ? debugSpecialRepeatDelay : postAttackStandbySeconds);
@@ -685,7 +721,11 @@ namespace SoulsLike.Enemies
         private void SetState(EnemyState next)
         {
             if (next != EnemyState.Attacking && attackCue != null) attackCue.Hide();
-            if (next != EnemyState.Attacking) { CurrentSequence = null; CurrentSequenceStep = 0; motor.CancelAttackMovement(); }
+            if (next != EnemyState.Attacking)
+            {
+                CurrentSequence = null; CurrentSequenceStep = 0; queuedSequenceStep = null; sequenceResumeAt = 0;
+                motor.CancelAttackMovement();
+            }
             if (next != EnemyState.Attacking) animationDriver.ResetAttackSpeed();
             state = next; stateEntered = lastProgress = Time.time; progressPosition = transform.position;
             if (next != EnemyState.Chasing && next != EnemyState.Returning) motor.Stop();
