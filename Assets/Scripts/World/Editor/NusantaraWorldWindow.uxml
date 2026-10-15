@@ -1,0 +1,31 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements">
+    <ui:Style src="NusantaraWorldWindow.uss" />
+    <ui:ScrollView class="world-panel">
+        <ui:Label text="NUSANTARA QUEST" class="world-title" />
+        <ui:Label text="World foundation · Regions 1–8" class="world-subtitle" />
+        <ui:Label text="Open NusantaraQuest_World. Every individual region contains its own 6 rows × 6 columns (36 cells). Each region has one continuous ground plane. Regions 7–8 are floating islands reached through Region 1. Use Tools → Nusantara → Preview → Brush Region 1–8, then the Terrain, Water, Vegetation and AI brushes. Each region can have its own grid size; use Recombine Brush Region Grids after changing dimensions." class="world-note" />
+        <ui:Label text="World navigation" class="world-heading" />
+        <ui:Label text="Use the Scene tab to edit. Show all regions displays the combined world. Edit Region shows only that region and loads all its saved props. The Game tab follows the player and loads nearby props during play." class="world-note" />
+        <ui:Label name="region-size-summary" class="world-note" />
+        <ui:Toggle name="region-grid" label="Show each region’s cell grid in Scene view" />
+        <ui:Button name="show-world" text="Show all regions" />
+        <ui:VisualElement name="region-navigation" class="world-region-navigation" />
+        <ui:VisualElement class="world-region-navigation">
+            <ui:Button name="terrain-brush" text="Terrain Brush" class="world-region-button" />
+            <ui:Button name="road-brush" text="Road &amp; Ground Brush" />
+            <ui:Button name="vegetation-brush" text="Tree and Grass Painter" class="world-region-button" />
+            <ui:Button name="water-brush" text="Water Brush" class="world-region-button" />
+        </ui:VisualElement>
+        <uie:ObjectField name="definition" label="World definition" />
+        <ui:Button name="setup" text="Create / select foundation assets" />
+        <ui:Button name="checkConfig" text="Check world configuration" />
+        <ui:Button name="checks" text="Run foundation checks" />
+        <ui:Label text="Walkability" class="world-heading" />
+        <uie:ObjectField name="area" label="Validation area" />
+        <ui:Label text="Assign a WorldWalkabilityArea on loaded ground, with ground/obstacle layers, entry and required destinations. Checks slopes, steps, missing ground, character clearance and sampled route connectivity. Scene markers show the first 1,000 issues." class="world-note" />
+        <ui:Button name="validate" text="Validate loaded walking area" />
+        <ui:Button name="cancel" text="Cancel validation" />
+        <ui:Button name="report" text="Save validation report to Library" />
+        <ui:Label name="status" text="World authoring tools. Checks below run only when you choose them." class="world-status" />
+    </ui:ScrollView>
+</ui:UXML>

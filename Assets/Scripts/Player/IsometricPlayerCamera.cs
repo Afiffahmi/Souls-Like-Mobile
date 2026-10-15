@@ -31,6 +31,8 @@ public sealed class IsometricPlayerCamera : MonoBehaviour
         UpdateView(0f);
     }
 
+    public void SnapToPlayer() { initialized = false; UpdateView(0f); }
+
     private void LateUpdate() => UpdateView(Application.isPlaying ? Time.deltaTime : 0f);
 
     private void UpdateView(float dt)

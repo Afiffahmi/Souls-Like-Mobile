@@ -1,0 +1,47 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbad93e097c62442f83ba35a6e0bbb30, type: 3}
+  m_Name: Region5Palette
+  m_EditorClassIdentifier: Assembly-CSharp:Nusantara.World:VegetationPaintPalette
+  treePrefab: {fileID: 4378106470051402980, guid: e9929c821517c49a88765dd675ce4a1a, type: 3}
+  grassPrefab: {fileID: 473957084388574292, guid: 172bf91f471114036bc6bde3f4deeac2, type: 3}
+  leafMaterial: {fileID: 2100000, guid: 613d2954d18cc4831a41a1feb11afd97, type: 2}
+  treeBrushes:
+  - {fileID: 11400000, guid: 096f0bdc64e674cb8bcf7ad8794a887e, type: 2}
+  - {fileID: 11400000, guid: 32c8c8a1e9c3a4ac38d62fa169adc731, type: 2}
+  - {fileID: 11400000, guid: a78c0e2892a154138b33eb049fc1b318, type: 2}
+  - {fileID: 11400000, guid: f0491d3060a2e4011a5e34f5cb91ca47, type: 2}
+  - {fileID: 11400000, guid: 9d125841f3a084abbb6383fbb7ee014d, type: 2}
+  - {fileID: 11400000, guid: c40397f6b261e43f0a688c522a57b795, type: 2}
+  - {fileID: 11400000, guid: 000a9ff191e5740c194ef1c06d18a00e, type: 2}
+  - {fileID: 11400000, guid: b2184851384f04f4d9383edbd55bce1f, type: 2}
+  - {fileID: 11400000, guid: 4fb5ce79320aa4d4e862defbfae5949f, type: 2}
+  - {fileID: 11400000, guid: 1a7d1ab88d63546a28a2456fa195cf05, type: 2}
+  - {fileID: 11400000, guid: 3dd007d54300b47e7bddd08b2cb34566, type: 2}
+  grassBrushes:
+  - {fileID: 11400000, guid: 6053e80f8d71647cf888e0dd0654f306, type: 2}
+  - {fileID: 11400000, guid: cb9baca38584147b4aa28cc576de82cb, type: 2}
+  - {fileID: 11400000, guid: 6c5b3754b872d43d3a446458d6101df2, type: 2}
+  - {fileID: 11400000, guid: bf4c1e864da254459a10542664f62913, type: 2}
+  - {fileID: 11400000, guid: 1d6302fd1b5464d6890fd4a27766f918, type: 2}
+  - {fileID: 11400000, guid: 0d8c5163e71c748e9b029b246476352c, type: 2}
+  - {fileID: 11400000, guid: a3600207afafe4d0ca8868ea2ff9a8e6, type: 2}
+  - {fileID: 11400000, guid: 3885b5c53bec34bc69d5326c7072a1f1, type: 2}
+  - {fileID: 11400000, guid: baf56f4e7532f4a0cbf75e71239bc944, type: 2}
+  - {fileID: 11400000, guid: 4d1ec72e6e1944f0a9cebc28f52a6298, type: 2}
+  - {fileID: 11400000, guid: fce0d09ffa6464faa8eca451b852fe94, type: 2}
+  - {fileID: 11400000, guid: e5e2eba050b4b4fa3a1b1ab0a335a4a3, type: 2}
+  treeHeight: {x: 8, y: 18}
+  grassHeight: {x: 0.32, y: 0.65}
+  treeSpacing: 5
+  grassSpacing: 0.32
+  treeCollisionRadius: 0.8

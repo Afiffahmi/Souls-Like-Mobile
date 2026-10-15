@@ -1,0 +1,875 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c401e4e7f4536461fa2d5a0baf075f5b, type: 3}
+  m_Name: SharedPropCatalog
+  m_EditorClassIdentifier: Assembly-CSharp::Nusantara.World.WorldPropCatalog
+  entries:
+  - name: blue_crystal_cluster
+    assetGuid: 1e69a47da922ba04c84ad952bb6b2271
+    assetPath: Assets/Prefabs/Map/Props/Shared/blue_crystal_cluster.prefab
+    importedSize: {x: 2.234978, y: 3, z: 2.234978}
+    vertices: 6143
+    triangles: 5687
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks.
+  - name: blue_crystal_shard
+    assetGuid: fcbf9d28ecd09e34c952711bb741ebd8
+    assetPath: Assets/Prefabs/Map/Props/Shared/blue_crystal_shard.prefab
+    importedSize: {x: 2.1519022, y: 3, z: 1.1411996}
+    vertices: 4346
+    triangles: 5036
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks.
+  - name: blue_wooden_boat
+    assetGuid: 0444be1c91fed964abaa55edb9a5b937
+    assetPath: Assets/Prefabs/Map/Props/Shared/blue_wooden_boat.prefab
+    importedSize: {x: 7, y: 3.2288728, z: 1.8267307}
+    vertices: 4683
+    triangles: 4979
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks.
+  - name: cactus
+    assetGuid: 0ca3550259b89a74c87ac63217087d64
+    assetPath: Assets/Prefabs/Map/Props/Shared/cactus.prefab
+    importedSize: {x: 1.8011725, y: 3, z: 1.197362}
+    vertices: 6548
+    triangles: 4870
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks.
+  - name: crystal_pillar
+    assetGuid: a674b8df5aa45f3459b582f351d0da5b
+    assetPath: Assets/Prefabs/Map/Props/Shared/crystal_pillar.prefab
+    importedSize: {x: 2.6468003, y: 6, z: 2.6995602}
+    vertices: 6836
+    triangles: 5050
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks.
+  - name: fantasy_castle
+    assetGuid: 3208d33c395a55b4d94fcef86c4b5f87
+    assetPath: Assets/Prefabs/Map/Props/Shared/fantasy_castle.prefab
+    importedSize: {x: 45, y: 75.93933, z: 42.532005}
+    vertices: 6025
+    triangles: 6340
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks.
+  - name: fantasy_castle_center_fixed
+    assetGuid: bef28b60d11cf7b4fb7bc637cc189033
+    assetPath: Assets/Prefabs/Map/Props/Shared/fantasy_castle_center_fixed.prefab
+    importedSize: {x: 34.64582, y: 23.89595, z: 44.999996}
+    vertices: 33375
+    triangles: 20922
+    materials: 4
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks.
+  - name: fantasy_castle_shape_2
+    assetGuid: 9883f9c801d8ceb4f986ffc33ff2022f
+    assetPath: Assets/Prefabs/Map/Props/Shared/fantasy_castle_shape_2.prefab
+    importedSize: {x: 34.645824, y: 23.895948, z: 45}
+    vertices: 23576
+    triangles: 15262
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks.
+  - name: fantasy_cottage
+    assetGuid: cd0e0082e6eca5e49a190d88b9e814ae
+    assetPath: Assets/Prefabs/Map/Props/Shared/fantasy_cottage.prefab
+    importedSize: {x: 12, y: 12.928421, z: 11.640002}
+    vertices: 7418
+    triangles: 5307
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks.
+  - name: fantasy_crystal_tower
+    assetGuid: 403bf21b9bbc8274990941b8685480b4
+    assetPath: Assets/Prefabs/Map/Props/Shared/fantasy_crystal_tower.prefab
+    importedSize: {x: 12.688789, y: 22, z: 10.416102}
+    vertices: 5137
+    triangles: 5356
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks.
+  - name: fantasy_forest_statue
+    assetGuid: 1e1db9bf27db2fd46af1e32e7cfd4f0a
+    assetPath: Assets/Prefabs/Map/Props/Shared/fantasy_forest_statue.prefab
+    importedSize: {x: 5.255985, y: 7, z: 4.5994134}
+    vertices: 7098
+    triangles: 6082
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks.
+  - name: fantasy_lantern
+    assetGuid: 22c819bf4dc001143b2b1f5ddc66e445
+    assetPath: Assets/Prefabs/Map/Props/Shared/fantasy_lantern.prefab
+    importedSize: {x: 0.7532975, y: 2, z: 0.7630679}
+    vertices: 7133
+    triangles: 5435
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks.
+  - name: fantasy_pedestal
+    assetGuid: 06a23923df9726841bcdb4bed840e386
+    assetPath: Assets/Prefabs/Map/Props/Shared/fantasy_pedestal.prefab
+    importedSize: {x: 1.1284807, y: 2, z: 1.1480215}
+    vertices: 5538
+    triangles: 4529
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks.
+  - name: fantasy_potion_bottle
+    assetGuid: 11405ac342ec93241b97f117fb503fe1
+    assetPath: Assets/Prefabs/Map/Props/Shared/fantasy_potion_bottle.prefab
+    importedSize: {x: 0.33390328, y: 0.5, z: 0.3441622}
+    vertices: 5860
+    triangles: 5504
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks.
+  - name: fantasy_ruined_tower
+    assetGuid: f2125d7024b921348ab1a0f69988489c
+    assetPath: Assets/Prefabs/Map/Props/Shared/fantasy_ruined_tower.prefab
+    importedSize: {x: 15.873962, y: 22, z: 19.35613}
+    vertices: 7444
+    triangles: 5861
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks.
+  - name: fantasy_stone_monument
+    assetGuid: 262920c82f1b6224585d45fb808a3f73
+    assetPath: Assets/Prefabs/Map/Props/Shared/fantasy_stone_monument.prefab
+    importedSize: {x: 2.185149, y: 7, z: 3.5051296}
+    vertices: 5459
+    triangles: 4221
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks.
+  - name: fantasy_stone_portal
+    assetGuid: 45b563f0675b7e84eb5ae5ed4b25f093
+    assetPath: Assets/Prefabs/Map/Props/Shared/fantasy_stone_portal.prefab
+    importedSize: {x: 5.3815336, y: 8, z: 5.999023}
+    vertices: 5897
+    triangles: 5159
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks.
+  - name: fantasy_temple_ruin
+    assetGuid: 9554b0b6e7949c548810062c324a7b4d
+    assetPath: Assets/Prefabs/Map/Props/Shared/fantasy_temple_ruin.prefab
+    importedSize: {x: 12, y: 24.344896, z: 11.928642}
+    vertices: 5149
+    triangles: 4064
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks.
+  - name: fantasy_tower
+    assetGuid: 92cb0120436e77743b1e9eda30d486ee
+    assetPath: Assets/Prefabs/Map/Props/Shared/fantasy_tower.prefab
+    importedSize: {x: 7.6199317, y: 22, z: 7.6629224}
+    vertices: 6324
+    triangles: 4604
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks.
+  - name: fantasy_tree
+    assetGuid: c43956765ab7f8b4f8f7466c838b2a7b
+    assetPath: Assets/Prefabs/Map/Props/Shared/fantasy_tree.prefab
+    importedSize: {x: 14.799219, y: 22, z: 14.154372}
+    vertices: 8046
+    triangles: 5853
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks.
+  - name: floating_island
+    assetGuid: 451d9e2e4ee8d9e468c976c99f1c2739
+    assetPath: Assets/Prefabs/Map/Props/Shared/floating_island.prefab
+    importedSize: {x: 40, y: 34.85698, z: 38.454384}
+    vertices: 4217
+    triangles: 5280
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks.
+  - name: floating_rock_island
+    assetGuid: 26124fe975d927c4aa1e632d02ce415f
+    assetPath: Assets/Prefabs/Map/Props/Shared/floating_rock_island.prefab
+    importedSize: {x: 33.288174, y: 42.668056, z: 40}
+    vertices: 8390
+    triangles: 8282
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks.
+  - name: forest_fern_0
+    assetGuid: e804e28e3bc0b48cd85f727a0056f6f5
+    assetPath: Assets/Prefabs/Map/Props/Shared/Kampung/forest_fern_0.prefab
+    importedSize: {x: 0.5519406, y: 0.28680357, z: 0.6134211}
+    vertices: 744
+    triangles: 1108
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks.
+  - name: forest_fern_1
+    assetGuid: 3cdc2d2832f9e4845a115f2f3b38f75a
+    assetPath: Assets/Prefabs/Map/Props/Shared/Kampung/forest_fern_1.prefab
+    importedSize: {x: 0.9897474, y: 0.4276948, z: 0.8936899}
+    vertices: 1977
+    triangles: 3028
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks.
+  - name: forest_fern_2
+    assetGuid: cb6ad386a7d7a452abb398bbd3d3cbb0
+    assetPath: Assets/Prefabs/Map/Props/Shared/Kampung/forest_fern_2.prefab
+    importedSize: {x: 0.8743258, y: 0.34902042, z: 0.76522577}
+    vertices: 1869
+    triangles: 2864
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks.
+  - name: forest_fern_3
+    assetGuid: 08615cb9a9cd54d32bd877c9fc79599e
+    assetPath: Assets/Prefabs/Map/Props/Shared/Kampung/forest_fern_3.prefab
+    importedSize: {x: 0.57278216, y: 0.21308759, z: 0.5932783}
+    vertices: 773
+    triangles: 1141
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks.
+  - name: shore_rock_0
+    assetGuid: 21c0905e73daa4bc788bfe48db39e3bc
+    assetPath: Assets/Prefabs/Map/Props/Shared/Kampung/shore_rock_0.prefab
+    importedSize: {x: 2.2376323, y: 1.472698, z: 3.368804}
+    vertices: 6395
+    triangles: 11618
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks.
+  - name: shore_rock_1
+    assetGuid: 5179ec65b0b324e1ebb479dd5d982d35
+    assetPath: Assets/Prefabs/Map/Props/Shared/Kampung/shore_rock_1.prefab
+    importedSize: {x: 2.6553807, y: 1.261991, z: 3.2637203}
+    vertices: 6604
+    triangles: 11506
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks.
+  - name: shore_rock_2
+    assetGuid: 391908487eddc434d8ac1b616fac26e8
+    assetPath: Assets/Prefabs/Map/Props/Shared/Kampung/shore_rock_2.prefab
+    importedSize: {x: 2.1085825, y: 1.0996943, z: 2.0795856}
+    vertices: 3183
+    triangles: 5918
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks.
+  - name: shore_rock_3
+    assetGuid: c587a27a781464f81a755d2a715237f8
+    assetPath: Assets/Prefabs/Map/Props/Shared/Kampung/shore_rock_3.prefab
+    importedSize: {x: 2.1276293, y: 1.7683197, z: 1.9647412}
+    vertices: 6184
+    triangles: 11635
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks.
+  - name: shore_rock_4
+    assetGuid: e602133cbeb4641488490e74d05af710
+    assetPath: Assets/Prefabs/Map/Props/Shared/Kampung/shore_rock_4.prefab
+    importedSize: {x: 1.8173227, y: 1.2054505, z: 2.9986634}
+    vertices: 8800
+    triangles: 17110
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks.
+  - name: shore_rock_5
+    assetGuid: 4c14d720be8314e81ba1eb820c06ed9c
+    assetPath: Assets/Prefabs/Map/Props/Shared/Kampung/shore_rock_5.prefab
+    importedSize: {x: 2.125982, y: 1.2618525, z: 2.757303}
+    vertices: 5042
+    triangles: 9618
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks.
+  - name: magic_portal
+    assetGuid: 37c109f496a5e6f4993e7de4a85ea49a
+    assetPath: Assets/Prefabs/Map/Props/Shared/magic_portal.prefab
+    importedSize: {x: 7.874939, y: 8, z: 7.132389}
+    vertices: 5888
+    triangles: 5215
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks.
+  - name: market_stall
+    assetGuid: e1dcf577c8685dd4e966a869628f0b7e
+    assetPath: Assets/Prefabs/Map/Props/Shared/market_stall.prefab
+    importedSize: {x: 4.1771126, y: 5.577657, z: 5}
+    vertices: 7075
+    triangles: 4869
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks.
+  - name: market_stall_shape_2
+    assetGuid: e4ff9d9c26726594b818355987ebe507
+    assetPath: Assets/Prefabs/Map/Props/Shared/market_stall_shape_2.prefab
+    importedSize: {x: 5, y: 3.3341477, z: 3.6370294}
+    vertices: 7049
+    triangles: 4770
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks.
+  - name: medieval_banner
+    assetGuid: 4cf0ad1d5e5d3d14d88a758c751ed41d
+    assetPath: Assets/Prefabs/Map/Props/Shared/medieval_banner.prefab
+    importedSize: {x: 1.8136466, y: 4, z: 0.2692626}
+    vertices: 3883
+    triangles: 4527
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks.
+  - name: medieval_tent
+    assetGuid: 3703fd984309c064f92881e870603c78
+    assetPath: Assets/Prefabs/Map/Props/Shared/medieval_tent.prefab
+    importedSize: {x: 7, y: 5.3558717, z: 6.2526684}
+    vertices: 7688
+    triangles: 5557
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks.
+  - name: medieval_watchtower
+    assetGuid: 8fbcc88fdb46b6d498f012caafe191b9
+    assetPath: Assets/Prefabs/Map/Props/Shared/medieval_watchtower.prefab
+    importedSize: {x: 10.173913, y: 18, z: 10.103565}
+    vertices: 5668
+    triangles: 3882
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks.
+  - name: medieval_watchtower_shape_2
+    assetGuid: 3f5148c96853e7943a0c32173a1216ca
+    assetPath: Assets/Prefabs/Map/Props/Shared/medieval_watchtower_shape_2.prefab
+    importedSize: {x: 8.5207615, y: 18, z: 7.0434785}
+    vertices: 7073
+    triangles: 4847
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks.
+  - name: mossy_rock
+    assetGuid: 19378afa26f86db459c3564273fba516
+    assetPath: Assets/Prefabs/Map/Props/Shared/mossy_rock.prefab
+    importedSize: {x: 6, y: 5.7244744, z: 5.513434}
+    vertices: 2234
+    triangles: 2704
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks.
+  - name: mossy_rock_shape_2
+    assetGuid: 32207d803640a66489444635bd0ffd9d
+    assetPath: Assets/Prefabs/Map/Props/Shared/mossy_rock_shape_2.prefab
+    importedSize: {x: 2.945774, y: 3.0161211, z: 6}
+    vertices: 1285
+    triangles: 1485
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks.
+  - name: mountain_landscape
+    assetGuid: 1f8bd78abb4369741ae908210366fa5d
+    assetPath: Assets/Prefabs/Map/Props/Shared/mountain_landscape.prefab
+    importedSize: {x: 80, y: 46.38984, z: 67.96288}
+    vertices: 12748
+    triangles: 11156
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks.
+  - name: mountain_terrain
+    assetGuid: aaba828e82b9afb4cbdfd3ab7f38e8d6
+    assetPath: Assets/Prefabs/Map/Props/Shared/mountain_terrain.prefab
+    importedSize: {x: 33.14119, y: 22.745485, z: 80}
+    vertices: 17042
+    triangles: 12534
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks.
+  - name: ornate_column
+    assetGuid: bee2372473039384299d8e2b7a8d27e7
+    assetPath: Assets/Prefabs/Map/Props/Shared/ornate_column.prefab
+    importedSize: {x: 1.1050317, y: 6, z: 1.1167562}
+    vertices: 3512
+    triangles: 2945
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks.
+  - name: ornate_fantasy_door
+    assetGuid: f3197afc55813a942a5d63f2ddeab918
+    assetPath: Assets/Prefabs/Map/Props/Shared/ornate_fantasy_door.prefab
+    importedSize: {x: 0.8808012, y: 3, z: 0.24767953}
+    vertices: 6115
+    triangles: 4983
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks.
+  - name: ornate_monument
+    assetGuid: 96b9d76185c09414a83a5509b80450af
+    assetPath: Assets/Prefabs/Map/Props/Shared/ornate_monument.prefab
+    importedSize: {x: 4.3532, y: 7, z: 3.1494873}
+    vertices: 6889
+    triangles: 4448
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks.
+  - name: ornate_red_rug
+    assetGuid: 01b468f8a9579c24fa91cd24e0fd2b86
+    assetPath: Assets/Prefabs/Map/Props/Shared/ornate_red_rug.prefab
+    importedSize: {x: 2.4445534, y: 0.041035827, z: 4}
+    vertices: 1025
+    triangles: 852
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks.
+  - name: ornate_throne
+    assetGuid: b8064a59057ffd141af76b14bb9c701d
+    assetPath: Assets/Prefabs/Map/Props/Shared/ornate_throne.prefab
+    importedSize: {x: 4.7129703, y: 3, z: 3.165772}
+    vertices: 9841
+    triangles: 5907
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks.
+  - name: ornate_throne_shape_2
+    assetGuid: 0226919fa77036049b00003232ba1df5
+    assetPath: Assets/Prefabs/Map/Props/Shared/ornate_throne_shape_2.prefab
+    importedSize: {x: 1.3351246, y: 3, z: 1.4435761}
+    vertices: 7462
+    triangles: 5590
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks.
+  - name: ornate_wooden_gate
+    assetGuid: 5ca9c8c8e1391894f8b283d2cb72adec
+    assetPath: Assets/Prefabs/Map/Props/Shared/ornate_wooden_gate.prefab
+    importedSize: {x: 8, y: 9.695678, z: 2.401421}
+    vertices: 4251
+    triangles: 3038
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks.
+  - name: palm_leaf_shelter
+    assetGuid: 44c0a4d59c9647d45be80afdf5d33a42
+    assetPath: Assets/Prefabs/Map/Props/Shared/palm_leaf_shelter.prefab
+    importedSize: {x: 6.1579657, y: 9.47059, z: 7.0000005}
+    vertices: 5587
+    triangles: 4454
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks.
+  - name: rock_formation
+    assetGuid: 92f1ce6dfeac2f942b9bd770a80538b3
+    assetPath: Assets/Prefabs/Map/Props/Shared/rock_formation.prefab
+    importedSize: {x: 6, y: 4.1358085, z: 6}
+    vertices: 5504
+    triangles: 5293
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks.
+  - name: rocky_cliff_island
+    assetGuid: 8c3576813ffe19c4390c2401e115d480
+    assetPath: Assets/Prefabs/Map/Props/Shared/rocky_cliff_island.prefab
+    importedSize: {x: 40, y: 21.631657, z: 35.74011}
+    vertices: 11216
+    triangles: 9512
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks.
+  - name: rocky_island
+    assetGuid: 2ccd27efb7c9b624c84766a8e4425f8a
+    assetPath: Assets/Prefabs/Map/Props/Shared/rocky_island.prefab
+    importedSize: {x: 38.416317, y: 49.118176, z: 40}
+    vertices: 4452
+    triangles: 3955
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks.
+  - name: rocky_mountain
+    assetGuid: 51c4cfd2fc003fa4886a72d86f7b8510
+    assetPath: Assets/Prefabs/Map/Props/Shared/rocky_mountain.prefab
+    importedSize: {x: 33.805573, y: 59.052273, z: 80}
+    vertices: 6383
+    triangles: 6076
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks.
+  - name: rocky_mountain_shape_2
+    assetGuid: c5bb731a53212e248b6ecfc0d71d8b21
+    assetPath: Assets/Prefabs/Map/Props/Shared/rocky_mountain_shape_2.prefab
+    importedSize: {x: 39.276997, y: 28.646801, z: 80}
+    vertices: 12241
+    triangles: 9607
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks.
+  - name: rocky_mountain_shape_3
+    assetGuid: 9708597f8519caf408f77ece5917d974
+    assetPath: Assets/Prefabs/Map/Props/Shared/rocky_mountain_shape_3.prefab
+    importedSize: {x: 45.217392, y: 47.01515, z: 80}
+    vertices: 11620
+    triangles: 7829
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks.
+  - name: rocky_mountain_shape_4
+    assetGuid: 8a8c9a37f0cbe6c4793ebde0899abafa
+    assetPath: Assets/Prefabs/Map/Props/Shared/rocky_mountain_shape_4.prefab
+    importedSize: {x: 80, y: 79.7655, z: 79.37469}
+    vertices: 18014
+    triangles: 14129
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks.
+  - name: rocky_ruin
+    assetGuid: 8f3485094494de344ba58c41b3a28318
+    assetPath: Assets/Prefabs/Map/Props/Shared/rocky_ruin.prefab
+    importedSize: {x: 12, y: 14.842296, z: 5.488823}
+    vertices: 2050
+    triangles: 1924
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks.
+  - name: skull_pile
+    assetGuid: cd634fa0a845af04e895ab3820caebcc
+    assetPath: Assets/Prefabs/Map/Props/Shared/skull_pile.prefab
+    importedSize: {x: 4, y: 2.0889106, z: 2.9447973}
+    vertices: 7529
+    triangles: 5176
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks.
+  - name: stone_arch
+    assetGuid: 2d0792ee6b2b31b46b4c51df1ecd52a8
+    assetPath: Assets/Prefabs/Map/Props/Shared/stone_arch.prefab
+    importedSize: {x: 14, y: 8.378115, z: 5.3141184}
+    vertices: 6124
+    triangles: 4721
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks.
+  - name: stone_arch_ruin
+    assetGuid: d62eb7ce42fd8a444a26a3d777ad79ad
+    assetPath: Assets/Prefabs/Map/Props/Shared/stone_arch_ruin.prefab
+    importedSize: {x: 14, y: 13.890572, z: 4.780655}
+    vertices: 6014
+    triangles: 5127
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks.
+  - name: stone_arch_shape_2
+    assetGuid: 147d1de8dae8eab489a0cfe748ce10b4
+    assetPath: Assets/Prefabs/Map/Props/Shared/stone_arch_shape_2.prefab
+    importedSize: {x: 14, y: 8.856864, z: 6.9829025}
+    vertices: 6174
+    triangles: 4975
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks.
+  - name: stone_archway
+    assetGuid: 0c8416ce81afe794eb983c07b97762c2
+    assetPath: Assets/Prefabs/Map/Props/Shared/stone_archway.prefab
+    importedSize: {x: 14.000001, y: 19.669184, z: 4.8332176}
+    vertices: 6245
+    triangles: 4389
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks.
+  - name: stone_lantern
+    assetGuid: dfb497ecc0aed0947a2ba273fcf28265
+    assetPath: Assets/Prefabs/Map/Props/Shared/stone_lantern.prefab
+    importedSize: {x: 0.9135319, y: 2, z: 0.92134833}
+    vertices: 4737
+    triangles: 3723
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks.
+  - name: stone_lion_statue
+    assetGuid: 962631c7d4392da4abab99e5e371ff1b
+    assetPath: Assets/Prefabs/Map/Props/Shared/stone_lion_statue.prefab
+    importedSize: {x: 5.762091, y: 7, z: 6.001466}
+    vertices: 7219
+    triangles: 6003
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks.
+  - name: stone_monument
+    assetGuid: 99f8ea72e542c744fb89dd8d1d4e3901
+    assetPath: Assets/Prefabs/Map/Props/Shared/stone_monument.prefab
+    importedSize: {x: 3.163166, y: 7, z: 3.163166}
+    vertices: 6506
+    triangles: 5248
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks.
+  - name: stone_monument_shape_2
+    assetGuid: 91ffc55d2e8169f4298474bf1e78ea8c
+    assetPath: Assets/Prefabs/Map/Props/Shared/stone_monument_shape_2.prefab
+    importedSize: {x: 6.1929655, y: 7, z: 6.924768}
+    vertices: 4759
+    triangles: 4372
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks.
+  - name: stone_pedestal
+    assetGuid: 615dadba60be3d943ab6005aefe6cddf
+    assetPath: Assets/Prefabs/Map/Props/Shared/stone_pedestal.prefab
+    importedSize: {x: 0.82950664, y: 2, z: 0.82950664}
+    vertices: 4166
+    triangles: 3412
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks.
+  - name: stone_pillar
+    assetGuid: 55745ff0e8d8a744d96bb518994a4339
+    assetPath: Assets/Prefabs/Map/Props/Shared/stone_pillar.prefab
+    importedSize: {x: 2.2774792, y: 6, z: 2.388862}
+    vertices: 5179
+    triangles: 3911
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks.
+  - name: stone_ring_portal
+    assetGuid: 5f14f72923b89e142848a1ba2437e813
+    assetPath: Assets/Prefabs/Map/Props/Shared/stone_ring_portal.prefab
+    importedSize: {x: 3.912066, y: 8, z: 5.897411}
+    vertices: 5435
+    triangles: 3990
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks.
+  - name: stone_ring_portal_texture_02
+    assetGuid: b599defec79ebf1448800f25f4f7e6a5
+    assetPath: Assets/Prefabs/Map/Props/Shared/stone_ring_portal_texture_02.prefab
+    importedSize: {x: 3.912066, y: 8, z: 5.897411}
+    vertices: 5435
+    triangles: 3990
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks. Supplied alternate texture is byte-identical to the base texture. This variant has its own material for future texture changes and shares all geometry.
+  - name: stone_warrior_statue
+    assetGuid: e58a7f4f1b82eac4c95037075106ae8a
+    assetPath: Assets/Prefabs/Map/Props/Shared/stone_warrior_statue.prefab
+    importedSize: {x: 5.3913493, y: 7, z: 3.9867284}
+    vertices: 4805
+    triangles: 5501
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks.
+  - name: teepee_tent
+    assetGuid: 1b6f8c5f5054968449dce3d85e257f08
+    assetPath: Assets/Prefabs/Map/Props/Shared/teepee_tent.prefab
+    importedSize: {x: 7, y: 7, z: 6.849536}
+    vertices: 6557
+    triangles: 4297
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks.
+  - name: teepee_tent_texture_02
+    assetGuid: 79d2815601f92cd439c724263f93e02c
+    assetPath: Assets/Prefabs/Map/Props/Shared/teepee_tent_texture_02.prefab
+    importedSize: {x: 7, y: 7, z: 6.849536}
+    vertices: 6557
+    triangles: 4297
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks. Supplied alternate texture is byte-identical to the base texture. This variant has its own material for future texture changes and shares all geometry.
+  - name: tripo_convert_36886012-594d-4aae-82df-832ecb525e0c
+    assetGuid: c79e332e4080beb49b27935d98753002
+    assetPath: Assets/Prefabs/Map/Props/Shared/tripo_convert_36886012-594d-4aae-82df-832ecb525e0c.prefab
+    importedSize: {x: 5, y: 5.64534, z: 2.1207952}
+    vertices: 6319
+    triangles: 4925
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks.
+  - name: tripo_convert_6ef5a909-34bc-4b62-9a01-21aa292a7753
+    assetGuid: 324c22b960b58a049a242db5b4b20b14
+    assetPath: Assets/Prefabs/Map/Props/Shared/tripo_convert_6ef5a909-34bc-4b62-9a01-21aa292a7753.prefab
+    importedSize: {x: 5, y: 12.874216, z: 4.38365}
+    vertices: 7426
+    triangles: 5269
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks.
+  - name: tripo_convert_6ef5a909-34bc-4b62-9a01-21aa292a7753_texture_02
+    assetGuid: d5079ad97a52ac5409369a2b93dc07de
+    assetPath: Assets/Prefabs/Map/Props/Shared/tripo_convert_6ef5a909-34bc-4b62-9a01-21aa292a7753_texture_02.prefab
+    importedSize: {x: 5, y: 12.874216, z: 4.38365}
+    vertices: 7426
+    triangles: 5269
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks. Supplied alternate texture is byte-identical to the base texture. This variant has its own material for future texture changes and shares all geometry.
+  - name: tripo_convert_8531391d-c4b3-401f-ba45-9c26da42bec2
+    assetGuid: bab168e7b972d774a82590acda140cbd
+    assetPath: Assets/Prefabs/Map/Props/Shared/tripo_convert_8531391d-c4b3-401f-ba45-9c26da42bec2.prefab
+    importedSize: {x: 5, y: 5.064369, z: 2.539977}
+    vertices: 95825
+    triangles: 112169
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks.
+  - name: wooden_barrel
+    assetGuid: 5c404778bc926134486cc31188cd0ffa
+    assetPath: Assets/Prefabs/Map/Props/Shared/wooden_barrel.prefab
+    importedSize: {x: 1.25, y: 1.5902735, z: 1.2096022}
+    vertices: 6117
+    triangles: 5903
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks.
+  - name: wooden_fence
+    assetGuid: 6c93c9ee9cfa83942ab8c7e63a5305b6
+    assetPath: Assets/Prefabs/Map/Props/Shared/wooden_fence.prefab
+    importedSize: {x: 4, y: 1.5652174, z: 0.79140246}
+    vertices: 3492
+    triangles: 2622
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks.
+  - name: wooden_signpost
+    assetGuid: c39025081b15ad440a09f300cb82e541
+    assetPath: Assets/Prefabs/Map/Props/Shared/wooden_signpost.prefab
+    importedSize: {x: 1.6646312, y: 2.5, z: 1.5351735}
+    vertices: 5971
+    triangles: 4361
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks.
+  - name: wooden_wagon
+    assetGuid: 902bb815ed12c9e43858e5e7acc60ce1
+    assetPath: Assets/Prefabs/Map/Props/Shared/wooden_wagon.prefab
+    importedSize: {x: 4.5, y: 2.8688323, z: 2.5039084}
+    vertices: 7482
+    triangles: 5751
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks.
+  - name: wooden_wagon_texture_02
+    assetGuid: 24de9134576457c4ab4e05bf7cb4f3a1
+    assetPath: Assets/Prefabs/Map/Props/Shared/wooden_wagon_texture_02.prefab
+    importedSize: {x: 4.5, y: 2.8688323, z: 2.5039084}
+    vertices: 7482
+    triangles: 5751
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks. Supplied alternate texture is byte-identical to the base texture. This variant has its own material for future texture changes and shares all geometry.
+  - name: wooden_watchtower
+    assetGuid: f504afa7c2706c445ba36b92fd9d6321
+    assetPath: Assets/Prefabs/Map/Props/Shared/wooden_watchtower.prefab
+    importedSize: {x: 13.497803, y: 18, z: 12.407425}
+    vertices: 6562
+    triangles: 4512
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks.
+  - name: wooden_stilt_house
+    assetGuid: b4116635aab5b6945a942ab323744ce3
+    assetPath: Assets/Prefabs/Map/Props/Shared/wooden_stilt_house.prefab
+    importedSize: {x: 11.8197365, y: 12.611138, z: 15}
+    vertices: 6550
+    triangles: 4897
+    materials: 1
+    lodGroups: 1
+    colliders: 0
+    authoringNotes: Region unassigned. Visual prefab; walking collision belongs to essential chunks. Grounded and scaled to 15 m footprint, matching existing stilt_house.

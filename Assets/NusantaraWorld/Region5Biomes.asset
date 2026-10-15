@@ -1,0 +1,107 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 871fa8faeefc54d16906eebff929c72a, type: 3}
+  m_Name: Region5Biomes
+  m_EditorClassIdentifier: Assembly-CSharp::Nusantara.World.Region5BiomeProfile
+  biomes:
+  - name: Rainforest
+    props:
+    - fern_cluster
+    - broadleaf_bush
+    - moss_rock
+    - forest_mushrooms
+    - fallen_log
+    clustersPerChunk: 8
+    scaleRange: {x: 0.7, y: 1.4}
+    maxSlope: 15
+    heightRange: {x: 0, y: 250}
+    riverDistance: {x: 45, y: 10000}
+    pathClearance: 18
+    buildingClearance: 16
+    minimumSpacing: 4
+    seed: 17
+  - name: Riverbank
+    props:
+    - river_reeds
+    - moss_rock
+    - fern_cluster
+    - fallen_log
+    clustersPerChunk: 10
+    scaleRange: {x: 0.7, y: 1.4}
+    maxSlope: 15
+    heightRange: {x: 0, y: 250}
+    riverDistance: {x: 42, y: 100}
+    pathClearance: 18
+    buildingClearance: 16
+    minimumSpacing: 4
+    seed: 29
+  - name: Swamp
+    props:
+    - root_formation
+    - river_reeds
+    - broadleaf_bush
+    - moss_rock
+    clustersPerChunk: 9
+    scaleRange: {x: 0.7, y: 1.4}
+    maxSlope: 15
+    heightRange: {x: 0, y: 250}
+    riverDistance: {x: 42, y: 220}
+    pathClearance: 18
+    buildingClearance: 16
+    minimumSpacing: 4
+    seed: 43
+  - name: Village
+    props:
+    - barrel
+    - crates
+    - fern_cluster
+    clustersPerChunk: 4
+    scaleRange: {x: 0.7, y: 1.4}
+    maxSlope: 15
+    heightRange: {x: 0, y: 250}
+    riverDistance: {x: 45, y: 10000}
+    pathClearance: 18
+    buildingClearance: 16
+    minimumSpacing: 4
+    seed: 53
+  - name: Ruins
+    props:
+    - moss_rock
+    - fern_cluster
+    - broadleaf_bush
+    - ruined_walls
+    clustersPerChunk: 6
+    scaleRange: {x: 0.7, y: 1.4}
+    maxSlope: 15
+    heightRange: {x: 0, y: 250}
+    riverDistance: {x: 45, y: 10000}
+    pathClearance: 18
+    buildingClearance: 16
+    minimumSpacing: 4
+    seed: 61
+  - name: Boss Arena
+    props:
+    - root_formation
+    - moss_rock
+    - river_reeds
+    clustersPerChunk: 4
+    scaleRange: {x: 0.7, y: 1.4}
+    maxSlope: 15
+    heightRange: {x: 0, y: 250}
+    riverDistance: {x: 45, y: 10000}
+    pathClearance: 18
+    buildingClearance: 16
+    minimumSpacing: 4
+    seed: 71
+  boundaryInset: 30
+  maximumIslands: 24
+  seed: 5012026

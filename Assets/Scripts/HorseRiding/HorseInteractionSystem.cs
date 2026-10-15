@@ -72,7 +72,7 @@ namespace SoulsLike.Riding
         }
         private void Update()
         {
-            if (Available && interactionKey != Key.None && Keyboard.current != null && Keyboard.current[interactionKey].wasPressedThisFrame) Interact();
+            if (Available && !Nusantara.World.WorldRegionPortal.OwnsInteractionKeyFor(player.transform) && interactionKey != Key.None && Keyboard.current != null && Keyboard.current[interactionKey].wasPressedThisFrame) Interact();
         }
         private void LateUpdate()
         {

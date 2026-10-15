@@ -1,0 +1,2274 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 53bb5907a961e4824b789774cf170f94, type: 3}
+  m_Name: NusantaraWorld
+  m_EditorClassIdentifier: Assembly-CSharp::Nusantara.World.WorldDefinition
+  worldId: nusantara-brush-world
+  seed: 5012026
+  layoutApproved: 1
+  authoredChunkLayout: 1
+  brushAuthoredTerrain: 1
+  regionPaint: {fileID: 11400000, guid: 0ec3f80dc979e24409c65a0c0d270358, type: 2}
+  regionalGroundPlanes: 1
+  chunkAssetRoot: Assets/NusantaraWorld/Models
+  chunkSize: 128
+  gridSize: {x: 18, y: 22}
+  origin: {x: 2048, y: -256}
+  playerStart: {x: 2900.3, y: 44.293, z: 1155}
+  playerStartConfirmed: 1
+  gameplayRadius: 1
+  visualRadius: 1
+  distantRadius: 2
+  unloadRadius: 3
+  preloadSeconds: 2
+  maxLookAheadMetres: 32
+  maxConcurrentLoads: 1
+  planningInterval: 0.2
+  retryDelaySeconds: 10
+  maxWalkableSlope: 15
+  maxStepHeight: 0.2
+  seamTolerance: 0.005
+  agentRadius: 0.5
+  agentHeight: 2
+  regions:
+  - id: 1
+    name: Natural Starting Area
+    boss: 
+    detailedEnvironment: 1
+    chunkGridSize: {x: 0, y: 0}
+    chunkOffset: {x: 6, y: 11}
+    groundPrefab: {fileID: 0}
+    floatingIsland: 0
+    paintOnly: 1
+    groundAssetFolder: 
+    groundElevation: 0
+    treeBrush: {fileID: 11400000, guid: c40397f6b261e43f0a688c522a57b795, type: 2}
+    grassBrush: {fileID: 11400000, guid: a3600207afafe4d0ca8868ea2ff9a8e6, type: 2}
+    boundary: []
+  - id: 2
+    name: Naga Seri Gumum
+    boss: Naga Seri Gumum
+    detailedEnvironment: 1
+    chunkGridSize: {x: 6, y: 6}
+    chunkOffset: {x: 0, y: 0}
+    groundPrefab: {fileID: 8858836966592557436, guid: 4ceee8486c96a43d5b21c7c61475912f, type: 3}
+    floatingIsland: 0
+    paintOnly: 0
+    groundAssetFolder: Assets/NusantaraWorld/Models/Region1
+    groundElevation: 0
+    treeBrush: {fileID: 11400000, guid: f0491d3060a2e4011a5e34f5cb91ca47, type: 2}
+    grassBrush: {fileID: 11400000, guid: 1d6302fd1b5464d6890fd4a27766f918, type: 2}
+    boundary:
+    - {x: 2048, y: -256}
+    - {x: 2816, y: -256}
+    - {x: 2816, y: 512}
+    - {x: 2048, y: 512}
+  - id: 3
+    name: Harimau Penjaga Johor
+    boss: Harimau Penjaga Johor
+    detailedEnvironment: 1
+    chunkGridSize: {x: 6, y: 6}
+    chunkOffset: {x: 6, y: 0}
+    groundPrefab: {fileID: 2134387023784791131, guid: 8c7d1f26896e84cb7b5a1ceedbc0eb87, type: 3}
+    floatingIsland: 0
+    paintOnly: 0
+    groundAssetFolder: Assets/NusantaraWorld/Models/Region2
+    groundElevation: 0
+    treeBrush: {fileID: 11400000, guid: 9d125841f3a084abbb6383fbb7ee014d, type: 2}
+    grassBrush: {fileID: 11400000, guid: 0d8c5163e71c748e9b029b246476352c, type: 2}
+    boundary:
+    - {x: 2816, y: -256}
+    - {x: 3584, y: -256}
+    - {x: 3584, y: 512}
+    - {x: 2816, y: 512}
+  - id: 4
+    name: Sang Kelembai
+    boss: Sang Kelembai
+    detailedEnvironment: 1
+    chunkGridSize: {x: 6, y: 6}
+    chunkOffset: {x: 12, y: 0}
+    groundPrefab: {fileID: 180186763053942624, guid: 9cf0bb688116942beb0601ee681b1744, type: 3}
+    floatingIsland: 0
+    paintOnly: 0
+    groundAssetFolder: Assets/NusantaraWorld/Models/Region3
+    groundElevation: 0
+    treeBrush: {fileID: 11400000, guid: c40397f6b261e43f0a688c522a57b795, type: 2}
+    grassBrush: {fileID: 11400000, guid: a3600207afafe4d0ca8868ea2ff9a8e6, type: 2}
+    boundary:
+    - {x: 3584, y: -256}
+    - {x: 4352, y: -256}
+    - {x: 4352, y: 512}
+    - {x: 3584, y: 512}
+  - id: 5
+    name: Batu Belah Batu Bertangkup
+    boss: Batu Belah Batu Bertangkup
+    detailedEnvironment: 1
+    chunkGridSize: {x: 6, y: 6}
+    chunkOffset: {x: 0, y: 6}
+    groundPrefab: {fileID: 8947024754087505628, guid: 6986b8edcdcc54a41addaa88bdd5d922, type: 3}
+    floatingIsland: 0
+    paintOnly: 0
+    groundAssetFolder: Assets/NusantaraWorld/Models/Region4
+    groundElevation: 0
+    treeBrush: {fileID: 11400000, guid: 000a9ff191e5740c194ef1c06d18a00e, type: 2}
+    grassBrush: {fileID: 11400000, guid: 3885b5c53bec34bc69d5326c7072a1f1, type: 2}
+    boundary:
+    - {x: 2048, y: 512}
+    - {x: 2816, y: 512}
+    - {x: 2816, y: 1280}
+    - {x: 2048, y: 1280}
+  - id: 6
+    name: Bujang Senang
+    boss: Bujang Senang
+    detailedEnvironment: 1
+    chunkGridSize: {x: 6, y: 6}
+    chunkOffset: {x: 6, y: 6}
+    groundPrefab: {fileID: 4332576093525349503, guid: 8420095111c794cbead53d227959f8cd, type: 3}
+    floatingIsland: 0
+    paintOnly: 0
+    groundAssetFolder: Assets/NusantaraWorld/Models/Region5
+    groundElevation: 0
+    treeBrush: {fileID: 11400000, guid: b2184851384f04f4d9383edbd55bce1f, type: 2}
+    grassBrush: {fileID: 11400000, guid: baf56f4e7532f4a0cbf75e71239bc944, type: 2}
+    boundary:
+    - {x: 2816, y: 512}
+    - {x: 3584, y: 512}
+    - {x: 3584, y: 1280}
+    - {x: 2816, y: 1280}
+  - id: 7
+    name: Raja Bersiong
+    boss: Raja Bersiong
+    detailedEnvironment: 1
+    chunkGridSize: {x: 6, y: 6}
+    chunkOffset: {x: 12, y: 6}
+    groundPrefab: {fileID: 1874623918886019335, guid: e3b05af71ecb14731a57df0bdc59431a, type: 3}
+    floatingIsland: 0
+    paintOnly: 0
+    groundAssetFolder: Assets/NusantaraWorld/Models/Region6
+    groundElevation: 0
+    treeBrush: {fileID: 11400000, guid: 4fb5ce79320aa4d4e862defbfae5949f, type: 2}
+    grassBrush: {fileID: 11400000, guid: 4d1ec72e6e1944f0a9cebc28f52a6298, type: 2}
+    boundary:
+    - {x: 3584, y: 512}
+    - {x: 4352, y: 512}
+    - {x: 4352, y: 1280}
+    - {x: 3584, y: 1280}
+  - id: 8
+    name: Ulek Mayang
+    boss: Ulek Mayang
+    detailedEnvironment: 0
+    chunkGridSize: {x: 6, y: 6}
+    chunkOffset: {x: 0, y: 16}
+    groundPrefab: {fileID: 342653754596014383, guid: a31f2129b46b84ffa8b5a1d9ab25e04c, type: 3}
+    floatingIsland: 1
+    paintOnly: 0
+    groundAssetFolder: Assets/NusantaraWorld/Models/Region7
+    groundElevation: -160
+    treeBrush: {fileID: 11400000, guid: 1a7d1ab88d63546a28a2456fa195cf05, type: 2}
+    grassBrush: {fileID: 11400000, guid: fce0d09ffa6464faa8eca451b852fe94, type: 2}
+    boundary:
+    - {x: 2048, y: 1792}
+    - {x: 2816, y: 1792}
+    - {x: 2816, y: 2560}
+    - {x: 2048, y: 2560}
+  - id: 9
+    name: Darkness
+    boss: Darkness
+    detailedEnvironment: 0
+    chunkGridSize: {x: 6, y: 6}
+    chunkOffset: {x: 8, y: 16}
+    groundPrefab: {fileID: 8384127448350436247, guid: c267ba053fd564167aec480b2a3324bb, type: 3}
+    floatingIsland: 1
+    paintOnly: 0
+    groundAssetFolder: Assets/NusantaraWorld/Models/Region8
+    groundElevation: -160
+    treeBrush: {fileID: 11400000, guid: 3dd007d54300b47e7bddd08b2cb34566, type: 2}
+    grassBrush: {fileID: 11400000, guid: e5e2eba050b4b4fa3a1b1ab0a335a4a3, type: 2}
+    boundary:
+    - {x: 3072, y: 1792}
+    - {x: 3840, y: 1792}
+    - {x: 3840, y: 2560}
+    - {x: 3072, y: 2560}
+  locations: []
+  chunks:
+  - coordinate: {x: 0, y: 0}
+    assetFolder: Assets/NusantaraWorld/Models/Region1/Details/00_00
+    region: 2
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 1, y: 0}
+    assetFolder: Assets/NusantaraWorld/Models/Region1/Details/01_00
+    region: 2
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 2, y: 0}
+    assetFolder: Assets/NusantaraWorld/Models/Region1/Details/02_00
+    region: 2
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 3, y: 0}
+    assetFolder: Assets/NusantaraWorld/Models/Region1/Details/03_00
+    region: 2
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 4, y: 0}
+    assetFolder: Assets/NusantaraWorld/Models/Region1/Details/04_00
+    region: 2
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 5, y: 0}
+    assetFolder: Assets/NusantaraWorld/Models/Region1/Details/05_00
+    region: 2
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 0, y: 1}
+    assetFolder: Assets/NusantaraWorld/Models/Region1/Details/00_01
+    region: 2
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 1, y: 1}
+    assetFolder: Assets/NusantaraWorld/Models/Region1/Details/01_01
+    region: 2
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 2, y: 1}
+    assetFolder: Assets/NusantaraWorld/Models/Region1/Details/02_01
+    region: 2
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 3, y: 1}
+    assetFolder: Assets/NusantaraWorld/Models/Region1/Details/03_01
+    region: 2
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 4, y: 1}
+    assetFolder: Assets/NusantaraWorld/Models/Region1/Details/04_01
+    region: 2
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 5, y: 1}
+    assetFolder: Assets/NusantaraWorld/Models/Region1/Details/05_01
+    region: 2
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 0, y: 2}
+    assetFolder: Assets/NusantaraWorld/Models/Region1/Details/00_02
+    region: 2
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 1, y: 2}
+    assetFolder: Assets/NusantaraWorld/Models/Region1/Details/01_02
+    region: 2
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 2, y: 2}
+    assetFolder: Assets/NusantaraWorld/Models/Region1/Details/02_02
+    region: 2
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 3, y: 2}
+    assetFolder: Assets/NusantaraWorld/Models/Region1/Details/03_02
+    region: 2
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 4, y: 2}
+    assetFolder: Assets/NusantaraWorld/Models/Region1/Details/04_02
+    region: 2
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 5, y: 2}
+    assetFolder: Assets/NusantaraWorld/Models/Region1/Details/05_02
+    region: 2
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 0, y: 3}
+    assetFolder: Assets/NusantaraWorld/Models/Region1/Details/00_03
+    region: 2
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 1, y: 3}
+    assetFolder: Assets/NusantaraWorld/Models/Region1/Details/01_03
+    region: 2
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 2, y: 3}
+    assetFolder: Assets/NusantaraWorld/Models/Region1/Details/02_03
+    region: 2
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 3, y: 3}
+    assetFolder: Assets/NusantaraWorld/Models/Region1/Details/03_03
+    region: 2
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 4, y: 3}
+    assetFolder: Assets/NusantaraWorld/Models/Region1/Details/04_03
+    region: 2
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 5, y: 3}
+    assetFolder: Assets/NusantaraWorld/Models/Region1/Details/05_03
+    region: 2
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses:
+    - world/05_03/painted-vegetation
+    gameplayAddresses: []
+  - coordinate: {x: 0, y: 4}
+    assetFolder: Assets/NusantaraWorld/Models/Region1/Details/00_04
+    region: 2
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 1, y: 4}
+    assetFolder: Assets/NusantaraWorld/Models/Region1/Details/01_04
+    region: 2
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 2, y: 4}
+    assetFolder: Assets/NusantaraWorld/Models/Region1/Details/02_04
+    region: 2
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 3, y: 4}
+    assetFolder: Assets/NusantaraWorld/Models/Region1/Details/03_04
+    region: 2
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 4, y: 4}
+    assetFolder: Assets/NusantaraWorld/Models/Region1/Details/04_04
+    region: 2
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses:
+    - world/04_04/painted-vegetation
+    gameplayAddresses: []
+  - coordinate: {x: 5, y: 4}
+    assetFolder: Assets/NusantaraWorld/Models/Region1/Details/05_04
+    region: 2
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses:
+    - world/05_04/painted-vegetation
+    gameplayAddresses: []
+  - coordinate: {x: 0, y: 5}
+    assetFolder: Assets/NusantaraWorld/Models/Region1/Details/00_05
+    region: 2
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 1, y: 5}
+    assetFolder: Assets/NusantaraWorld/Models/Region1/Details/01_05
+    region: 2
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 2, y: 5}
+    assetFolder: Assets/NusantaraWorld/Models/Region1/Details/02_05
+    region: 2
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 3, y: 5}
+    assetFolder: Assets/NusantaraWorld/Models/Region1/Details/03_05
+    region: 2
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 4, y: 5}
+    assetFolder: Assets/NusantaraWorld/Models/Region1/Details/04_05
+    region: 2
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses:
+    - world/04_05/painted-vegetation
+    gameplayAddresses: []
+  - coordinate: {x: 5, y: 5}
+    assetFolder: Assets/NusantaraWorld/Models/Region1/Details/05_05
+    region: 2
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses:
+    - world/05_05/painted-vegetation
+    gameplayAddresses: []
+  - coordinate: {x: 6, y: 0}
+    assetFolder: Assets/NusantaraWorld/Models/Region2/Details/00_00
+    region: 3
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 7, y: 0}
+    assetFolder: Assets/NusantaraWorld/Models/Region2/Details/01_00
+    region: 3
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 8, y: 0}
+    assetFolder: Assets/NusantaraWorld/Models/Region2/Details/02_00
+    region: 3
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 9, y: 0}
+    assetFolder: Assets/NusantaraWorld/Models/Region2/Details/03_00
+    region: 3
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 10, y: 0}
+    assetFolder: Assets/NusantaraWorld/Models/Region2/Details/04_00
+    region: 3
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 11, y: 0}
+    assetFolder: Assets/NusantaraWorld/Models/Region2/Details/05_00
+    region: 3
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 6, y: 1}
+    assetFolder: Assets/NusantaraWorld/Models/Region2/Details/00_01
+    region: 3
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 7, y: 1}
+    assetFolder: Assets/NusantaraWorld/Models/Region2/Details/01_01
+    region: 3
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 8, y: 1}
+    assetFolder: Assets/NusantaraWorld/Models/Region2/Details/02_01
+    region: 3
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 9, y: 1}
+    assetFolder: Assets/NusantaraWorld/Models/Region2/Details/03_01
+    region: 3
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 10, y: 1}
+    assetFolder: Assets/NusantaraWorld/Models/Region2/Details/04_01
+    region: 3
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 11, y: 1}
+    assetFolder: Assets/NusantaraWorld/Models/Region2/Details/05_01
+    region: 3
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 6, y: 2}
+    assetFolder: Assets/NusantaraWorld/Models/Region2/Details/00_02
+    region: 3
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 7, y: 2}
+    assetFolder: Assets/NusantaraWorld/Models/Region2/Details/01_02
+    region: 3
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 8, y: 2}
+    assetFolder: Assets/NusantaraWorld/Models/Region2/Details/02_02
+    region: 3
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses:
+    - world/08_02/painted-vegetation
+    gameplayAddresses: []
+  - coordinate: {x: 9, y: 2}
+    assetFolder: Assets/NusantaraWorld/Models/Region2/Details/03_02
+    region: 3
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses:
+    - world/09_02/painted-vegetation
+    gameplayAddresses: []
+  - coordinate: {x: 10, y: 2}
+    assetFolder: Assets/NusantaraWorld/Models/Region2/Details/04_02
+    region: 3
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 11, y: 2}
+    assetFolder: Assets/NusantaraWorld/Models/Region2/Details/05_02
+    region: 3
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 6, y: 3}
+    assetFolder: Assets/NusantaraWorld/Models/Region2/Details/00_03
+    region: 3
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses:
+    - world/06_03/painted-vegetation
+    gameplayAddresses: []
+  - coordinate: {x: 7, y: 3}
+    assetFolder: Assets/NusantaraWorld/Models/Region2/Details/01_03
+    region: 3
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses:
+    - world/07_03/painted-vegetation
+    gameplayAddresses: []
+  - coordinate: {x: 8, y: 3}
+    assetFolder: Assets/NusantaraWorld/Models/Region2/Details/02_03
+    region: 3
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses:
+    - world/08_03/painted-vegetation
+    gameplayAddresses: []
+  - coordinate: {x: 9, y: 3}
+    assetFolder: Assets/NusantaraWorld/Models/Region2/Details/03_03
+    region: 3
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses:
+    - world/09_03/painted-vegetation
+    gameplayAddresses: []
+  - coordinate: {x: 10, y: 3}
+    assetFolder: Assets/NusantaraWorld/Models/Region2/Details/04_03
+    region: 3
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses:
+    - world/10_03/painted-vegetation
+    gameplayAddresses: []
+  - coordinate: {x: 11, y: 3}
+    assetFolder: Assets/NusantaraWorld/Models/Region2/Details/05_03
+    region: 3
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses:
+    - world/11_03/painted-vegetation
+    gameplayAddresses: []
+  - coordinate: {x: 6, y: 4}
+    assetFolder: Assets/NusantaraWorld/Models/Region2/Details/00_04
+    region: 3
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses:
+    - world/06_04/painted-vegetation
+    gameplayAddresses: []
+  - coordinate: {x: 7, y: 4}
+    assetFolder: Assets/NusantaraWorld/Models/Region2/Details/01_04
+    region: 3
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses:
+    - world/07_04/painted-vegetation
+    gameplayAddresses: []
+  - coordinate: {x: 8, y: 4}
+    assetFolder: Assets/NusantaraWorld/Models/Region2/Details/02_04
+    region: 3
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses:
+    - world/08_04/painted-vegetation
+    gameplayAddresses: []
+  - coordinate: {x: 9, y: 4}
+    assetFolder: Assets/NusantaraWorld/Models/Region2/Details/03_04
+    region: 3
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses:
+    - world/09_04/painted-vegetation
+    gameplayAddresses: []
+  - coordinate: {x: 10, y: 4}
+    assetFolder: Assets/NusantaraWorld/Models/Region2/Details/04_04
+    region: 3
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses:
+    - world/10_04/painted-vegetation
+    gameplayAddresses: []
+  - coordinate: {x: 11, y: 4}
+    assetFolder: Assets/NusantaraWorld/Models/Region2/Details/05_04
+    region: 3
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses:
+    - world/11_04/painted-vegetation
+    gameplayAddresses: []
+  - coordinate: {x: 6, y: 5}
+    assetFolder: Assets/NusantaraWorld/Models/Region2/Details/00_05
+    region: 3
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses:
+    - world/06_05/painted-vegetation
+    gameplayAddresses: []
+  - coordinate: {x: 7, y: 5}
+    assetFolder: Assets/NusantaraWorld/Models/Region2/Details/01_05
+    region: 3
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses:
+    - world/07_05/painted-vegetation
+    gameplayAddresses: []
+  - coordinate: {x: 8, y: 5}
+    assetFolder: Assets/NusantaraWorld/Models/Region2/Details/02_05
+    region: 3
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 9, y: 5}
+    assetFolder: Assets/NusantaraWorld/Models/Region2/Details/03_05
+    region: 3
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 10, y: 5}
+    assetFolder: Assets/NusantaraWorld/Models/Region2/Details/04_05
+    region: 3
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses:
+    - world/10_05/painted-vegetation
+    gameplayAddresses: []
+  - coordinate: {x: 11, y: 5}
+    assetFolder: Assets/NusantaraWorld/Models/Region2/Details/05_05
+    region: 3
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses:
+    - world/11_05/painted-vegetation
+    gameplayAddresses: []
+  - coordinate: {x: 12, y: 0}
+    assetFolder: Assets/NusantaraWorld/Models/Region3/Details/00_00
+    region: 4
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 13, y: 0}
+    assetFolder: Assets/NusantaraWorld/Models/Region3/Details/01_00
+    region: 4
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 14, y: 0}
+    assetFolder: Assets/NusantaraWorld/Models/Region3/Details/02_00
+    region: 4
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 15, y: 0}
+    assetFolder: Assets/NusantaraWorld/Models/Region3/Details/03_00
+    region: 4
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 16, y: 0}
+    assetFolder: Assets/NusantaraWorld/Models/Region3/Details/04_00
+    region: 4
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 17, y: 0}
+    assetFolder: Assets/NusantaraWorld/Models/Region3/Details/05_00
+    region: 4
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 12, y: 1}
+    assetFolder: Assets/NusantaraWorld/Models/Region3/Details/00_01
+    region: 4
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 13, y: 1}
+    assetFolder: Assets/NusantaraWorld/Models/Region3/Details/01_01
+    region: 4
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 14, y: 1}
+    assetFolder: Assets/NusantaraWorld/Models/Region3/Details/02_01
+    region: 4
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 15, y: 1}
+    assetFolder: Assets/NusantaraWorld/Models/Region3/Details/03_01
+    region: 4
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 16, y: 1}
+    assetFolder: Assets/NusantaraWorld/Models/Region3/Details/04_01
+    region: 4
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 17, y: 1}
+    assetFolder: Assets/NusantaraWorld/Models/Region3/Details/05_01
+    region: 4
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 12, y: 2}
+    assetFolder: Assets/NusantaraWorld/Models/Region3/Details/00_02
+    region: 4
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 13, y: 2}
+    assetFolder: Assets/NusantaraWorld/Models/Region3/Details/01_02
+    region: 4
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 14, y: 2}
+    assetFolder: Assets/NusantaraWorld/Models/Region3/Details/02_02
+    region: 4
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 15, y: 2}
+    assetFolder: Assets/NusantaraWorld/Models/Region3/Details/03_02
+    region: 4
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 16, y: 2}
+    assetFolder: Assets/NusantaraWorld/Models/Region3/Details/04_02
+    region: 4
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 17, y: 2}
+    assetFolder: Assets/NusantaraWorld/Models/Region3/Details/05_02
+    region: 4
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 12, y: 3}
+    assetFolder: Assets/NusantaraWorld/Models/Region3/Details/00_03
+    region: 4
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses:
+    - world/12_03/painted-vegetation
+    gameplayAddresses: []
+  - coordinate: {x: 13, y: 3}
+    assetFolder: Assets/NusantaraWorld/Models/Region3/Details/01_03
+    region: 4
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 14, y: 3}
+    assetFolder: Assets/NusantaraWorld/Models/Region3/Details/02_03
+    region: 4
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 15, y: 3}
+    assetFolder: Assets/NusantaraWorld/Models/Region3/Details/03_03
+    region: 4
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 16, y: 3}
+    assetFolder: Assets/NusantaraWorld/Models/Region3/Details/04_03
+    region: 4
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 17, y: 3}
+    assetFolder: Assets/NusantaraWorld/Models/Region3/Details/05_03
+    region: 4
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 12, y: 4}
+    assetFolder: Assets/NusantaraWorld/Models/Region3/Details/00_04
+    region: 4
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses:
+    - world/12_04/painted-vegetation
+    gameplayAddresses: []
+  - coordinate: {x: 13, y: 4}
+    assetFolder: Assets/NusantaraWorld/Models/Region3/Details/01_04
+    region: 4
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 14, y: 4}
+    assetFolder: Assets/NusantaraWorld/Models/Region3/Details/02_04
+    region: 4
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 15, y: 4}
+    assetFolder: Assets/NusantaraWorld/Models/Region3/Details/03_04
+    region: 4
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 16, y: 4}
+    assetFolder: Assets/NusantaraWorld/Models/Region3/Details/04_04
+    region: 4
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 17, y: 4}
+    assetFolder: Assets/NusantaraWorld/Models/Region3/Details/05_04
+    region: 4
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 12, y: 5}
+    assetFolder: Assets/NusantaraWorld/Models/Region3/Details/00_05
+    region: 4
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses:
+    - world/12_05/painted-vegetation
+    gameplayAddresses: []
+  - coordinate: {x: 13, y: 5}
+    assetFolder: Assets/NusantaraWorld/Models/Region3/Details/01_05
+    region: 4
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses:
+    - world/13_05/painted-vegetation
+    gameplayAddresses: []
+  - coordinate: {x: 14, y: 5}
+    assetFolder: Assets/NusantaraWorld/Models/Region3/Details/02_05
+    region: 4
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 15, y: 5}
+    assetFolder: Assets/NusantaraWorld/Models/Region3/Details/03_05
+    region: 4
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 16, y: 5}
+    assetFolder: Assets/NusantaraWorld/Models/Region3/Details/04_05
+    region: 4
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 17, y: 5}
+    assetFolder: Assets/NusantaraWorld/Models/Region3/Details/05_05
+    region: 4
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 0, y: 6}
+    assetFolder: Assets/NusantaraWorld/Models/Region4/Details/00_00
+    region: 5
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 1, y: 6}
+    assetFolder: Assets/NusantaraWorld/Models/Region4/Details/01_00
+    region: 5
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 2, y: 6}
+    assetFolder: Assets/NusantaraWorld/Models/Region4/Details/02_00
+    region: 5
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 3, y: 6}
+    assetFolder: Assets/NusantaraWorld/Models/Region4/Details/03_00
+    region: 5
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 4, y: 6}
+    assetFolder: Assets/NusantaraWorld/Models/Region4/Details/04_00
+    region: 5
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses:
+    - world/04_06/painted-vegetation
+    gameplayAddresses: []
+  - coordinate: {x: 5, y: 6}
+    assetFolder: Assets/NusantaraWorld/Models/Region4/Details/05_00
+    region: 5
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses:
+    - world/05_06/painted-vegetation
+    gameplayAddresses: []
+  - coordinate: {x: 0, y: 7}
+    assetFolder: Assets/NusantaraWorld/Models/Region4/Details/00_01
+    region: 5
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 1, y: 7}
+    assetFolder: Assets/NusantaraWorld/Models/Region4/Details/01_01
+    region: 5
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 2, y: 7}
+    assetFolder: Assets/NusantaraWorld/Models/Region4/Details/02_01
+    region: 5
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 3, y: 7}
+    assetFolder: Assets/NusantaraWorld/Models/Region4/Details/03_01
+    region: 5
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 4, y: 7}
+    assetFolder: Assets/NusantaraWorld/Models/Region4/Details/04_01
+    region: 5
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 5, y: 7}
+    assetFolder: Assets/NusantaraWorld/Models/Region4/Details/05_01
+    region: 5
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses:
+    - world/05_07/painted-vegetation
+    gameplayAddresses: []
+  - coordinate: {x: 0, y: 8}
+    assetFolder: Assets/NusantaraWorld/Models/Region4/Details/00_02
+    region: 5
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 1, y: 8}
+    assetFolder: Assets/NusantaraWorld/Models/Region4/Details/01_02
+    region: 5
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 2, y: 8}
+    assetFolder: Assets/NusantaraWorld/Models/Region4/Details/02_02
+    region: 5
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 3, y: 8}
+    assetFolder: Assets/NusantaraWorld/Models/Region4/Details/03_02
+    region: 5
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 4, y: 8}
+    assetFolder: Assets/NusantaraWorld/Models/Region4/Details/04_02
+    region: 5
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 5, y: 8}
+    assetFolder: Assets/NusantaraWorld/Models/Region4/Details/05_02
+    region: 5
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 0, y: 9}
+    assetFolder: Assets/NusantaraWorld/Models/Region4/Details/00_03
+    region: 5
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 1, y: 9}
+    assetFolder: Assets/NusantaraWorld/Models/Region4/Details/01_03
+    region: 5
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 2, y: 9}
+    assetFolder: Assets/NusantaraWorld/Models/Region4/Details/02_03
+    region: 5
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 3, y: 9}
+    assetFolder: Assets/NusantaraWorld/Models/Region4/Details/03_03
+    region: 5
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 4, y: 9}
+    assetFolder: Assets/NusantaraWorld/Models/Region4/Details/04_03
+    region: 5
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 5, y: 9}
+    assetFolder: Assets/NusantaraWorld/Models/Region4/Details/05_03
+    region: 5
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 0, y: 10}
+    assetFolder: Assets/NusantaraWorld/Models/Region4/Details/00_04
+    region: 5
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 1, y: 10}
+    assetFolder: Assets/NusantaraWorld/Models/Region4/Details/01_04
+    region: 5
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 2, y: 10}
+    assetFolder: Assets/NusantaraWorld/Models/Region4/Details/02_04
+    region: 5
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 3, y: 10}
+    assetFolder: Assets/NusantaraWorld/Models/Region4/Details/03_04
+    region: 5
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 4, y: 10}
+    assetFolder: Assets/NusantaraWorld/Models/Region4/Details/04_04
+    region: 5
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 5, y: 10}
+    assetFolder: Assets/NusantaraWorld/Models/Region4/Details/05_04
+    region: 5
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses:
+    - world/05_10/painted-vegetation
+    gameplayAddresses: []
+  - coordinate: {x: 0, y: 11}
+    assetFolder: Assets/NusantaraWorld/Models/Region4/Details/00_05
+    region: 5
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 1, y: 11}
+    assetFolder: Assets/NusantaraWorld/Models/Region4/Details/01_05
+    region: 5
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 2, y: 11}
+    assetFolder: Assets/NusantaraWorld/Models/Region4/Details/02_05
+    region: 5
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 3, y: 11}
+    assetFolder: Assets/NusantaraWorld/Models/Region4/Details/03_05
+    region: 5
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 4, y: 11}
+    assetFolder: Assets/NusantaraWorld/Models/Region4/Details/04_05
+    region: 5
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 5, y: 11}
+    assetFolder: Assets/NusantaraWorld/Models/Region4/Details/05_05
+    region: 5
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 6, y: 6}
+    assetFolder: Assets/NusantaraWorld/Models/Region5/Details/00_00
+    region: 6
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses:
+    - world/06_06/painted-vegetation
+    gameplayAddresses: []
+  - coordinate: {x: 7, y: 6}
+    assetFolder: Assets/NusantaraWorld/Models/Region5/Details/01_00
+    region: 6
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses:
+    - world/07_06/painted-vegetation
+    gameplayAddresses: []
+  - coordinate: {x: 8, y: 6}
+    assetFolder: Assets/NusantaraWorld/Models/Region5/Details/02_00
+    region: 6
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses:
+    - world/08_06/painted-vegetation
+    gameplayAddresses: []
+  - coordinate: {x: 9, y: 6}
+    assetFolder: Assets/NusantaraWorld/Models/Region5/Details/03_00
+    region: 6
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses:
+    - world/09_06/painted-vegetation
+    gameplayAddresses: []
+  - coordinate: {x: 10, y: 6}
+    assetFolder: Assets/NusantaraWorld/Models/Region5/Details/04_00
+    region: 6
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses:
+    - world/10_06/painted-vegetation
+    gameplayAddresses: []
+  - coordinate: {x: 11, y: 6}
+    assetFolder: Assets/NusantaraWorld/Models/Region5/Details/05_00
+    region: 6
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses:
+    - world/11_06/painted-vegetation
+    gameplayAddresses: []
+  - coordinate: {x: 6, y: 7}
+    assetFolder: Assets/NusantaraWorld/Models/Region5/Details/00_01
+    region: 6
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses:
+    - world/06_07/painted-vegetation
+    gameplayAddresses: []
+  - coordinate: {x: 7, y: 7}
+    assetFolder: Assets/NusantaraWorld/Models/Region5/Details/01_01
+    region: 6
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses:
+    - world/07_07/painted-vegetation
+    gameplayAddresses: []
+  - coordinate: {x: 8, y: 7}
+    assetFolder: Assets/NusantaraWorld/Models/Region5/Details/02_01
+    region: 6
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses:
+    - world/08_07/painted-vegetation
+    gameplayAddresses: []
+  - coordinate: {x: 9, y: 7}
+    assetFolder: Assets/NusantaraWorld/Models/Region5/Details/03_01
+    region: 6
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses:
+    - world/09_07/painted-vegetation
+    gameplayAddresses: []
+  - coordinate: {x: 10, y: 7}
+    assetFolder: Assets/NusantaraWorld/Models/Region5/Details/04_01
+    region: 6
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses:
+    - world/10_07/painted-vegetation
+    gameplayAddresses: []
+  - coordinate: {x: 11, y: 7}
+    assetFolder: Assets/NusantaraWorld/Models/Region5/Details/05_01
+    region: 6
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses:
+    - world/11_07/painted-vegetation
+    gameplayAddresses: []
+  - coordinate: {x: 6, y: 8}
+    assetFolder: Assets/NusantaraWorld/Models/Region5/Details/00_02
+    region: 6
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses:
+    - world/06_08/painted-vegetation
+    gameplayAddresses: []
+  - coordinate: {x: 7, y: 8}
+    assetFolder: Assets/NusantaraWorld/Models/Region5/Details/01_02
+    region: 6
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses:
+    - world/07_08/painted-vegetation
+    gameplayAddresses: []
+  - coordinate: {x: 8, y: 8}
+    assetFolder: Assets/NusantaraWorld/Models/Region5/Details/02_02
+    region: 6
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses:
+    - world/08_08/painted-vegetation
+    gameplayAddresses: []
+  - coordinate: {x: 9, y: 8}
+    assetFolder: Assets/NusantaraWorld/Models/Region5/Details/03_02
+    region: 6
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses:
+    - world/09_08/painted-vegetation
+    gameplayAddresses: []
+  - coordinate: {x: 10, y: 8}
+    assetFolder: Assets/NusantaraWorld/Models/Region5/Details/04_02
+    region: 6
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses:
+    - world/10_08/painted-vegetation
+    gameplayAddresses: []
+  - coordinate: {x: 11, y: 8}
+    assetFolder: Assets/NusantaraWorld/Models/Region5/Details/05_02
+    region: 6
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses:
+    - world/11_08/painted-vegetation
+    gameplayAddresses: []
+  - coordinate: {x: 6, y: 9}
+    assetFolder: Assets/NusantaraWorld/Models/Region5/Details/00_03
+    region: 6
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 7, y: 9}
+    assetFolder: Assets/NusantaraWorld/Models/Region5/Details/01_03
+    region: 6
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 8, y: 9}
+    assetFolder: Assets/NusantaraWorld/Models/Region5/Details/02_03
+    region: 6
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 9, y: 9}
+    assetFolder: Assets/NusantaraWorld/Models/Region5/Details/03_03
+    region: 6
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 10, y: 9}
+    assetFolder: Assets/NusantaraWorld/Models/Region5/Details/04_03
+    region: 6
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 11, y: 9}
+    assetFolder: Assets/NusantaraWorld/Models/Region5/Details/05_03
+    region: 6
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 6, y: 10}
+    assetFolder: Assets/NusantaraWorld/Models/Region5/Details/00_04
+    region: 6
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses:
+    - world/06_10/painted-vegetation
+    gameplayAddresses: []
+  - coordinate: {x: 7, y: 10}
+    assetFolder: Assets/NusantaraWorld/Models/Region5/Details/01_04
+    region: 6
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses:
+    - world/07_10/painted-vegetation
+    gameplayAddresses: []
+  - coordinate: {x: 8, y: 10}
+    assetFolder: Assets/NusantaraWorld/Models/Region5/Details/02_04
+    region: 6
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 9, y: 10}
+    assetFolder: Assets/NusantaraWorld/Models/Region5/Details/03_04
+    region: 6
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 10, y: 10}
+    assetFolder: Assets/NusantaraWorld/Models/Region5/Details/04_04
+    region: 6
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 11, y: 10}
+    assetFolder: Assets/NusantaraWorld/Models/Region5/Details/05_04
+    region: 6
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 6, y: 11}
+    assetFolder: Assets/NusantaraWorld/Models/Region5/Details/00_05
+    region: 6
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses:
+    - world/06_11/painted-vegetation
+    gameplayAddresses: []
+  - coordinate: {x: 7, y: 11}
+    assetFolder: Assets/NusantaraWorld/Models/Region5/Details/01_05
+    region: 6
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses:
+    - world/07_11/painted-vegetation
+    gameplayAddresses: []
+  - coordinate: {x: 8, y: 11}
+    assetFolder: Assets/NusantaraWorld/Models/Region5/Details/02_05
+    region: 6
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 9, y: 11}
+    assetFolder: Assets/NusantaraWorld/Models/Region5/Details/03_05
+    region: 6
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 10, y: 11}
+    assetFolder: Assets/NusantaraWorld/Models/Region5/Details/04_05
+    region: 6
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 11, y: 11}
+    assetFolder: Assets/NusantaraWorld/Models/Region5/Details/05_05
+    region: 6
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 12, y: 6}
+    assetFolder: Assets/NusantaraWorld/Models/Region6/Details/00_00
+    region: 7
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses:
+    - world/12_06/painted-vegetation
+    gameplayAddresses: []
+  - coordinate: {x: 13, y: 6}
+    assetFolder: Assets/NusantaraWorld/Models/Region6/Details/01_00
+    region: 7
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses:
+    - world/13_06/painted-vegetation
+    gameplayAddresses: []
+  - coordinate: {x: 14, y: 6}
+    assetFolder: Assets/NusantaraWorld/Models/Region6/Details/02_00
+    region: 7
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 15, y: 6}
+    assetFolder: Assets/NusantaraWorld/Models/Region6/Details/03_00
+    region: 7
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 16, y: 6}
+    assetFolder: Assets/NusantaraWorld/Models/Region6/Details/04_00
+    region: 7
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 17, y: 6}
+    assetFolder: Assets/NusantaraWorld/Models/Region6/Details/05_00
+    region: 7
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 12, y: 7}
+    assetFolder: Assets/NusantaraWorld/Models/Region6/Details/00_01
+    region: 7
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses:
+    - world/12_07/painted-vegetation
+    gameplayAddresses: []
+  - coordinate: {x: 13, y: 7}
+    assetFolder: Assets/NusantaraWorld/Models/Region6/Details/01_01
+    region: 7
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 14, y: 7}
+    assetFolder: Assets/NusantaraWorld/Models/Region6/Details/02_01
+    region: 7
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 15, y: 7}
+    assetFolder: Assets/NusantaraWorld/Models/Region6/Details/03_01
+    region: 7
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 16, y: 7}
+    assetFolder: Assets/NusantaraWorld/Models/Region6/Details/04_01
+    region: 7
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 17, y: 7}
+    assetFolder: Assets/NusantaraWorld/Models/Region6/Details/05_01
+    region: 7
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 12, y: 8}
+    assetFolder: Assets/NusantaraWorld/Models/Region6/Details/00_02
+    region: 7
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 13, y: 8}
+    assetFolder: Assets/NusantaraWorld/Models/Region6/Details/01_02
+    region: 7
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 14, y: 8}
+    assetFolder: Assets/NusantaraWorld/Models/Region6/Details/02_02
+    region: 7
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 15, y: 8}
+    assetFolder: Assets/NusantaraWorld/Models/Region6/Details/03_02
+    region: 7
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 16, y: 8}
+    assetFolder: Assets/NusantaraWorld/Models/Region6/Details/04_02
+    region: 7
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 17, y: 8}
+    assetFolder: Assets/NusantaraWorld/Models/Region6/Details/05_02
+    region: 7
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 12, y: 9}
+    assetFolder: Assets/NusantaraWorld/Models/Region6/Details/00_03
+    region: 7
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 13, y: 9}
+    assetFolder: Assets/NusantaraWorld/Models/Region6/Details/01_03
+    region: 7
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 14, y: 9}
+    assetFolder: Assets/NusantaraWorld/Models/Region6/Details/02_03
+    region: 7
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 15, y: 9}
+    assetFolder: Assets/NusantaraWorld/Models/Region6/Details/03_03
+    region: 7
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 16, y: 9}
+    assetFolder: Assets/NusantaraWorld/Models/Region6/Details/04_03
+    region: 7
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 17, y: 9}
+    assetFolder: Assets/NusantaraWorld/Models/Region6/Details/05_03
+    region: 7
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 12, y: 10}
+    assetFolder: Assets/NusantaraWorld/Models/Region6/Details/00_04
+    region: 7
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 13, y: 10}
+    assetFolder: Assets/NusantaraWorld/Models/Region6/Details/01_04
+    region: 7
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 14, y: 10}
+    assetFolder: Assets/NusantaraWorld/Models/Region6/Details/02_04
+    region: 7
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 15, y: 10}
+    assetFolder: Assets/NusantaraWorld/Models/Region6/Details/03_04
+    region: 7
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 16, y: 10}
+    assetFolder: Assets/NusantaraWorld/Models/Region6/Details/04_04
+    region: 7
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 17, y: 10}
+    assetFolder: Assets/NusantaraWorld/Models/Region6/Details/05_04
+    region: 7
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 12, y: 11}
+    assetFolder: Assets/NusantaraWorld/Models/Region6/Details/00_05
+    region: 7
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 13, y: 11}
+    assetFolder: Assets/NusantaraWorld/Models/Region6/Details/01_05
+    region: 7
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 14, y: 11}
+    assetFolder: Assets/NusantaraWorld/Models/Region6/Details/02_05
+    region: 7
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 15, y: 11}
+    assetFolder: Assets/NusantaraWorld/Models/Region6/Details/03_05
+    region: 7
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 16, y: 11}
+    assetFolder: Assets/NusantaraWorld/Models/Region6/Details/04_05
+    region: 7
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 17, y: 11}
+    assetFolder: Assets/NusantaraWorld/Models/Region6/Details/05_05
+    region: 7
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 0, y: 16}
+    assetFolder: Assets/NusantaraWorld/Models/Region7/Details/00_00
+    region: 8
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 1, y: 16}
+    assetFolder: Assets/NusantaraWorld/Models/Region7/Details/01_00
+    region: 8
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 2, y: 16}
+    assetFolder: Assets/NusantaraWorld/Models/Region7/Details/02_00
+    region: 8
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 3, y: 16}
+    assetFolder: Assets/NusantaraWorld/Models/Region7/Details/03_00
+    region: 8
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 4, y: 16}
+    assetFolder: Assets/NusantaraWorld/Models/Region7/Details/04_00
+    region: 8
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 5, y: 16}
+    assetFolder: Assets/NusantaraWorld/Models/Region7/Details/05_00
+    region: 8
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 0, y: 17}
+    assetFolder: Assets/NusantaraWorld/Models/Region7/Details/00_01
+    region: 8
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 1, y: 17}
+    assetFolder: Assets/NusantaraWorld/Models/Region7/Details/01_01
+    region: 8
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 2, y: 17}
+    assetFolder: Assets/NusantaraWorld/Models/Region7/Details/02_01
+    region: 8
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 3, y: 17}
+    assetFolder: Assets/NusantaraWorld/Models/Region7/Details/03_01
+    region: 8
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 4, y: 17}
+    assetFolder: Assets/NusantaraWorld/Models/Region7/Details/04_01
+    region: 8
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 5, y: 17}
+    assetFolder: Assets/NusantaraWorld/Models/Region7/Details/05_01
+    region: 8
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 0, y: 18}
+    assetFolder: Assets/NusantaraWorld/Models/Region7/Details/00_02
+    region: 8
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 1, y: 18}
+    assetFolder: Assets/NusantaraWorld/Models/Region7/Details/01_02
+    region: 8
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 2, y: 18}
+    assetFolder: Assets/NusantaraWorld/Models/Region7/Details/02_02
+    region: 8
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 3, y: 18}
+    assetFolder: Assets/NusantaraWorld/Models/Region7/Details/03_02
+    region: 8
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 4, y: 18}
+    assetFolder: Assets/NusantaraWorld/Models/Region7/Details/04_02
+    region: 8
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 5, y: 18}
+    assetFolder: Assets/NusantaraWorld/Models/Region7/Details/05_02
+    region: 8
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 0, y: 19}
+    assetFolder: Assets/NusantaraWorld/Models/Region7/Details/00_03
+    region: 8
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 1, y: 19}
+    assetFolder: Assets/NusantaraWorld/Models/Region7/Details/01_03
+    region: 8
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 2, y: 19}
+    assetFolder: Assets/NusantaraWorld/Models/Region7/Details/02_03
+    region: 8
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 3, y: 19}
+    assetFolder: Assets/NusantaraWorld/Models/Region7/Details/03_03
+    region: 8
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 4, y: 19}
+    assetFolder: Assets/NusantaraWorld/Models/Region7/Details/04_03
+    region: 8
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 5, y: 19}
+    assetFolder: Assets/NusantaraWorld/Models/Region7/Details/05_03
+    region: 8
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 0, y: 20}
+    assetFolder: Assets/NusantaraWorld/Models/Region7/Details/00_04
+    region: 8
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 1, y: 20}
+    assetFolder: Assets/NusantaraWorld/Models/Region7/Details/01_04
+    region: 8
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 2, y: 20}
+    assetFolder: Assets/NusantaraWorld/Models/Region7/Details/02_04
+    region: 8
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 3, y: 20}
+    assetFolder: Assets/NusantaraWorld/Models/Region7/Details/03_04
+    region: 8
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 4, y: 20}
+    assetFolder: Assets/NusantaraWorld/Models/Region7/Details/04_04
+    region: 8
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 5, y: 20}
+    assetFolder: Assets/NusantaraWorld/Models/Region7/Details/05_04
+    region: 8
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 0, y: 21}
+    assetFolder: Assets/NusantaraWorld/Models/Region7/Details/00_05
+    region: 8
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 1, y: 21}
+    assetFolder: Assets/NusantaraWorld/Models/Region7/Details/01_05
+    region: 8
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 2, y: 21}
+    assetFolder: Assets/NusantaraWorld/Models/Region7/Details/02_05
+    region: 8
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 3, y: 21}
+    assetFolder: Assets/NusantaraWorld/Models/Region7/Details/03_05
+    region: 8
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 4, y: 21}
+    assetFolder: Assets/NusantaraWorld/Models/Region7/Details/04_05
+    region: 8
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 5, y: 21}
+    assetFolder: Assets/NusantaraWorld/Models/Region7/Details/05_05
+    region: 8
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 8, y: 16}
+    assetFolder: Assets/NusantaraWorld/Models/Region8/Details/00_00
+    region: 9
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 9, y: 16}
+    assetFolder: Assets/NusantaraWorld/Models/Region8/Details/01_00
+    region: 9
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 10, y: 16}
+    assetFolder: Assets/NusantaraWorld/Models/Region8/Details/02_00
+    region: 9
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 11, y: 16}
+    assetFolder: Assets/NusantaraWorld/Models/Region8/Details/03_00
+    region: 9
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 12, y: 16}
+    assetFolder: Assets/NusantaraWorld/Models/Region8/Details/04_00
+    region: 9
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 13, y: 16}
+    assetFolder: Assets/NusantaraWorld/Models/Region8/Details/05_00
+    region: 9
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 8, y: 17}
+    assetFolder: Assets/NusantaraWorld/Models/Region8/Details/00_01
+    region: 9
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 9, y: 17}
+    assetFolder: Assets/NusantaraWorld/Models/Region8/Details/01_01
+    region: 9
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 10, y: 17}
+    assetFolder: Assets/NusantaraWorld/Models/Region8/Details/02_01
+    region: 9
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 11, y: 17}
+    assetFolder: Assets/NusantaraWorld/Models/Region8/Details/03_01
+    region: 9
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 12, y: 17}
+    assetFolder: Assets/NusantaraWorld/Models/Region8/Details/04_01
+    region: 9
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 13, y: 17}
+    assetFolder: Assets/NusantaraWorld/Models/Region8/Details/05_01
+    region: 9
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 8, y: 18}
+    assetFolder: Assets/NusantaraWorld/Models/Region8/Details/00_02
+    region: 9
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 9, y: 18}
+    assetFolder: Assets/NusantaraWorld/Models/Region8/Details/01_02
+    region: 9
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 10, y: 18}
+    assetFolder: Assets/NusantaraWorld/Models/Region8/Details/02_02
+    region: 9
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 11, y: 18}
+    assetFolder: Assets/NusantaraWorld/Models/Region8/Details/03_02
+    region: 9
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 12, y: 18}
+    assetFolder: Assets/NusantaraWorld/Models/Region8/Details/04_02
+    region: 9
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 13, y: 18}
+    assetFolder: Assets/NusantaraWorld/Models/Region8/Details/05_02
+    region: 9
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 8, y: 19}
+    assetFolder: Assets/NusantaraWorld/Models/Region8/Details/00_03
+    region: 9
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 9, y: 19}
+    assetFolder: Assets/NusantaraWorld/Models/Region8/Details/01_03
+    region: 9
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 10, y: 19}
+    assetFolder: Assets/NusantaraWorld/Models/Region8/Details/02_03
+    region: 9
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 11, y: 19}
+    assetFolder: Assets/NusantaraWorld/Models/Region8/Details/03_03
+    region: 9
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 12, y: 19}
+    assetFolder: Assets/NusantaraWorld/Models/Region8/Details/04_03
+    region: 9
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 13, y: 19}
+    assetFolder: Assets/NusantaraWorld/Models/Region8/Details/05_03
+    region: 9
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 8, y: 20}
+    assetFolder: Assets/NusantaraWorld/Models/Region8/Details/00_04
+    region: 9
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 9, y: 20}
+    assetFolder: Assets/NusantaraWorld/Models/Region8/Details/01_04
+    region: 9
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 10, y: 20}
+    assetFolder: Assets/NusantaraWorld/Models/Region8/Details/02_04
+    region: 9
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 11, y: 20}
+    assetFolder: Assets/NusantaraWorld/Models/Region8/Details/03_04
+    region: 9
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 12, y: 20}
+    assetFolder: Assets/NusantaraWorld/Models/Region8/Details/04_04
+    region: 9
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 13, y: 20}
+    assetFolder: Assets/NusantaraWorld/Models/Region8/Details/05_04
+    region: 9
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 8, y: 21}
+    assetFolder: Assets/NusantaraWorld/Models/Region8/Details/00_05
+    region: 9
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 9, y: 21}
+    assetFolder: Assets/NusantaraWorld/Models/Region8/Details/01_05
+    region: 9
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 10, y: 21}
+    assetFolder: Assets/NusantaraWorld/Models/Region8/Details/02_05
+    region: 9
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 11, y: 21}
+    assetFolder: Assets/NusantaraWorld/Models/Region8/Details/03_05
+    region: 9
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 12, y: 21}
+    assetFolder: Assets/NusantaraWorld/Models/Region8/Details/04_05
+    region: 9
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
+  - coordinate: {x: 13, y: 21}
+    assetFolder: Assets/NusantaraWorld/Models/Region8/Details/05_05
+    region: 9
+    essentialAddress: 
+    distantAddress: 
+    decorationAddresses: []
+    gameplayAddresses: []
