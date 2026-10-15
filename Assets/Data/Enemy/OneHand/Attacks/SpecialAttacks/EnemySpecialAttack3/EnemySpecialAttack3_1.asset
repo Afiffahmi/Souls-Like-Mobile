@@ -12,11 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6aeff0118f1adac4c85f170194a156c3, type: 3}
   m_Name: EnemySpecialAttack3_1
   m_EditorClassIdentifier: Assembly-CSharp::SoulsLike.Enemies.EnemyAttackDefinition
-  available: 0
+  available: 1
   attackType: 3
+  trigger: 0
   stateName: EnemySpecialAttack3_1
-  animation: {fileID: 0}
-  playbackSpeed: 1
+  animation: {fileID: 7400000, guid: 391e935b5fc0947438e431bb31948d3f, type: 2}
+  playbackSpeed: 2
+  jumpSpeedMultiplier: 1
   windupSpeedMultiplier: 0.65
   minimumRange: 0
   range: 5
@@ -24,34 +26,57 @@ MonoBehaviour:
   damage: 12
   cooldown: 5
   dealsDamage: 1
-  movement: 0
+  showAttackCue: 1
+  canBeParried: 0
+  attackCueFrame: 20
+  invulnerableAfterCue: 1
+  cueDuration: 0.7
+  cueRadius: 0.75
+  cueMaterial: {fileID: 2100000, guid: d51b4da13c690cc4c9c8462ccfdc4e4f, type: 2}
+  applyElementToPlayer: 1
+  movement: 1
   movementDirection: 2
-  movementDistance: 3
-  movementStartFrame: 0
-  movementEndFrame: 14
-  targetStoppingDistance: 1
+  movementDistance: 6
+  fixedMovementDistance: 1
+  approachBeforeDash: 1
+  movementStartFrame: 32
+  movementEndFrame: 41
+  targetStoppingDistance: 3
+  playerKnockback: 6
+  animationAction: {fileID: 0}
+  actionFrame: 10
   followUpSteps: []
   useFrameWindow: 1
-  damageAtWindowEnd: 1
-  hitStartFrame: 8
-  hitEndFrame: 13
+  damageAtWindowEnd: 0
+  hitStartFrame: 32
+  hitEndFrame: 41
   hitStart: 0.4
   hitEnd: 0.55
-  turnUntil: 0.25
+  turnUntil: 0
+  lockFacingAtStart: 1
   weight: 1
   priority: 0
   minimumHealthRatio: 0
   maximumHealthRatio: 1
   effect: {fileID: 11400000, guid: 36328d502b3dcbf488a9dfc600ec5cb2, type: 2}
   slashPrefab: {fileID: 8455488987529208815, guid: 0be2e103942bac744ba889bc431868b7, type: 3}
+  elementalSlashPrefabs:
+  - {fileID: 4148447339483950623, guid: 23c9fec1fa2eee94e8a98e6fd0d07387, type: 3}
+  - {fileID: 5098853300861897407, guid: 7d71aada029d2ec4a84025c3e0fb4093, type: 3}
+  - {fileID: 4433340883600705335, guid: 5b465d0ad8011bf438308710530d8464, type: 3}
+  - {fileID: 2342229596812052019, guid: 4017c55a2ae0d8145a5c9bdcc0f69e7f, type: 3}
+  - {fileID: 5624798680627592448, guid: 726045ccd25b77448b192388caea238c, type: 3}
+  - {fileID: 6643760036014901148, guid: 2ab2aa31b3c348d4e94c0a21dd6ab0ff, type: 3}
+  - {fileID: 1921150181880817648, guid: 3f302ccdb0b959b488bb008145631e26, type: 3}
   slash:
     enabled: 1
-    startFrame: 14
-    endFrame: 19
-    localOffset: {x: 0, y: 1.2, z: 0.05}
-    localEulerAngles: {x: 0, y: 0, z: -90}
+    startFrame: 32
+    endFrame: 41
+    localOffset: {x: 0, y: 1.2, z: 0.3}
+    localEulerAngles: {x: 0, y: 0, z: 0}
     reverseSweep: 0
     fullCircle: 0
+    thrust: 1
     startSweepAngle: 0
     endSweepAngle: 0
     progression:
@@ -81,4 +106,4 @@ MonoBehaviour:
     size: 1
     visualScale: {x: 1, y: 1, z: 1}
     forwardDrift: 0
-    followPlayer: 0
+    followPlayer: 1

@@ -106,6 +106,9 @@ namespace ElementalGems
             if (current == null && !consumed)
             {
                 consumed = true;
+                CombatCameraShake.PlayerAttack(transform.position,
+                    player.CurrentAttackInput ?? CombatAttackInput.LightAttack,
+                    player.CurrentSwordHeavyDamagePhase == SwordHeavyDamagePhase.High ? 1.25f : 1f);
                 var prefab = elementalSlashes == null ? null : System.Array.Find(elementalSlashes,
                     s => s != null && s.element == manager.EquippedElement);
                 if (prefab == null && manager.EquippedElement == ElementType.Normal && elementalSlashes != null)

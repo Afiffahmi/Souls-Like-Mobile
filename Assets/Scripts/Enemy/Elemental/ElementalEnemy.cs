@@ -231,8 +231,10 @@ namespace ElementalGems
         public void ApplyKnockback(Vector3 direction, float strength, float durationMultiplier = 1f)
         {
             if (Protected || health == null || health.IsDead || !isActiveAndEnabled) return;
+            bool accepted = CanKnockback(direction, strength, durationMultiplier);
             knockbackMotion.Add(direction, Mathf.Max(0, strength - knockbackResistance), durationMultiplier);
             push = knockbackMotion.Velocity;
+            if (accepted) CombatCameraShake.Knockback(transform.position, strength - knockbackResistance);
         }
         private void Update()
         {

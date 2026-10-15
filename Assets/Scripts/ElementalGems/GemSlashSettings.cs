@@ -17,6 +17,8 @@ namespace ElementalGems
         public bool reverseSweep;
         [Tooltip("Full circular visual and 360-degree damage area, including behind the player.")]
         public bool fullCircle;
+        [Tooltip("Shape the layered glow into a straight, pointed thrust instead of sweeping an arc.")]
+        public bool thrust;
         [Tooltip("Additional rotation about the slash plane's local Y axis, from start to end. Use values outside +/-180 for larger arcs.")]
         public float startSweepAngle;
         public float endSweepAngle;

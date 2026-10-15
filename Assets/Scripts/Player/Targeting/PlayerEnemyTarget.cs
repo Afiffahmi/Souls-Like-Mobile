@@ -16,6 +16,9 @@ namespace SoulsLike.Enemies
         private PlayerOverall health;
         private PlayerStateManager player;
         private CharacterController body;
+        private readonly ElementalGems.KnockbackMotion attackKnockback = new ElementalGems.KnockbackMotion();
+        public float KnockbackRemaining => attackKnockback.Remaining;
+        public bool IsKnockedBack => isActiveAndEnabled && KnockbackRemaining > 0;
         private void Awake() { health = GetComponent<PlayerOverall>(); player = GetComponent<PlayerStateManager>(); body = GetComponent<CharacterController>(); }
         public override bool IsAlive => isActiveAndEnabled && health != null && health.currentHealth > 0;
         public override Vector3 AimPosition => body != null && body.enabled ? body.bounds.center : transform.position + Vector3.up;
@@ -26,6 +29,7 @@ namespace SoulsLike.Enemies
             if (!CanReceiveHit(damage, source, allowParry)) return false;
             int before = health.currentHealth;
             health.TakeDamage(damage);
+            ApplyAttackKnockback(source);
             return health.currentHealth < before;
         }
         public override bool ReceiveElementalDamage(int damage, EnemyBrain source, ElementalGems.ElementType incoming, bool allowParry)
@@ -34,12 +38,32 @@ namespace SoulsLike.Enemies
             var elemental = GetComponent<ElementalGems.PlayerElementalState>();
             if (elemental != null && elemental.isActiveAndEnabled)
             {
-                return elemental.ReceiveHit(damage, incoming);
+                bool accepted = elemental.ReceiveHit(damage, incoming);
+                if (accepted) ApplyAttackKnockback(source);
+                return accepted;
             }
             int before = health.currentHealth;
             health.TakeDamage(damage);
+            ApplyAttackKnockback(source);
             return health.currentHealth < before;
         }
+        private void ApplyAttackKnockback(EnemyBrain source)
+        {
+            var attack = source != null ? source.CurrentAttack : null;
+            if (attack == null || attack.playerKnockback <= 0 || !IsAlive) return;
+            Vector3 direction = attack.lockFacingAtStart ? source.transform.forward : GroundPosition - source.transform.position;
+            attackKnockback.Add(direction, attack.playerKnockback);
+            if (player != null) player.InterruptForElementalStatus();
+        }
+        private void LateUpdate() => TickKnockback(Time.deltaTime);
+        private void TickKnockback(float seconds)
+        {
+            if (!IsAlive) { attackKnockback.Clear(); return; }
+            if (attackKnockback.Remaining <= 0) return;
+            Vector3 displacement = attackKnockback.Advance(seconds);
+            if (body != null && body.enabled) body.Move(displacement);
+        }
+        protected override void OnDisable() { attackKnockback.Clear(); base.OnDisable(); }
         public override bool TryParryAttack(EnemyBrain source)
         {
             if (source != null && source.CurrentAttack != null && !source.CurrentAttack.canBeParried) return false;

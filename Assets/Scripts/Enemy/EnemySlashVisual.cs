@@ -11,6 +11,7 @@ namespace SoulsLike.Enemies
         readonly Dictionary<GemCrescentSlash, GemCrescentSlash> cached = new Dictionary<GemCrescentSlash, GemCrescentSlash>();
         EnemyBrain brain;
         EnemyAnimationDriver driver;
+        ElementalEnemy elemental;
         EnemyAttackDefinition attack;
         GemSlashSettings settings;
         GemCrescentSlash current;
@@ -18,7 +19,7 @@ namespace SoulsLike.Enemies
         Quaternion facing;
         bool consumed;
         public GemCrescentSlash ActiveSlash => current;
-        void Awake() { brain=GetComponent<EnemyBrain>(); driver=GetComponent<EnemyAnimationDriver>(); }
+        void Awake() { brain=GetComponent<EnemyBrain>(); driver=GetComponent<EnemyAnimationDriver>(); elemental=GetComponent<ElementalEnemy>(); }
         void OnEnable() { brain.AttackStarted+=Begin; brain.StateChanged+=StateChanged; }
         void OnDisable()
         {
@@ -49,6 +50,7 @@ namespace SoulsLike.Enemies
                 localOffset=source.localOffset, localEulerAngles=source.localEulerAngles,
                 reverseSweep=source.reverseSweep, startSweepAngle=source.startSweepAngle,
                 endSweepAngle=source.endSweepAngle, progression=source.progression,
+                fullCircle=source.fullCircle, thrust=source.thrust, visualScale=source.visualScale,
                 size=source.size, forwardDrift=source.forwardDrift, followPlayer=source.followPlayer
             };
         }
@@ -65,11 +67,15 @@ namespace SoulsLike.Enemies
             if(current==null && !consumed)
             {
                 consumed=true;
-                if(!cached.TryGetValue(attack.slashPrefab,out current) || current==null)
+                var type=elemental!=null?elemental.CurrentElement:ElementType.Normal;
+                var prefab=attack.elementalSlashPrefabs==null?null:System.Array.Find(attack.elementalSlashPrefabs,
+                    p=>p!=null && p.element==type);
+                if(prefab==null) prefab=attack.slashPrefab;
+                if(!cached.TryGetValue(prefab,out current) || current==null)
                 {
-                    current=Instantiate(attack.slashPrefab);
-                    current.name=name+" Sword Slash";
-                    cached[attack.slashPrefab]=current;
+                    current=Instantiate(prefab);
+                    current.name=name+(settings.thrust?" Sword Thrust":" Sword Slash");
+                    cached[prefab]=current;
                 }
                 CapturePose(); current.gameObject.SetActive(true); current.InitializeDriven(settings);
             }

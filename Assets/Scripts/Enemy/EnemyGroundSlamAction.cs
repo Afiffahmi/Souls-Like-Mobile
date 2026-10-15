@@ -62,6 +62,7 @@ namespace SoulsLike.Enemies
             ElementType type = element != null ? (useInnateElement ? element.element : element.CurrentElement) : ElementType.Normal;
             var gem = System.Array.Find(elementPalette, g => g != null && g.element == type);
             Color tint = gem != null ? gem.color : ElementalReactionVfx.Tint(type);
+            CombatCameraShake.EnemyAttack(center, true, 1.4f);
             ElementalGroundImpact.Spawn(source.gameObject.scene, center, normal, radius, effectLifetime, crackDetail,
                 particleCount, type, tint, groundMaterial, particleMaterial, energyMaterial, effectSpeed, edgeRoughness,
                 crackGlow, crackOpacity, crackWidth, groundAndObstacles, coreRadiusRatio, coreOpacity);

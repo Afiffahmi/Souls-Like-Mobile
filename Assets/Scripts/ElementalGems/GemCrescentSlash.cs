@@ -35,14 +35,24 @@ namespace ElementalGems
 
         // Matches the primary Band in GemCrescentBuilder and _WidthScale in CrescentSlash.shader.
         public const float BodyRadius = 2.12f, BodyWidth = 1.52f, BodyArc = 172f;
+        public const float ThrustLength = 3.8f, ThrustHalfWidth = .45f;
+        public const float ThrustTail = 2f;
         public float RevealedSweep => drivenSettings != null ? drivenSettings.Evaluate(drivenProgress) : 0;
         public bool ReverseSweep => direction < 0;
         public bool FullCircle => drivenSettings != null && drivenSettings.fullCircle;
+        public bool IsThrust => drivenSettings != null && drivenSettings.thrust;
         public bool HasDrivenGeometry => drivenSettings != null && gameObject.activeInHierarchy;
         public Quaternion HitFacing { get; private set; } = Quaternion.identity;
 
         public void GetLocalHitSpan(float sweep, out Vector3 inner, out Vector3 outer)
         {
+            if (IsThrust)
+            {
+                float z = Mathf.Clamp01(sweep) * ThrustLength;
+                inner = new Vector3(-ThrustHalfWidth, 0, z);
+                outer = new Vector3(ThrustHalfWidth, 0, z);
+                return;
+            }
             float u = direction < 0 ? 1 - sweep : sweep;
             float angle = (FullCircle ? u * 360f - 270f : (u - .5f) * BodyArc) * Mathf.Deg2Rad;
             float taper = FullCircle ? 1f : Mathf.Pow(Mathf.Max(.001f, Mathf.Sin(u * Mathf.PI)), .7f) * (.7f + .6f * u);
@@ -73,7 +83,8 @@ namespace ElementalGems
                 // Shader expands the front crescent into a full ring; include its back half in culling.
                 float radius = Mathf.Max(Mathf.Abs(authoredBounds.min.x), Mathf.Abs(authoredBounds.max.x),
                     Mathf.Abs(authoredBounds.min.z), Mathf.Abs(authoredBounds.max.z));
-                surface.localBounds = FullCircle ? new Bounds(Vector3.zero, new Vector3(radius * 2, Mathf.Max(2, authoredBounds.size.y), radius * 2)) : authoredBounds;
+                surface.localBounds = IsThrust ? new Bounds(Vector3.forward * ((ThrustLength - ThrustTail) * .5f), new Vector3(2, 2, ThrustLength + ThrustTail + 1)) :
+                    FullCircle ? new Bounds(Vector3.zero, new Vector3(radius * 2, Mathf.Max(2, authoredBounds.size.y), radius * 2)) : authoredBounds;
             }
             if (accents == null) return;
             foreach (var ps in accents)
@@ -104,6 +115,7 @@ namespace ElementalGems
                 properties.SetFloat("_WidthScale", bandWidth);
                 properties.SetFloat("_Direction", direction);
                 properties.SetFloat("_FullCircle", FullCircle ? 1f : 0f);
+                properties.SetFloat("_Thrust", IsThrust ? 1f : 0f);
                 surface.SetPropertyBlock(properties);
                 surface.enabled = drivenProgress < 1;
             }
@@ -115,13 +127,17 @@ namespace ElementalGems
                 if (direction < 0) u = 1 - u;
                 float a = (FullCircle ? u * 360f - 270f : (u - .5f) * arcDegrees) * Mathf.Deg2Rad;
                 var radial = new Vector3(Mathf.Sin(a), 0, Mathf.Cos(a));
+                Vector3 localPosition = IsThrust
+                    ? new Vector3(Mathf.Sin(emittedParticles * 2.4f) * .2f, 0, Mathf.Lerp(-ThrustTail, ThrustLength, u))
+                    : radial * particleRadius;
+                Vector3 velocity = IsThrust ? Vector3.forward * 2f : radial * .3f;
                 if (accents == null) continue;
                 foreach (var ps in accents)
                 {
                     if (ps == null) continue;
                     ps.Emit(new ParticleSystem.EmitParams {
-                        position = transform.TransformPoint(radial * particleRadius),
-                        velocity = transform.rotation * radial * .3f,
+                        position = transform.TransformPoint(localPosition),
+                        velocity = transform.rotation * velocity,
                         applyShapeToPosition = false
                     }, 1);
                 }
@@ -180,6 +196,8 @@ namespace ElementalGems
             if (surface == null) return;
             properties.SetFloat(Age, Mathf.Clamp01(t));
             properties.SetFloat("_SweepProgress", -1);
+            properties.SetFloat("_Thrust", 0);
+            properties.SetFloat("_FullCircle", 0);
             properties.SetColor(Tint, color);
             properties.SetFloat(Intensity, intensity);
             properties.SetFloat("_WidthScale", bandWidth);

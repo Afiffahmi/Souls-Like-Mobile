@@ -6,6 +6,8 @@ namespace SoulsLike.Enemies
     public sealed class EnemyAnimationDriver : MonoBehaviour
     {
         public Animator animator;
+        [Tooltip("Use the Run state while moving. Leave off for enemies with separate walking locomotion.")]
+        public bool runForLocomotion;
         private int requested;
         public const string AttackPhaseSpeedParameter = "EnemyAttackPhaseSpeed";
         private static readonly int AttackPhaseSpeedHash = Animator.StringToHash(AttackPhaseSpeedParameter);
@@ -61,7 +63,7 @@ namespace SoulsLike.Enemies
             if (info.fullPathHash != hash) return false;
             time = info.normalizedTime; return true;
         }
-        public void Locomotion(bool moving, float blend) => Play(moving ? "Walk" : "Idle", blend);
+        public void Locomotion(bool moving, float blend) => Play(moving ? (runForLocomotion && HasState("Run") ? "Run" : "Walk") : "Idle", blend);
         private void OnDisable() { requested = 0; ResetAttackSpeed(); }
     }
 }

@@ -11,6 +11,7 @@ Shader "ElementalGems/Broad Crescent Slash"
         _SweepProgress("Animation sweep (negative uses lifetime)", Float)=-1
         _WidthScale("Crescent band width", Range(.4,1.8))=1
         _FullCircle("Full circular slash", Float)=0
+        _Thrust("Straight thrust", Float)=0
     }
     SubShader
     {
@@ -24,14 +25,26 @@ Shader "ElementalGems/Broad Crescent Slash"
             #pragma fragment frag
             #include "UnityCG.cginc"
             float4 _Tint;
-            float _Intensity, _Age, _FlowSpeed, _Turbulence, _Direction, _WidthScale, _SweepProgress, _FullCircle;
+            float _Intensity, _Age, _FlowSpeed, _Turbulence, _Direction, _WidthScale, _SweepProgress, _FullCircle, _Thrust;
             struct A { float4 vertex:POSITION; float2 uv:TEXCOORD0; float2 layer:TEXCOORD1; float4 color:COLOR; };
             struct V { float4 vertex:SV_POSITION; float2 uv:TEXCOORD0; float2 layer:TEXCOORD1; float4 color:COLOR; };
             V vert(A v)
             {
                 V o;
                 float r=length(v.vertex.xz);
-                if (_FullCircle>.5)
+                if (_Thrust>.5)
+                {
+                    // Unwrap the same closed, layered crescent bands into a pointed lance.
+                    // Keep its glow/filaments/material, with reveal travelling toward the tip.
+                    float u=v.uv.x;
+                    float authoredTaper=pow(max(.001,sin(u*3.14159265)),.7)*(.7+.6*u);
+                    float taper=pow(max(0,sin(u*3.14159265)),.55)*(1-.5*u);
+                    float across=(r-v.layer.y)/authoredTaper;
+                    v.vertex.x=((v.layer.y-2.12)*.32+across*.4*_WidthScale)*taper;
+                    v.vertex.y=(v.vertex.y-v.layer.x*.004)/authoredTaper*taper*.6+v.layer.x*.004;
+                    v.vertex.z=lerp(-2,3.8,u);
+                }
+                else if (_FullCircle>.5)
                 {
                     // Undo the authored crescent taper and wrap each band into a closed ring.
                     float taper=pow(max(.001,sin(v.uv.x*3.14159265)),.7)*(.7+.6*v.uv.x);
@@ -51,6 +64,7 @@ Shader "ElementalGems/Broad Crescent Slash"
                 float wave=sin(phase)*sin(phase*.43+v*7);
                 float endFade=_FullCircle>.5?1:pow(saturate(sin(u*3.14159265)),.38);
                 float reveal=smoothstep(-.09,.05, (_SweepProgress>=0?_SweepProgress:_Age*6)-(_Direction>0?u:1-u));
+                if (_Thrust>.5) reveal=1;
                 float fade=1-smoothstep(_SweepProgress>=0?.8:.25,1,_Age);
                 float edge=smoothstep(0,.12,v)*(1-smoothstep(.85,1,v));
                 float flowV=v+wave*_Turbulence*.10*(1-v);

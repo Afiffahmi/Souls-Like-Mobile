@@ -28,6 +28,7 @@ namespace Nusantara.World
         [Tooltip("Context menu: Preview Day / Preview Night / Restore Lighting. Preview does not advance game time.")]
         [Range(0,24)] public float previewHour = 12;
         double elapsed;
+        float configuredDayMinutes, configuredNightMinutes;
         Material runtimeSky;
         bool captured;
         Material originalSky;
@@ -40,6 +41,7 @@ namespace Nusantara.World
         public Material RuntimeSky => runtimeSky;
         public float CurrentHour { get; private set; }
         public bool IsDay => CurrentHour>=6 && CurrentHour<18;
+        public bool IsNight => !IsDay;
 
         public static float HourAt(double seconds,float day,float night)
         {
@@ -65,13 +67,28 @@ namespace Nusantara.World
         }
         public void Advance(double seconds)
         {
+            // Duration edits change the clock rate without jumping to a different hour.
+            if (configuredDayMinutes != dayMinutes || configuredNightMinutes != nightMinutes)
+            {
+                elapsed=SecondsAt(CurrentHour,dayMinutes,nightMinutes);
+                configuredDayMinutes=dayMinutes;configuredNightMinutes=nightMinutes;
+            }
             elapsed=(elapsed+System.Math.Max(0,seconds))%((System.Math.Max(.01,dayMinutes)+System.Math.Max(.01,nightMinutes))*60);
             ApplyHour(HourAt(elapsed,dayMinutes,nightMinutes));
         }
         public void SetHour(float hour)
         {
+            configuredDayMinutes=dayMinutes;configuredNightMinutes=nightMinutes;
             elapsed=SecondsAt(hour,dayMinutes,nightMinutes);ApplyHour(Mathf.Repeat(hour,24));
         }
+        public void SetTestHour(float hour)
+        {
+            runCycle=false;
+            if(!Application.isPlaying)startingHour=Mathf.Repeat(hour,24);
+            previewHour=Mathf.Repeat(hour,24);SetHour(hour);
+        }
+        [ContextMenu("Test Day (pause at noon)")] public void TestDay()=>SetTestHour(12);
+        [ContextMenu("Test Night (pause at midnight)")] public void TestNight()=>SetTestHour(0);
         public void ApplyHour(float hour)
         {
             CaptureLighting();CurrentHour=Mathf.Repeat(hour,24);

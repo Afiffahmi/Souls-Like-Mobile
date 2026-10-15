@@ -17,6 +17,7 @@ namespace SoulsLike.Enemies
         private Vector3 attackMoveStart;
         private Vector3 attackMoveDirection;
         private float attackMoveDistance, attackMoveProgress;
+        public bool IsApproachingAttack { get; private set; }
         private void Awake() => Agent = GetComponent<NavMeshAgent>();
         public void Configure(EnemyProfile profile)
         {
@@ -93,6 +94,32 @@ namespace SoulsLike.Enemies
         {
             CancelAttackMovement();
             if (!Ready || attack.movement == EnemyAttackMotion.AnimationOnly) return;
+            IsApproachingAttack = attack.HasApproachPhase;
+            if (IsApproachingAttack) return;
+            CaptureAttackMovement(attack, target);
+        }
+        public bool TickAttackApproach(EnemyAttackDefinition attack, float time, EnemyTarget target, EnemyProfile profile, float speedMultiplier)
+        {
+            if (!IsApproachingAttack) return false;
+            float frame = time * attack.animation.length * attack.animation.frameRate;
+            if (frame < attack.movementStartFrame)
+            {
+                if (target != null && Vector3.ProjectOnPlane(target.GroundPosition - NavigationPosition, Vector3.up).magnitude > attack.targetStoppingDistance)
+                    MoveTo(target.GroundPosition, attack.targetStoppingDistance, profile, speedMultiplier);
+                else Stop();
+                return true;
+            }
+            // Live pursuit ends here. Neither the heading nor distance re-reads the target afterward.
+            IsApproachingAttack = false;
+            Stop();
+            CaptureAttackMovement(attack, target);
+            if (attack.lockFacingAtStart && attackMoveDirection.sqrMagnitude > .0001f)
+                transform.rotation = Quaternion.LookRotation(attackMoveDirection);
+            return false;
+        }
+        private void CaptureAttackMovement(EnemyAttackDefinition attack, EnemyTarget target)
+        {
+            if (!Ready) return;
             attackMoveStart = Agent.nextPosition;
             Vector3 toward = target != null ? target.GroundPosition - attackMoveStart : transform.forward;
             toward = Vector3.ProjectOnPlane(toward, Vector3.up);
@@ -100,8 +127,9 @@ namespace SoulsLike.Enemies
                 attack.movementDirection == EnemyAttackDirection.TowardTarget ? toward.normalized :
                 attack.movementDirection == EnemyAttackDirection.AwayFromTarget ? -toward.normalized : transform.forward;
             attackMoveDirection = Vector3.ProjectOnPlane(attackMoveDirection, Vector3.up).normalized;
+            if (attackMoveDirection.sqrMagnitude < .0001f) attackMoveDirection = transform.forward;
             attackMoveDistance = attack.movementDistance;
-            if (attack.movementDirection == EnemyAttackDirection.TowardTarget)
+            if (attack.movementDirection == EnemyAttackDirection.TowardTarget && !attack.fixedMovementDistance)
                 attackMoveDistance = Mathf.Min(attackMoveDistance, Mathf.Max(0, toward.magnitude - attack.targetStoppingDistance));
             Vector3 destination = attackMoveStart + attackMoveDirection * attackMoveDistance;
             if (attack.movement == EnemyAttackMotion.Jump)
@@ -159,7 +187,7 @@ namespace SoulsLike.Enemies
                 remaining -= length;
             }
         }
-        public void CancelAttackMovement() { attackCorners = null; attackNextCorner = 1; attackMoveDistance = attackMoveProgress = 0; attackMoveDirection = Vector3.zero; }
+        public void CancelAttackMovement() { IsApproachingAttack = false; attackCorners = null; attackNextCorner = 1; attackMoveDistance = attackMoveProgress = 0; attackMoveDirection = Vector3.zero; }
         private void OnDisable() => Stop();
     }
 }

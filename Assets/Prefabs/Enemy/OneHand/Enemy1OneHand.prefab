@@ -148,6 +148,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SoulsLike.Enemies.EnemyAnimationDriver
   animator: {fileID: 8471537213565491657}
+  runForLocomotion: 0
 --- !u!114 &8363412304640773842
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -161,6 +162,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ElementalGems.ElementalEnemy
   element: 1
+  infusionDuration: 0
+  showDarknessShield: 1
+  reactionRadius: 4
+  reactionDamageScale: 0.65
+  reactionCooldown: 0.65
+  maxChainTargets: 6
+  darknessShieldEnabled: 1
+  darknessShieldLayers: 2
+  purificationWindow: 6
+  shieldDamageMultiplier: 0
   resistances: []
   immunities: 
   interruptOnStun: []
@@ -193,6 +204,11 @@ MonoBehaviour:
   targetOverride: {fileID: 0}
   attackOrigin: {fileID: 1328701319360936749}
   postAttackStandbySeconds: 2
+  debugRepeatSpecialAttacks: 0
+  debugBypassHealthMilestone: 0
+  debugIgnoreSpecialCooldown: 1
+  debugSpecialRepeatDelay: 0.5
+  debugSpecialAttacks: []
   state: 0
 --- !u!114 &7225455177558656621
 MonoBehaviour:
@@ -206,6 +222,30 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aa336a46916cb6e4c8f1ebdf00a3a00f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SoulsLike.Enemies.EnemySlashVisual
+--- !u!114 &901170000000000002
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1162985367512093051}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 57c902da77c54c20a0176612ef2acf8b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ElementalGems.EnemyEyeParticles
+  arrowVisualsSource: {fileID: 8723608089948372503, guid: e12600e3e9b401041bc0a5874fd78417, type: 3}
+  eyeMarkers: []
+  useEyeBonesWhenMarkersMissing: 1
+  eyeSize: 0.25
+  chargedParticleTrails: 1
+  trailLifetime: 1.2
+  ribbonMaterial: {fileID: 2100000, guid: df94db6b523f346a7a995fd65c86ceb8, type: 2}
+  tailLength: 1.5
+  tailFadeSeconds: 0.25
+  tailWidth: 0.045
+  brightness: 3
+  timeCycle: {fileID: 0}
 --- !u!1 &3181411364579265923
 GameObject:
   m_ObjectHideFlags: 0
@@ -562,6 +602,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SoulsLike.Enemies.EnemyHealthBarBillboard
   health: {fileID: 2051703639057441049}
   worldOffset: {x: 0, y: 3.15, z: 0}
+  gemIconSource: {fileID: 0}
+  elementIconSize: 1.5
+  elementIconGap: 0.3
 --- !u!1 &7840020435308184202
 GameObject:
   m_ObjectHideFlags: 0
@@ -815,20 +858,3 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &901170000000000002
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1162985367512093051}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 57c902da77c54c20a0176612ef2acf8b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ElementalGems.EnemyEyeParticles
-  arrowVisualsSource: {fileID: 8723608089948372503, guid: e12600e3e9b401041bc0a5874fd78417, type: 3}
-  eyeMarkers: []
-  useEyeBonesWhenMarkersMissing: 1
-  eyeSize: 0.35
-  chargedParticleTrails: 1

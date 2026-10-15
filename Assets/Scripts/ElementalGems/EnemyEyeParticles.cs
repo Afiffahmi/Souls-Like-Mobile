@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Nusantara.World;
 
 namespace ElementalGems
 {
@@ -15,8 +16,38 @@ namespace ElementalGems
         [Tooltip("Create missing markers on the character's eye bones when no custom markers are assigned or found.")]
         public bool useEyeBonesWhenMarkersMissing = true;
         [Min(.01f), Tooltip("World size relative to the arrowhead effect. Change this to resize both eyes together.")]
-        public float eyeSize = .35f;
+        public float eyeSize = .2f;
+        [InspectorName("Show Ribbon Tail")]
         public bool chargedParticleTrails = true;
+        [HideInInspector]
+        public float trailLifetime = 1.2f;
+        [Header("Visible eye ribbon")]
+        public Material ribbonMaterial;
+        [Min(.1f), Tooltip("Maximum world length of the trail left by movement. No tail is drawn while idle.")]
+        public float tailLength = 1.2f;
+        [Min(.05f), Tooltip("Seconds before the movement tail fades away after stopping.")]
+        public float tailFadeSeconds = .25f;
+        [Min(.01f), Tooltip("World width of the bright ribbon. The core and soft glow scale with this.")]
+        public float tailWidth = .035f;
+        [Min(1), Tooltip("Brightness of the core and ribbon; remains visible without camera bloom.")]
+        public float brightness = 3f;
+        [Tooltip("Optional clock override. Otherwise uses the active world's day/night clock. Eyes are hidden without an active clock and during 06:00–18:00.")]
+        public WorldDayNightCycle timeCycle;
+        private static WorldDayNightCycle sharedTimeCycle;
+        private static float nextClockLookup;
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void ResetClock() { sharedTimeCycle = null; nextClockLookup = 0; }
+        private bool IsNight()
+        {
+            if (timeCycle != null) return timeCycle.isActiveAndEnabled && timeCycle.IsNight;
+            if ((sharedTimeCycle == null || !sharedTimeCycle.isActiveAndEnabled) && Time.unscaledTime >= nextClockLookup)
+            {
+                sharedTimeCycle = FindAnyObjectByType<WorldDayNightCycle>();
+                nextClockLookup = Time.unscaledTime + 1;
+            }
+            return sharedTimeCycle != null && sharedTimeCycle.isActiveAndEnabled && sharedTimeCycle.IsNight;
+        }
 
         private ElementalEnemy enemy;
         private readonly List<Transform> anchors = new List<Transform>();
@@ -26,6 +57,8 @@ namespace ElementalGems
         private GameObject displayedPrefab;
         private float displayedSize;
         private bool displayedTrails;
+        private float displayedTrailLifetime, displayedLength, displayedWidth, displayedBrightness, displayedFadeSeconds;
+        private Material displayedRibbonMaterial;
 
         private void Awake() => enemy = GetComponent<ElementalEnemy>();
         private void OnEnable() => FindEyeMarkers();
@@ -80,7 +113,7 @@ namespace ElementalGems
         {
             // Element-born eyes turn off during the fixed Normal window, then return to their innate design.
             // Ordinary knockback never starts or refreshes that window.
-            var element = enemy != null && enemy.Health != null && !enemy.Health.IsDead
+            var element = IsNight() && enemy != null && enemy.Health != null && !enemy.Health.IsDead
                 ? (enemy.IsElementBorn ? enemy.CurrentElement : enemy.element) : ElementType.Normal;
             var styles = arrowVisualsSource != null ? arrowVisualsSource.styles : null;
             var style = element == ElementType.Normal || styles == null ? null :
@@ -88,7 +121,8 @@ namespace ElementalGems
             var prefab = style != null ? style.arrowheadAura : null;
             float size = style != null ? Mathf.Max(.01f, eyeSize) * style.size : 0;
             if (element == displayedElement && style == displayedStyle && prefab == displayedPrefab &&
-                size == displayedSize && chargedParticleTrails == displayedTrails) return;
+                size == displayedSize && chargedParticleTrails == displayedTrails && trailLifetime == displayedTrailLifetime &&
+                tailFadeSeconds == displayedFadeSeconds && tailLength == displayedLength && tailWidth == displayedWidth && brightness == displayedBrightness && ribbonMaterial == displayedRibbonMaterial) return;
 
             ClearEffects();
             displayedElement = element;
@@ -96,21 +130,35 @@ namespace ElementalGems
             displayedPrefab = prefab;
             displayedSize = size;
             displayedTrails = chargedParticleTrails;
+            displayedTrailLifetime = trailLifetime;
+            displayedFadeSeconds = tailFadeSeconds; displayedLength = tailLength; displayedWidth = tailWidth; displayedBrightness = brightness; displayedRibbonMaterial = ribbonMaterial;
             if (prefab == null) return;
-            foreach (var marker in anchors)
+            Vector3 center = Vector3.zero;
+            foreach (var marker in anchors) if (marker != null) center += marker.position;
+            center /= Mathf.Max(1, anchors.Count);
+            for (int index = 0; index < anchors.Count; index++)
             {
-                if (marker == null) continue;
-                var effect = Instantiate(prefab, marker, false);
-                effect.name = "Eye Particle - " + element;
-                effect.transform.localPosition = Vector3.zero;
-                effect.transform.localRotation = Quaternion.identity;
+                var marker = anchors[index]; if (marker == null) continue;
+                var effect = new GameObject("Eye Particle - " + element); effect.layer = gameObject.layer;
+                effect.transform.SetParent(marker, false);
                 var scale = marker.lossyScale;
-                effect.transform.localScale = new Vector3(
-                    1 / Mathf.Max(.001f, Mathf.Abs(scale.x)),
-                    1 / Mathf.Max(.001f, Mathf.Abs(scale.y)),
-                    1 / Mathf.Max(.001f, Mathf.Abs(scale.z))) * size;
-                GemArrowVisuals.ConfigureTipParticles(effect, ElementalReactionVfx.Tint(element),
-                    style.trailMaterial, chargedParticleTrails);
+                effect.transform.localScale = new Vector3(1 / Mathf.Max(.001f, Mathf.Abs(scale.x)),
+                    1 / Mathf.Max(.001f, Mathf.Abs(scale.y)), 1 / Mathf.Max(.001f, Mathf.Abs(scale.z)));
+                var accent = Instantiate(prefab, effect.transform, false);
+                accent.name = "Elemental eye motes"; accent.transform.localScale = Vector3.one * size;
+                var tint = ElementalReactionVfx.Tint(element);
+                GemArrowVisuals.ConfigureTipParticles(accent, tint, style.trailMaterial, false);
+                foreach (var particle in accent.GetComponentsInChildren<ParticleSystem>(true))
+                { var trails = particle.trails; trails.enabled = false; }
+                foreach (var ribbon in accent.GetComponentsInChildren<GemVfxRibbons>(true)) ribbon.enabled = false;
+                foreach (var line in accent.GetComponentsInChildren<LineRenderer>(true)) line.enabled = false;
+                if (chargedParticleTrails && ribbonMaterial != null)
+                {
+                    float secondary = anchors.Count > 2 && index >= 2 ? .45f : 1;
+                    float side = Vector3.Dot(marker.position - center, transform.right) >= 0 ? 1 : -1;
+                    effect.AddComponent<EnemyEyeRibbon>().Configure(transform, ribbonMaterial, tint,
+                        tailLength * (secondary < 1 ? .7f : 1), tailWidth * secondary, brightness, side, tailFadeSeconds);
+                }
                 effects.Add(effect);
             }
         }

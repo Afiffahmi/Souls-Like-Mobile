@@ -45,10 +45,17 @@ namespace SoulsLike.Enemies
         public EnemyAttackMotion movement;
         public EnemyAttackDirection movementDirection = EnemyAttackDirection.TowardTarget;
         [Min(0)] public float movementDistance = 3f;
+        [Tooltip("Travel the full Movement Distance, even past a nearby target. NavMesh boundaries still stop movement.")]
+        public bool fixedMovementDistance;
+        [Tooltip("Start without requiring melee range, facing or direct sight, then pursue the player until Movement Start Frame. At that frame, capture a new heading and commit to the dash.")]
+        public bool approachBeforeDash;
+        public bool HasApproachPhase => approachBeforeDash && movement == EnemyAttackMotion.Dash && movementStartFrame > 0;
         [Min(0)] public float movementStartFrame;
         [Min(1)] public float movementEndFrame = 14;
         [Tooltip("Stop this far from the target when moving toward it. Direction is captured at step start. Jump uses the clip's own airborne pose; movement stays on the NavMesh.")]
         [Min(0)] public float targetStoppingDistance = 1f;
+        [Tooltip("Push strength on an accepted player hit. Zero leaves the player in place. Each hit adds its own decaying impulse.")]
+        [Min(0)] public float playerKnockback;
         [Header("Animation action (optional)")]
         [Tooltip("An action such as Summon Army, independent of movement and melee damage. Works on opening attacks and follow-ups.")]
         public EnemyAnimationAction animationAction;
@@ -68,6 +75,8 @@ namespace SoulsLike.Enemies
         [Range(0, 1)] public float hitStart = .4f;
         [Range(0, 1)] public float hitEnd = .55f;
         [Range(0, 1)] public float turnUntil = .25f;
+        [Tooltip("Face the target once when this step starts, then keep that heading. With Approach Before Dash, lock at Movement Start Frame after chasing.")]
+        public bool lockFacingAtStart;
         [Min(0)] public float weight = 1;
         public int priority;
         [Range(0, 1)] public float minimumHealthRatio;
@@ -77,6 +86,8 @@ namespace SoulsLike.Enemies
         [Header("Reusable slash visual")]
         [Tooltip("Optional shared sword slash prefab. Timing always uses this attack's damage window.")]
         public ElementalGems.GemCrescentSlash slashPrefab;
+        [Tooltip("Optional elemental variants. Uses the enemy's current gem; Slash Prefab is the Normal/fallback visual.")]
+        public ElementalGems.GemCrescentSlash[] elementalSlashPrefabs = new ElementalGems.GemCrescentSlash[0];
         [Tooltip("Placement, direction and size; start/end frames are read from Damage Timing above.")]
         public ElementalGems.GemSlashSettings slash = new ElementalGems.GemSlashSettings();
         private bool StepConfigured => available && animation != null && !animation.isLooping &&

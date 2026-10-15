@@ -1,0 +1,53 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fb66e02b62df5634689ec68204e25241, type: 3}
+  m_Name: Snake
+  m_EditorClassIdentifier: Assembly-CSharp::SoulsLike.Enemies.EnemyProfile
+  detectionRadius: 10
+  chaseRadius: 20
+  detectionInterval: 0.25
+  requireLineOfSight: 1
+  obstructionLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  lostSightGrace: 3
+  movementSpeed: 2.5
+  acceleration: 10
+  rotationSpeed: 420
+  repathInterval: 0.25
+  homeTolerance: 0.25
+  unreachableTimeout: 5
+  globalAttackCooldown: 0.65
+  avoidRepeatingAttack: 1
+  attacks:
+  - {fileID: 11400000, guid: d1a229e33a11942cc9d1d1fa4ea6e140, type: 2}
+  selector: {fileID: 0}
+  healthLossSpecialsEnabled: 0
+  healthLossSpecialInterval: 25
+  resetPositionEnabled: 0
+  resetPositionHealthInterval: 25
+  resetPositionAnimation: {fileID: 0}
+  resetPositionPlaybackSpeed: 1
+  resetPositionJumpStartFrame: 2
+  resetPositionJumpEndFrame: 16
+  resetPositionRecovery: 1
+  idle: {fileID: 7400000, guid: a69356e3b74704bd1a632bb855a5c737, type: 2}
+  walk: {fileID: 7400000, guid: be22f0f6b431f46ca92365e5aaa7af47, type: 2}
+  run: {fileID: 7400000, guid: be22f0f6b431f46ca92365e5aaa7af47, type: 2}
+  hit: {fileID: 7400000, guid: cb2156a07f0374784b200cbe314b79f7, type: 2}
+  die: {fileID: 7400000, guid: 543977f0fa147489bb8629faecb0ca61, type: 2}
+  spawnAnimation: {fileID: 0}
+  spawnPlaybackSpeed: 1
+  transitionDuration: 0.08
+  hitFallbackDuration: 1.0000004
+  hitReactionMilliseconds: 0
+  corpseLifetime: 12

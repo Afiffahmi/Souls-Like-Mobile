@@ -49,6 +49,7 @@ namespace SoulsLike.Enemies
         private Vector3 progressPosition;
         private bool appliedHit, pendingContact, attackEntered, initialized, hitAnimationActive, hitAnimationEntered;
         private bool actionExecuted;
+        private bool attackShakePlayed;
         private bool attackCueShown, protectionBrokenByParry;
         private EnemyAttackCue attackCue;
         public bool IsAttackProtected
@@ -188,7 +189,7 @@ namespace SoulsLike.Enemies
                     if (Time.time >= nextAttack)
                     {
                         int special = ChooseAttack(true);
-                        if (special >= 0 && WithinArc(Target, profile.attacks[special].arc)) BeginAttack(special);
+                        if (special >= 0 && (profile.attacks[special].HasApproachPhase || WithinArc(Target, profile.attacks[special].arc))) BeginAttack(special);
                     }
                 }
                 return;
@@ -226,7 +227,7 @@ namespace SoulsLike.Enemies
                 {
                     var attack = profile.attacks[index];
                     motor.Face(Target.GroundPosition - transform.position, profile.rotationSpeed);
-                    if (WithinArc(Target, attack.arc)) { BeginAttack(index); return; }
+                    if (attack.HasApproachPhase || WithinArc(Target, attack.arc)) { BeginAttack(index); return; }
                 }
             }
             float minimum = MinimumEngagementRange();
@@ -293,10 +294,23 @@ namespace SoulsLike.Enemies
             Vector3 delta = Vector3.ProjectOnPlane(target.GroundPosition - transform.position, Vector3.up);
             return delta.sqrMagnitude < .001f || Vector3.Angle(transform.forward, delta) <= arc * .5f;
         }
-        public bool CanHit(EnemyTarget target, EnemyAttackDefinition attack) =>
-            state == EnemyState.Attacking && !Health.IsDead && (status == null || !status.CannotAct) && Valid(target) &&
-            Vector3.Distance(transform.position, target.GroundPosition) <= attack.range &&
-            WithinArc(target, attack.arc) && HasLineOfSight(target);
+        public bool CanHit(EnemyTarget target, EnemyAttackDefinition attack)
+        {
+            if (state != EnemyState.Attacking || Health.IsDead || (status != null && status.CannotAct) || !Valid(target)) return false;
+            if (attack.slash != null && attack.slash.enabled && attack.slash.thrust)
+            {
+                // A thrust contacts the forward lance, not the broad melee selection radius.
+                Vector3 delta = target.GroundPosition - motor.NavigationPosition;
+                Vector3 local = Quaternion.Inverse(transform.rotation) * delta - attack.slash.localOffset;
+                float scale = attack.slash.size;
+                float reach = ElementalGems.GemCrescentSlash.ThrustLength * scale * attack.slash.visualScale.z;
+                float width = ElementalGems.GemCrescentSlash.ThrustHalfWidth * scale * attack.slash.visualScale.x;
+                return Mathf.Abs(delta.y) <= 2f && local.z >= -.35f && local.z <= reach + .35f &&
+                    Mathf.Abs(local.x) <= width + .3f && HasLineOfSight(target);
+            }
+            return Vector3.Distance(transform.position, target.GroundPosition) <= attack.range &&
+                WithinArc(target, attack.arc) && HasLineOfSight(target);
+        }
         public bool CanSelectAttack(int index)
             => CanUseAttack(index) && profile.attacks[index].trigger == EnemyAttackTrigger.Normal && !ImmediateSpecialDebug;
         private bool CanUseAttack(int index)
@@ -313,7 +327,8 @@ namespace SoulsLike.Enemies
             float distance = Vector3.Distance(transform.position, Target.GroundPosition);
             bool selfCast = attack.animationAction != null && !attack.dealsDamage;
             return (debug || (hp >= attack.minimumHealthRatio && hp <= attack.maximumHealthRatio)) &&
-                (selfCast || (distance >= attack.minimumRange && distance <= attack.range && HasLineOfSight(Target)));
+                (selfCast || attack.HasApproachPhase ||
+                    (distance >= attack.minimumRange && distance <= attack.range && HasLineOfSight(Target)));
         }
         private bool CanChooseAttack(int index, bool special)
         {
@@ -385,9 +400,15 @@ namespace SoulsLike.Enemies
             CurrentAttack = step;
             appliedHit = pendingContact = attackEntered = false; previousAttackTime = 0;
             actionExecuted = false;
+            attackShakePlayed = false;
             attackCueShown = protectionBrokenByParry = false;
             if (attackCue != null) attackCue.Hide();
             SetState(EnemyState.Attacking);
+            if (step.lockFacingAtStart && !step.HasApproachPhase && Valid(Target))
+            {
+                Vector3 direction = Vector3.ProjectOnPlane(Target.GroundPosition - motor.NavigationPosition, Vector3.up);
+                if (direction.sqrMagnitude > .0001f) transform.rotation = Quaternion.LookRotation(direction);
+            }
             motor.BeginAttackMovement(step, Target);
             animationDriver.PlayAttack(CurrentAttack, profile.transitionDuration);
             AttackStarted?.Invoke(CurrentAttack);
@@ -410,12 +431,24 @@ namespace SoulsLike.Enemies
                 attackCue.Show(attack, animationDriver.animator);
             }
             animationDriver.UpdateAttackSpeed(attack, time);
-            motor.TickAttackMovement(attack, time);
-            if (time <= attack.turnUntil && Valid(Target)) motor.Face(Target.GroundPosition - transform.position, profile.rotationSpeed);
+            bool approaching = motor.TickAttackApproach(attack, time, Target, profile, status != null ? status.MovementMultiplier : 1);
+            if (!approaching) motor.TickAttackMovement(attack, time);
+            if (!attack.lockFacingAtStart && time <= attack.turnUntil && Valid(Target))
+                motor.Face(Target.GroundPosition - transform.position, profile.rotationSpeed);
             // Exact frame mode never delivers a delayed hit outside the authored window.
             // Legacy normalized mode retains crossing detection for existing profiles.
             bool inWindow = attack.useFrameWindow ? attack.IsInsideFrameWindow(time)
                 : time >= attack.hitStart && previousAttackTime <= attack.hitEnd;
+            // Cross the authored impact frame once per step, even when a rendered frame is skipped.
+            // Ground slams dispatch their own stronger pulse at the actual ground impact.
+            float shakeTime = attack.useFrameWindow
+                ? attack.hitStartFrame / (attack.animation.length * attack.animation.frameRate) : attack.hitStart;
+            if (!attackShakePlayed && attack.dealsDamage && !(attack.animationAction is EnemyGroundSlamAction) && time >= shakeTime)
+            {
+                attackShakePlayed = true;
+                CombatCameraShake.EnemyAttack(AttackPosition, attack.attackType == EnemyAttackType.Special ||
+                    attack.movement == EnemyAttackMotion.Jump);
+            }
             if (attack.dealsDamage && attack.damageAtWindowEnd && !appliedHit)
             {
                 // Give the target the whole visible window to parry. The end

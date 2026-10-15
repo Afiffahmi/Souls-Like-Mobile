@@ -158,6 +158,9 @@ public sealed partial class PlayerBowShooter : MonoBehaviour
         Transform origin = launchPoint != null ? launchPoint : visuals.BowModel;
         if (origin == null) return;
         Vector3 start = origin.TransformPoint(launchOffset);
+        CombatCameraShake.PlayerAttack(player.transform.position,
+            request.special ? CombatAttackInput.SpecialAttack : request.heavy ? CombatAttackInput.HeavyAttack : CombatAttackInput.LightAttack,
+            request.highSpecial ? 1.25f : 1f);
         if (request.highSpecial)
         {
             // Aim at the lock when available; otherwise release forward instead of dropping the shot.
