@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Nusantara.World.Editor
 {
-    public sealed class WorldTerrainBrushWindow : EditorWindow
+    public sealed partial class WorldTerrainBrushWindow : EditorWindow
     {
         enum BrushMode { Raise, Lower, Uneven, Smooth, Flatten }
         [SerializeField] WorldGeographyProfile profile;
@@ -71,8 +71,10 @@ namespace Nusantara.World.Editor
             GUILayout.Label("LAND SCULPTING", EditorStyles.boldLabel);
             GUILayout.Label("Shape your world directly in Scene view.", EditorStyles.wordWrappedLabel);
             EditorGUILayout.Space(10);
+            EditorGUI.BeginChangeCheck();
             using (new EditorGUI.DisabledScope(stroke || painting))
                 profile = (WorldGeographyProfile)EditorGUILayout.ObjectField("World geography", profile, typeof(WorldGeographyProfile), false);
+            if (EditorGUI.EndChangeCheck()) ResetShape();
             if (profile == null || profile.world == null)
             {
                 EditorGUILayout.HelpBox("Assign the world's geography profile to begin.", MessageType.Info);
@@ -83,7 +85,7 @@ namespace Nusantara.World.Editor
                 EditorGUILayout.Space(8);
                 var oldColor = GUI.backgroundColor;
                 GUI.backgroundColor = painting ? new Color(.48f, .83f, .59f) : oldColor;
-                bool enabled = GUILayout.Toggle(painting, painting ? "BRUSH ON — drag in Scene view" : "Enable Terrain Brush", "Button", GUILayout.Height(34));
+                bool enabled = GUILayout.Toggle(painting, painting ? (shapeTool == ShapeTool.Freehand ? "BRUSH ON — drag in Scene view" : "TOOL ON — click to place points") : "Enable Terrain Brush", "Button", GUILayout.Height(34));
                 GUI.backgroundColor = oldColor;
                 if (enabled != painting)
                 {
@@ -96,38 +98,46 @@ namespace Nusantara.World.Editor
                     SceneView.RepaintAll();
                 }
                 EditorGUILayout.Space(10);
-                EditorGUI.BeginChangeCheck();
-                mode = (BrushMode)GUILayout.SelectionGrid((int)mode, new[] { "Raise", "Lower", "Uneven", "Smooth", "Flatten" }, 3, GUILayout.Height(52));
-                if (EditorGUI.EndChangeCheck()) { EndStroke(); SceneView.RepaintAll(); }
-                EditorGUILayout.Space(6);
-                string description = mode == BrushMode.Uneven ? "Natural land: adds small hills and hollows with a stable noise pattern."
-                    : mode == BrushMode.Smooth ? "Clean up rough ground while preserving its overall shape."
-                    : mode == BrushMode.Flatten ? "Level the brush area toward the height where your stroke starts."
-                    : "Clean round brush with a soft edge. Shift reverses raise / lower.";
-                EditorGUILayout.HelpBox(description, MessageType.None);
-                float grid = profile.sculptData != null ? profile.sculptData.spacing : profile.world.chunkSize / Mathf.Max(1, profile.terrainIntervals);
-                radius = EditorGUILayout.Slider("Radius (m)", radius, Mathf.Max(2, grid * 1.5f), 160);
-                hardness = EditorGUILayout.Slider("Hardness", hardness, 0, .9f);
-                if (mode == BrushMode.Raise || mode == BrushMode.Lower)
-                    strength = EditorGUILayout.Slider("Height per dab (m)", strength, .05f, 5);
+                DrawToolMode();
+                if (shapeTool != ShapeTool.Freehand) DrawShapeControls();
                 else
-                    blend = EditorGUILayout.Slider("Strength", blend, .02f, 1);
-                if (mode == BrushMode.Uneven)
                 {
-                    amplitude = EditorGUILayout.Slider("Variation height (m)", amplitude, .1f, 8);
-                    featureSize = EditorGUILayout.Slider("Feature size (m)", featureSize, grid * 4, 200);
-                    seed = EditorGUILayout.IntField("Pattern seed", seed);
+                    EditorGUI.BeginChangeCheck();
+                    mode = (BrushMode)GUILayout.SelectionGrid((int)mode, new[] { "Raise", "Lower", "Uneven", "Smooth", "Flatten" }, 3, GUILayout.Height(52));
+                    if (EditorGUI.EndChangeCheck()) { EndStroke(); SceneView.RepaintAll(); }
+                    EditorGUILayout.Space(6);
+                    string description = mode == BrushMode.Uneven ? "Natural land: adds small hills and hollows with a stable noise pattern."
+                        : mode == BrushMode.Smooth ? "Clean up rough ground while preserving its overall shape."
+                        : mode == BrushMode.Flatten ? "Level the brush area toward the height where your stroke starts."
+                        : "Clean round brush with a soft edge. Shift reverses raise / lower.";
+                    EditorGUILayout.HelpBox(description, MessageType.None);
+                    float grid = profile.sculptData != null ? profile.sculptData.spacing : profile.world.chunkSize / Mathf.Max(1, profile.terrainIntervals);
+                    radius = EditorGUILayout.Slider("Radius (m)", radius, Mathf.Max(2, grid * 1.5f), 160);
+                    hardness = EditorGUILayout.Slider("Hardness", hardness, 0, .9f);
+                    if (mode == BrushMode.Raise || mode == BrushMode.Lower)
+                        strength = EditorGUILayout.Slider("Height per dab (m)", strength, .05f, 5);
+                    else
+                        blend = EditorGUILayout.Slider("Strength", blend, .02f, 1);
+                    if (mode == BrushMode.Uneven)
+                    {
+                        amplitude = EditorGUILayout.Slider("Variation height (m)", amplitude, .1f, 8);
+                        featureSize = EditorGUILayout.Slider("Feature size (m)", featureSize, grid * 4, 200);
+                        seed = EditorGUILayout.IntField("Pattern seed", seed);
+                    }
+                    EditorGUILayout.Space(6);
+                    protect = EditorGUILayout.ToggleLeft("Protect roads and buildings", protect);
                 }
-                EditorGUILayout.Space(6);
-                protect = EditorGUILayout.ToggleLeft("Protect roads and buildings", protect);
-                EditorGUILayout.HelpBox("Ground detail spacing: " + grid.ToString("0.#") + " m. Existing trees and props stay at their placed heights.", MessageType.None);
+                float detailGrid = profile.sculptData != null ? profile.sculptData.spacing : profile.world.chunkSize / Mathf.Max(1, profile.terrainIntervals);
+                EditorGUILayout.HelpBox("Ground detail spacing: " + detailGrid.ToString("0.#") + " m. Existing trees and props stay at their placed heights.", MessageType.None);
                 EditorGUILayout.Space(8);
                 if (GUILayout.Button("Save Terrain", GUILayout.Height(30))) Save();
                 int pending = profile.sculptData != null ? profile.sculptData.pendingChunks.Count : 0;
                 GUILayout.Label(pending == 0 ? "All terrain changes saved." : pending + " chunk(s) need saving.", EditorStyles.miniLabel);
             }
             EditorGUILayout.Space(10);
-            EditorGUILayout.HelpBox("Drag: paint  •  Shift: reverse raise / lower\nCtrl: smooth  •  [ / ]: brush size\nCtrl+Z: undo  •  Esc: disable brush\nAlt + mouse: orbit the scene", MessageType.Info);
+            EditorGUILayout.HelpBox(shapeTool == ShapeTool.Freehand
+                ? "Drag: paint  •  Shift: reverse raise / lower\nCtrl: smooth  •  [ / ]: brush size\nCtrl+Z: undo  •  Esc: disable brush\nAlt + mouse: orbit the scene"
+                : "Click: add point  •  Drag numbered handles: reshape\nEnter: apply / update  •  Backspace: remove selected point\nCtrl+Z: undo  •  Esc: disable tool\nAlt + mouse: orbit the scene", MessageType.Info);
             EditorGUILayout.HelpBox(status, MessageType.None);
             EditorGUILayout.EndScrollView();
         }
@@ -159,6 +169,7 @@ namespace Nusantara.World.Editor
             var e = Event.current;
             if (stroke && (e.rawType == EventType.MouseUp || e.type == EventType.Ignore || e.type == EventType.MouseLeaveWindow)) EndStroke();
             if (!painting || profile == null || profile.sculptData == null || EditorApplication.isPlayingOrWillChangePlaymode) return;
+            if (shapeTool != ShapeTool.Freehand) { ShapeSceneGUI(view); return; }
             if (e.type == EventType.KeyDown)
             {
                 if (e.keyCode == KeyCode.Escape) { EndStroke(); painting = false; e.Use(); Repaint(); return; }
@@ -208,9 +219,10 @@ namespace Nusantara.World.Editor
             }
             catch (Exception error) { EndStroke(); painting = false; status = error.Message; Debug.LogException(error); }
         }
-        float Protection(Vector2 p)
+        float Protection(Vector2 p) => Protection(p, protect);
+        float Protection(Vector2 p, bool enabled)
         {
-            if (!protect) return 1;
+            if (!enabled) return 1;
             float grid = profile.sculptData.spacing;
             // Include a lattice halo: the rendered triangle can extend into a protected road.
             float mask = Mathf.SmoothStep(0, 1, Mathf.Clamp01((profile.RouteDistance(p) - grid * 2) / (grid * 2)));

@@ -13,6 +13,7 @@ namespace Nusantara.World
         [Min(.01f)] public float spacing = 8;
         [Tooltip("Chunks whose generated terrain needs to be refreshed after an edit.")]
         public List<Vector2Int> pendingChunks = new List<Vector2Int>();
+        [HideInInspector] public List<WorldTerrainShape> shapes = new List<WorldTerrainShape>();
 
         [Serializable]
         sealed class Tile
@@ -91,6 +92,7 @@ namespace Nusantara.World
             spacing = ValidSpacing;
             origin = new Vector2(ValidOriginX, ValidOriginZ);
             if (pendingChunks == null) pendingChunks = new List<Vector2Int>();
+            if (shapes == null) shapes = new List<WorldTerrainShape>();
         }
 
         void EnsureCache()
