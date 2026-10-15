@@ -157,7 +157,7 @@ namespace ElementalGems
             for(int i=0;i<count;i++)
             {
                 motes[i]=new Mote {surface=samples[random.Next(samples.Count)],release=(float)random.NextDouble()*.46f,
-                    phase=(float)random.NextDouble()*Mathf.PI*2,travel=Mathf.Lerp(.4f,.54f,(float)random.NextDouble()),spread=Mathf.Lerp(.35f,1.1f,(float)random.NextDouble()),size=Mathf.Lerp(.025f,.065f,(float)random.NextDouble())};
+                    phase=(float)random.NextDouble()*Mathf.PI*2,travel=Mathf.Lerp(.4f,.54f,(float)random.NextDouble()),spread=Mathf.Lerp(.35f,1.1f,(float)random.NextDouble()),size=Mathf.Lerp(.08f,.2f,(float)random.NextDouble())};
             }
             var go=new GameObject("Staggered Dust Stream");go.transform.SetParent(transform,false);
             dust=go.AddComponent<ParticleSystem>();dust.Stop(true,ParticleSystemStopBehavior.StopEmittingAndClear);
